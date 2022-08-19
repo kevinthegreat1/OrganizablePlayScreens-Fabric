@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "organizableplayscreens",
+  "version": "${version}",
+
+  "name": "Organizable Play Screens",
+  "description": "Organize your worlds and servers with folders in the play screens.",
+  "authors": [
+    "Kevinthegreat"
+  ],
+  "contact": {
+    "homepage": "https://github.com/kevinthegreat1/OrganizablePlayScreens-Fabric",
+    "sources": "https://github.com/kevinthegreat1/OrganizablePlayScreens-Fabric",
+    "issues": "https://github.com/kevinthegreat1/OrganizablePlayScreens-Fabric/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens"
+    ]
+  },
+  "mixins": [
+      "organizableplayscreens.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.6",
+    "fabric": "*",
+    "minecraft": "~1.19",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
