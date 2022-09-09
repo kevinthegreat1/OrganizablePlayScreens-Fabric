@@ -1,0 +1,3 @@
+accessWidener v1 named
+accessible  method  net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$ServerEntry <init>  (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;Lnet/minecraft/client/network/ServerInfo;)V
+accessible  method  net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget updateEntries   ()V

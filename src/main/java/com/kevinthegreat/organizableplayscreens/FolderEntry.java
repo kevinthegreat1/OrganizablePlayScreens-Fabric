@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FolderEntry extends MultiplayerServerListWidget.Entry {
@@ -12,14 +13,22 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
     private final String name;
     private final List<MultiplayerServerListWidget.Entry> entries;
 
-    public List<MultiplayerServerListWidget.Entry> getEntries() {
-        return entries;
+    public FolderEntry(String name) {
+        this(name, new ArrayList<>());
     }
 
     public FolderEntry(String name, List<MultiplayerServerListWidget.Entry> entries) {
         this.name = name;
         this.entries = entries;
         minecraftClient = MinecraftClient.getInstance();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<MultiplayerServerListWidget.Entry> getEntries() {
+        return entries;
     }
 
     @Override
