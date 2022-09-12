@@ -1,7 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.EntriesAccessor;
 import com.kevinthegreat.organizableplayscreens.FolderEntry;
+import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.List;
 
 @Mixin(MultiplayerServerListWidget.class)
-public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEntryListWidget<MultiplayerServerListWidget.Entry> implements EntriesAccessor {
+public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEntryListWidget<MultiplayerServerListWidget.Entry> implements MultiplayerServerListWidgetAccessor {
     @Shadow
     @Final
     private MultiplayerScreen screen;
@@ -40,7 +40,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Shadow
     public abstract void updateEntries();
 
-    private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry("root");
+    private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry(screen, null, "root");
     private FolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -55,6 +55,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Override
     public List<MultiplayerServerListWidget.Entry> organizableplayscreens_getCurrentEntries() {
         return organizableplayscreens_currentFolder.getEntries();
+    }
+
+    @Override
+    public boolean organizableplayscreens_isRootFolder() {
+        return organizableplayscreens_currentFolder == organizableplayscreens_rootFolder;
     }
 
     @Override
@@ -103,7 +108,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     folder.getEntries().add(((MultiplayerServerListWidget) ((Object) this)).new ServerEntry(screen, serverInfo));
                 }
             } else {
-                folder.getEntries().add(organizableplayscreens_fromNbt(new FolderEntry(nbtEntry.getString("name")), nbtEntry));
+                folder.getEntries().add(organizableplayscreens_fromNbt(new FolderEntry(screen, folder, nbtEntry.getString("name")), nbtEntry));
             }
         }
         return folder;
