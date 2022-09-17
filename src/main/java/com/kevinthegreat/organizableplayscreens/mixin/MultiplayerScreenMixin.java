@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiplayerScreen.class)
 public abstract class MultiplayerScreenMixin extends Screen implements MultiplayerScreenAccessor {
@@ -79,6 +80,20 @@ public abstract class MultiplayerScreenMixin extends Screen implements Multiplay
     @Override
     public void organizableplayscreens_openFolder(FolderEntry folderEntry) {
         multiplayerServerListWidgetAccessor.organizableplayscreens_setCurrentFolder(folderEntry);
+    }
+
+    @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
+    private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        if (keyCode == 256 && !shouldCloseOnEsc()) {
+            multiplayerServerListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent();
+            cir.setReturnValue(true);
+            cir.cancel();
+        }
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return multiplayerServerListWidgetAccessor.organizableplayscreens_isRootFolder();
     }
 
     @Inject(method = "updateButtonActivationStates", at = @At(value = "RETURN"))
