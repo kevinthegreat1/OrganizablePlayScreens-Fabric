@@ -64,7 +64,14 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
 
     @Override
     public void organizableplayscreens_setCurrentFolder(FolderEntry folderEntry) {
-        this.organizableplayscreens_currentFolder = folderEntry;
+        organizableplayscreens_currentFolder = folderEntry;
+        screen.select(null);
+        updateEntries();
+    }
+
+    @Override
+    public void organizableplayscreens_setCurrentFolderToParent() {
+        organizableplayscreens_setCurrentFolder(organizableplayscreens_currentFolder.getParent());
     }
 
     @Override
@@ -95,6 +102,12 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         } catch (Exception e) {
             OrganizablePlayScreens.LOGGER.error("Couldn't save server and folder list", e);
         }
+    }
+
+    @Override
+    public void organizableplayscreens_updateAndSave(){
+        updateEntries();
+        organizableplayscreens_saveFile();
     }
 
     private FolderEntry organizableplayscreens_fromNbt(FolderEntry folder, NbtCompound nbtCompound) {
