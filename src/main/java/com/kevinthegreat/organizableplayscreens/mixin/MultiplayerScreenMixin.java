@@ -137,6 +137,13 @@ public abstract class MultiplayerScreenMixin extends Screen implements Multiplay
         multiplayerServerListWidgetAccessor.organizableplayscreens_setCurrentFolder(folderEntry);
     }
 
+    @Inject(method = "connect()V", at = @At(value = "RETURN"))
+    private void organizableplayscreens_openFolder(CallbackInfo ci) {
+        if (serverListWidget.getSelectedOrNull() instanceof FolderEntry folderEntry) {
+            multiplayerServerListWidgetAccessor.organizableplayscreens_setCurrentFolder(folderEntry);
+        }
+    }
+
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (keyCode == 256 && !shouldCloseOnEsc()) {
@@ -144,11 +151,6 @@ public abstract class MultiplayerScreenMixin extends Screen implements Multiplay
             cir.setReturnValue(true);
             cir.cancel();
         }
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return multiplayerServerListWidgetAccessor.organizableplayscreens_isRootFolder();
     }
 
     @Inject(method = "updateButtonActivationStates", at = @At(value = "RETURN"))
@@ -163,5 +165,16 @@ public abstract class MultiplayerScreenMixin extends Screen implements Multiplay
             buttonDelete.active = true;
         }
         organizableplayscreens_buttonCancel.setMessage(multiplayerServerListWidgetAccessor.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
+    }
+
+    @Override
+    public void removed() {
+        multiplayerServerListWidgetAccessor.organizableplayscreens_saveFile();
+        super.removed();
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return multiplayerServerListWidgetAccessor.organizableplayscreens_isRootFolder();
     }
 }

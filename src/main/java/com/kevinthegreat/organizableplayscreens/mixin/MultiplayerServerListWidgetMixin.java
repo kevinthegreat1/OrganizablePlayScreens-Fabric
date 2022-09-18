@@ -121,7 +121,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     folder.getEntries().add(((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, serverInfo));
                 }
             } else {
-                folder.getEntries().add(organizableplayscreens_fromNbt(new FolderEntry(screen, folder, nbtEntry.getString("name")), nbtEntry));
+                FolderEntry folderEntry = new FolderEntry(screen, folder, nbtEntry.getString("name"));
+                if (nbtEntry.getBoolean("current")) {
+                    organizableplayscreens_currentFolder = folderEntry;
+                }
+                folder.getEntries().add(organizableplayscreens_fromNbt(folderEntry, nbtEntry));
             }
         }
         return folder;
@@ -136,8 +140,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                 nbtList.add(nbtEntry);
             } else if (entry instanceof FolderEntry folderEntry) {
                 NbtCompound nbtEntry = organizableplayscreens_toNbt(folderEntry);
-                nbtEntry.putString("name", folderEntry.getName());
                 nbtEntry.putBoolean("type", true);
+                if (folderEntry == organizableplayscreens_currentFolder) {
+                    nbtEntry.putBoolean("current", true);
+                }
+                nbtEntry.putString("name", folderEntry.getName());
                 nbtList.add(nbtEntry);
             }
         }
