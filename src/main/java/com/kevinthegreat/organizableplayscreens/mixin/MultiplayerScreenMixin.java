@@ -73,7 +73,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "method_19914", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (serverListWidget.getSelectedOrNull() instanceof FolderEntry folderEntry) {
-            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteFolderWarning", folderEntry.getName()), Text.translatable("organizableplayscreens:folder.deleteFolderButton"), ScreenTexts.CANCEL));
+            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
         }
     }
 
@@ -153,7 +153,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         if (entry instanceof MultiplayerServerListWidget.ServerEntry) {
             buttonJoin.setMessage(Text.translatable("selectServer.select"));
         } else if (entry instanceof FolderEntry) {
-            buttonJoin.setMessage(Text.translatable("organizableplayscreens:selectServer.openFolder"));
+            buttonJoin.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
             buttonJoin.active = true;
             buttonEdit.active = true;
             buttonDelete.active = true;

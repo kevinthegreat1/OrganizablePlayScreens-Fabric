@@ -1,0 +1,9 @@
+{
+    "organizableplayscreens:folder.folder": "Folder",
+    "organizableplayscreens:folder.newFolder": "New Folder",
+    "organizableplayscreens:folder.openFolder": "Open Folder",
+    "organizableplayscreens:folder.edit": "Edit Folder",
+    "organizableplayscreens:folder.enterName": "Folder Name",
+    "organizableplayscreens:folder.deleteFolderQuestion": "Are you sure you want to delete this folder?",
+    "organizableplayscreens:folder.deleteFolderWarning": "'%s' and all contents of the folder will be lost forever! (A long time!)"
+}

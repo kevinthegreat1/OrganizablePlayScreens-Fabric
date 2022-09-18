@@ -11,14 +11,14 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
 public class EditFolderScreen extends Screen {
-    private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:editFolder.name");
+    private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
     private final BooleanConsumer callback;
     private final FolderEntry folderEntry;
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
 
     public EditFolderScreen(BooleanConsumer callback, FolderEntry folderEntry) {
-        super(Text.translatable("organizableplayscreens:editFolder.title"));
+        super(Text.translatable("organizableplayscreens:folder.edit"));
         this.callback = callback;
         this.folderEntry = folderEntry;
     }
@@ -26,7 +26,7 @@ public class EditFolderScreen extends Screen {
     @Override
     protected void init() {
         client.keyboard.setRepeatEvents(true);
-        nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 116, 200, 20, ENTER_FOLDER_NAME_TEXT);
+        nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, ENTER_FOLDER_NAME_TEXT);
         nameField.setMaxLength(128);
         nameField.setTextFieldFocused(true);
         nameField.setText(folderEntry.getName());
@@ -77,7 +77,7 @@ public class EditFolderScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         renderBackground(matrices);
         drawCenteredText(matrices, textRenderer, title, width / 2, 20, 16777215);
-        drawTextWithShadow(matrices, textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 100, 10526880);
+        drawTextWithShadow(matrices, textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 80, 10526880);
         nameField.render(matrices, mouseX, mouseY, delta);
         super.render(matrices, mouseX, mouseY, delta);
     }
