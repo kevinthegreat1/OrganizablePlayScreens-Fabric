@@ -105,7 +105,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public void organizableplayscreens_updateAndSave(){
+    public void organizableplayscreens_updateAndSave() {
         updateEntries();
         organizableplayscreens_saveFile();
     }
@@ -118,7 +118,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             if (!nbtEntry.getBoolean("type")) {
                 if (!nbtEntry.getBoolean("hidden")) {
                     ServerInfo serverInfo = ServerInfo.fromNbt(nbtEntry);
-                    folder.getEntries().add(((MultiplayerServerListWidget) ((Object) this)).new ServerEntry(screen, serverInfo));
+                    folder.getEntries().add(((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, serverInfo));
                 }
             } else {
                 folder.getEntries().add(organizableplayscreens_fromNbt(new FolderEntry(screen, folder, nbtEntry.getString("name")), nbtEntry));

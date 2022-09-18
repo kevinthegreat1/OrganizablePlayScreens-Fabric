@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,21 @@ import java.util.List;
 public class FolderEntry extends MultiplayerServerListWidget.Entry {
     private final MinecraftClient minecraftClient;
     private final MultiplayerScreen screen;
-    private final String name;
+    @NotNull
+    private String name;
     private final FolderEntry parent;
     private final List<MultiplayerServerListWidget.Entry> entries;
     private long time;
 
-    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, String name) {
+    public FolderEntry(MultiplayerScreen screen, FolderEntry parent) {
+        this(screen, parent, "New Folder", new ArrayList<>());
+    }
+
+    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, @NotNull String name) {
         this(screen, parent, name, new ArrayList<>());
     }
 
-    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, String name, List<MultiplayerServerListWidget.Entry> entries) {
+    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, @NotNull String name, List<MultiplayerServerListWidget.Entry> entries) {
         minecraftClient = MinecraftClient.getInstance();
         this.screen = screen;
         this.parent = parent;
@@ -30,8 +36,12 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
         this.entries = entries;
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
     }
 
     public FolderEntry getParent() {
