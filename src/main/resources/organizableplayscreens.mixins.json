@@ -5,7 +5,9 @@
     "compatibilityLevel": "JAVA_17",
     "mixins":             [
     ],
-    "client":             ["MultiplayerScreenMixin", "MultiplayerServerListWidgetMixin"],
+    "client":             [
+        "MultiplayerScreenMixin", "MultiplayerServerListWidgetMixin", "ServerEntryMixin"
+    ],
     "injectors":          {
         "defaultRequire": 1
     }

@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(MultiplayerServerListWidget.class)
@@ -38,7 +39,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     private List<MultiplayerServerListWidget.LanServerEntry> lanServers;
 
     @Shadow
-    public abstract void updateEntries();
+    protected abstract void updateEntries();
 
     private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry(screen, null, "root");
     private FolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
@@ -151,6 +152,14 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         NbtCompound nbtCompound = new NbtCompound();
         nbtCompound.put("entries", nbtList);
         return nbtCompound;
+    }
+
+    @Override
+    public void organizableplayscreens_swapEntries(int i, int j) {
+        Collections.swap(organizableplayscreens_currentFolder.getEntries(), i, j);
+        organizableplayscreens_updateAndSave();
+        setSelected(children().get(j));
+        ensureSelectedEntryVisible();
     }
 
     @Inject(method = "updateEntries", at = @At(value = "HEAD"), cancellable = true)

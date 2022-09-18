@@ -20,4 +20,6 @@ public interface MultiplayerServerListWidgetAccessor {
     void organizableplayscreens_setCurrentFolder(FolderEntry folderEntry);
 
     void organizableplayscreens_setCurrentFolderToParent();
+
+    void organizableplayscreens_swapEntries(int i, int j);
 }
