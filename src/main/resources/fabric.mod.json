@@ -25,6 +25,7 @@
   "mixins": [
       "organizableplayscreens.mixins.json"
   ],
+  "accessWidener": "organizableplayscreens.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.14.6",
