@@ -14,13 +14,15 @@ public class EditFolderScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
     private final BooleanConsumer callback;
     private final FolderEntry folderEntry;
+    private final boolean newFolder;
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
 
-    public EditFolderScreen(BooleanConsumer callback, FolderEntry folderEntry) {
+    public EditFolderScreen(BooleanConsumer callback, FolderEntry folderEntry, boolean newFolder) {
         super(Text.translatable("organizableplayscreens:folder.edit"));
         this.callback = callback;
         this.folderEntry = folderEntry;
+        this.newFolder = newFolder;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class EditFolderScreen extends Screen {
     }
 
     private void updateDoneButton(String text) {
-        doneButton.active = !folderEntry.getName().equals(text);
+        doneButton.active = newFolder || !folderEntry.getName().equals(text);
     }
 
     @Override
