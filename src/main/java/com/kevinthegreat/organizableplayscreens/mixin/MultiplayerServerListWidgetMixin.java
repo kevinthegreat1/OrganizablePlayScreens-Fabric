@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,8 +41,10 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
 
     @Shadow
     protected abstract void updateEntries();
+    @NotNull
 
     private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry(screen, null, "root");
+    @NotNull
     private FolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -64,15 +67,21 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public void organizableplayscreens_setCurrentFolder(FolderEntry folderEntry) {
+    public void organizableplayscreens_setCurrentFolder(@NotNull FolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
         screen.select(null);
         updateEntries();
     }
 
     @Override
-    public void organizableplayscreens_setCurrentFolderToParent() {
-        organizableplayscreens_setCurrentFolder(organizableplayscreens_currentFolder.getParent());
+    public boolean organizableplayscreens_setCurrentFolderToParent() {
+        if (organizableplayscreens_currentFolder != organizableplayscreens_rootFolder) {
+            FolderEntry oldCurrentFolder = organizableplayscreens_currentFolder;
+            organizableplayscreens_setCurrentFolder(organizableplayscreens_currentFolder.getParent());
+            screen.select(oldCurrentFolder);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -168,6 +177,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         children().addAll(organizableplayscreens_currentFolder.getEntries());
         children().add(scanningEntry);
         children().addAll(lanServers);
+        if (getSelectedOrNull() == null) {
+            setScrollAmount(0);
+        }
         ci.cancel();
     }
 }

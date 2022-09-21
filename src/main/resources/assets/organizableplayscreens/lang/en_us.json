@@ -4,6 +4,8 @@
     "organizableplayscreens:folder.openFolder": "Open Folder",
     "organizableplayscreens:folder.edit": "Edit Folder",
     "organizableplayscreens:folder.enterName": "Folder Name",
+    "organizableplayscreens:folder.moveBack": "Move the selected entry back to the previous folder.",
+    "organizableplayscreens:folder.moveInto": "Move the selected entry into this folder.",
     "organizableplayscreens:folder.deleteFolderQuestion": "Are you sure you want to delete this folder?",
     "organizableplayscreens:folder.deleteFolderWarning": "'%s' and all contents of the folder will be lost forever! (A long time!)"
 }

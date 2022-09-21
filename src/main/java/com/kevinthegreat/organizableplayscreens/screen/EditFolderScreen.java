@@ -9,6 +9,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 public class EditFolderScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
@@ -46,7 +47,7 @@ public class EditFolderScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (!doneButton.active || getFocused() != nameField || keyCode != 257 && keyCode != 335) {
+        if (!doneButton.active || getFocused() != nameField || keyCode != GLFW.GLFW_KEY_ENTER && keyCode != GLFW.GLFW_KEY_KP_ENTER) {
             return super.keyPressed(keyCode, scanCode, modifiers);
         } else {
             saveAndClose();
