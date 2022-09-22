@@ -96,11 +96,11 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 16777215);
-        client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 8421504);
+        client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
+        client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
         if (client.options.getTouchscreen().getValue() || hovered) {
             RenderSystem.setShaderTexture(0, SERVER_SELECTION_TEXTURE);
-            DrawableHelper.fill(matrices, x, y, x + 32, y + 32, -1601138544);
+            DrawableHelper.fill(matrices, x, y, x + 32, y + 32, 0xa0909090);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1, 1, 1, 1);
             int o = mouseX - x;
