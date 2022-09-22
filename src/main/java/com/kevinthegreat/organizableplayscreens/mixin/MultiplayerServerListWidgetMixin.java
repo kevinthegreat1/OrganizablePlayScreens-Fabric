@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,11 +42,13 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
 
     @Shadow
     protected abstract void updateEntries();
+
     @NotNull
 
     private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry(screen, null, "root");
     @NotNull
     private FolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
+    private String organizableplayscreens_currentPath;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
         super(minecraftClient, i, j, k, l, m);
@@ -64,6 +67,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Override
     public boolean organizableplayscreens_isRootFolder() {
         return organizableplayscreens_currentFolder == organizableplayscreens_rootFolder;
+    }
+
+    @Override
+    public String organizableplayscreens_getCurrentPath() {
+        return organizableplayscreens_currentPath;
     }
 
     @Override
@@ -180,6 +188,18 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         if (getSelectedOrNull() == null) {
             setScrollAmount(0);
         }
+        organizableplayscreens_updateCurrentPath();
         ci.cancel();
+    }
+
+    private void organizableplayscreens_updateCurrentPath() {
+        List<String> path = new ArrayList<>();
+        FolderEntry folder = organizableplayscreens_currentFolder;
+        while (folder.getParent() != null) {
+            path.add(folder.getName());
+            folder = folder.getParent();
+        }
+        Collections.reverse(path);
+        organizableplayscreens_currentPath = String.join(" > ", path);
     }
 }

@@ -17,6 +17,8 @@ public interface MultiplayerServerListWidgetAccessor {
 
     boolean organizableplayscreens_isRootFolder();
 
+    String organizableplayscreens_getCurrentPath();
+
     void organizableplayscreens_setCurrentFolder(FolderEntry folderEntry);
 
     boolean organizableplayscreens_setCurrentFolderToParent();
