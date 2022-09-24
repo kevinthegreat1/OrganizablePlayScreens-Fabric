@@ -20,28 +20,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FolderEntry extends MultiplayerServerListWidget.Entry {
+public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry {
     private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
     private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
     private final MinecraftClient client;
     private final MultiplayerScreen screen;
     @NotNull
     private String name;
-    private FolderEntry parent;
+    private MultiplayerFolderEntry parent;
     @NotNull
     private final List<MultiplayerServerListWidget.Entry> entries;
     private final ButtonWidget buttonMoveInto;
     private long time;
 
-    public FolderEntry(MultiplayerScreen screen, FolderEntry parent) {
+    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent) {
         this(screen, parent, I18n.translate("organizableplayscreens:folder.newFolder"), new ArrayList<>());
     }
 
-    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, @NotNull String name) {
+    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent, @NotNull String name) {
         this(screen, parent, name, new ArrayList<>());
     }
 
-    public FolderEntry(MultiplayerScreen screen, FolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
+    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
         client = MinecraftClient.getInstance();
         this.screen = screen;
         this.parent = parent;
@@ -50,7 +50,7 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
         buttonMoveInto = new ButtonWidget(0, 0, 20, 20, Text.of("+"), button -> {
             MultiplayerServerListWidget.Entry entry = screen.serverListWidget.getSelectedOrNull();
             if (entry != null) {
-                if (entry instanceof FolderEntry folderEntry) {
+                if (entry instanceof MultiplayerFolderEntry folderEntry) {
                     folderEntry.parent = this;
                 }
                 entries.add(entry);
@@ -82,11 +82,11 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
         this.name = name;
     }
 
-    public FolderEntry getParent() {
+    public MultiplayerFolderEntry getParent() {
         return parent;
     }
 
-    public void setParent(FolderEntry parent) {
+    public void setParent(MultiplayerFolderEntry parent) {
         this.parent = parent;
     }
 
@@ -181,7 +181,7 @@ public class FolderEntry extends MultiplayerServerListWidget.Entry {
         ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_swapEntries(i, j);
     }
 
-    public void updateButtonActivationStates() {
+    public void updateButtonStates() {
         MultiplayerServerListWidget.Entry entry = screen.serverListWidget.getSelectedOrNull();
         buttonMoveInto.active = entry != null && entry != this;
     }

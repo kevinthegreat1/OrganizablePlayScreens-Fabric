@@ -11,7 +11,7 @@ public interface MultiplayerServerListWidgetAccessor {
 
     void organizableplayscreens_updateAndSave();
 
-    FolderEntry organizableplayscreens_getCurrentFolder();
+    MultiplayerFolderEntry organizableplayscreens_getCurrentFolder();
 
     List<MultiplayerServerListWidget.Entry> organizableplayscreens_getCurrentEntries();
 
@@ -19,7 +19,7 @@ public interface MultiplayerServerListWidgetAccessor {
 
     String organizableplayscreens_getCurrentPath();
 
-    void organizableplayscreens_setCurrentFolder(FolderEntry folderEntry);
+    void organizableplayscreens_setCurrentFolder(MultiplayerFolderEntry folderEntry);
 
     boolean organizableplayscreens_setCurrentFolderToParent();
 

@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.FolderEntry;
+import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import net.minecraft.client.MinecraftClient;
@@ -44,10 +44,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     protected abstract void updateEntries();
 
     @NotNull
-
-    private final FolderEntry organizableplayscreens_rootFolder = new FolderEntry(screen, null, "root");
+    private final MultiplayerFolderEntry organizableplayscreens_rootFolder = new MultiplayerFolderEntry(screen, null, "root");
     @NotNull
-    private FolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
+    private MultiplayerFolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
     private String organizableplayscreens_currentPath;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -55,7 +54,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public FolderEntry organizableplayscreens_getCurrentFolder() {
+    public MultiplayerFolderEntry organizableplayscreens_getCurrentFolder() {
         return organizableplayscreens_currentFolder;
     }
 
@@ -75,7 +74,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public void organizableplayscreens_setCurrentFolder(@NotNull FolderEntry folderEntry) {
+    public void organizableplayscreens_setCurrentFolder(@NotNull MultiplayerFolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
         screen.select(null);
         updateEntries();
@@ -128,7 +127,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         organizableplayscreens_saveFile();
     }
 
-    private FolderEntry organizableplayscreens_fromNbt(FolderEntry folder, NbtCompound nbtCompound) {
+    private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound) {
         NbtList nbtList = nbtCompound.getList("entries", 10);
         folder.getEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
@@ -139,24 +138,24 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     folder.getEntries().add(((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, serverInfo));
                 }
             } else {
-                FolderEntry folderEntry = new FolderEntry(screen, folder, nbtEntry.getString("name"));
+                MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
                 if (nbtEntry.getBoolean("current")) {
                     organizableplayscreens_currentFolder = folderEntry;
                 }
-                folder.getEntries().add(organizableplayscreens_fromNbt(folderEntry, nbtEntry));
+                organizableplayscreens_fromNbt(folderEntry, nbtEntry);
+                folder.getEntries().add(folderEntry);
             }
         }
-        return folder;
     }
 
-    private NbtCompound organizableplayscreens_toNbt(FolderEntry folder) {
+    private NbtCompound organizableplayscreens_toNbt(MultiplayerFolderEntry folder) {
         NbtList nbtList = new NbtList();
         for (MultiplayerServerListWidget.Entry entry : folder.getEntries()) {
             if (entry instanceof MultiplayerServerListWidget.ServerEntry serverEntry) {
                 NbtCompound nbtEntry = serverEntry.getServer().toNbt();
                 nbtEntry.putBoolean("hidden", false);
                 nbtList.add(nbtEntry);
-            } else if (entry instanceof FolderEntry folderEntry) {
+            } else if (entry instanceof MultiplayerFolderEntry folderEntry) {
                 NbtCompound nbtEntry = organizableplayscreens_toNbt(folderEntry);
                 nbtEntry.putBoolean("type", true);
                 if (folderEntry == organizableplayscreens_currentFolder) {
@@ -194,7 +193,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
 
     private void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
-        FolderEntry folder = organizableplayscreens_currentFolder;
+        MultiplayerFolderEntry folder = organizableplayscreens_currentFolder;
         while (folder.getParent() != null) {
             path.add(folder.getName());
             folder = folder.getParent();

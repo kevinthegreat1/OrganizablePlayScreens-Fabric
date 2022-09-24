@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.screen;
 
-import com.kevinthegreat.organizableplayscreens.FolderEntry;
+import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,12 +14,12 @@ import org.lwjgl.glfw.GLFW;
 public class EditFolderScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
     private final BooleanConsumer callback;
-    private final FolderEntry folderEntry;
+    private final MultiplayerFolderEntry folderEntry;
     private final boolean newFolder;
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
 
-    public EditFolderScreen(BooleanConsumer callback, FolderEntry folderEntry, boolean newFolder) {
+    public EditFolderScreen(BooleanConsumer callback, MultiplayerFolderEntry folderEntry, boolean newFolder) {
         super(Text.translatable("organizableplayscreens:folder.edit"));
         this.callback = callback;
         this.folderEntry = folderEntry;

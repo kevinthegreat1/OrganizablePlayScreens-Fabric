@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.FolderEntry;
+import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.screen.EditFolderScreen;
 import net.minecraft.client.gui.Drawable;
@@ -31,7 +31,8 @@ import java.util.function.Consumer;
 @Mixin(MultiplayerScreen.class)
 public abstract class MultiplayerScreenMixin extends Screen {
     @Shadow
-    private ServerInfo selectedEntry;
+    @Final
+    private Screen parent;
     @Shadow
     public MultiplayerServerListWidget serverListWidget;
     @Shadow
@@ -40,18 +41,17 @@ public abstract class MultiplayerScreenMixin extends Screen {
     private ButtonWidget buttonEdit;
     @Shadow
     private ButtonWidget buttonDelete;
+    @Shadow
+    private ServerInfo selectedEntry;
 
     @Shadow
     public abstract void select(MultiplayerServerListWidget.Entry entry);
 
-    @Shadow
-    @Final
-    private Screen parent;
     public MultiplayerServerListWidgetAccessor serverListWidgetAccessor;
     private ButtonWidget organizableplayscreens_buttonCancel;
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
     @Nullable
-    private FolderEntry organizableplayscreens_newFolder;
+    private MultiplayerFolderEntry organizableplayscreens_newFolder;
 
     protected MultiplayerScreenMixin(Text title) {
         super(title);
@@ -74,8 +74,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
             if (!serverListWidgetAccessor.organizableplayscreens_isRootFolder()) {
                 MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
                 if (entry != null) {
-                    FolderEntry parentFolder = serverListWidgetAccessor.organizableplayscreens_getCurrentFolder().getParent();
-                    if (entry instanceof FolderEntry folderEntry) {
+                    MultiplayerFolderEntry parentFolder = serverListWidgetAccessor.organizableplayscreens_getCurrentFolder().getParent();
+                    if (entry instanceof MultiplayerFolderEntry folderEntry) {
                         folderEntry.setParent(parentFolder);
                     }
                     parentFolder.getEntries().add(entry);
@@ -99,7 +99,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
             }
         }));
         addDrawableChild(new ButtonWidget(width - 28, 8, 20, 20, Text.of("+"), buttonWidget -> {
-            organizableplayscreens_newFolder = new FolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
+            organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             select(organizableplayscreens_newFolder);
         }));
@@ -107,14 +107,14 @@ public abstract class MultiplayerScreenMixin extends Screen {
 
     @Inject(method = "method_19915", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
-        if (serverListWidget.getSelectedOrNull() instanceof FolderEntry folderEntry) {
+        if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_editFolder, folderEntry, false));
         }
     }
 
     @Inject(method = "method_19914", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
-        if (serverListWidget.getSelectedOrNull() instanceof FolderEntry folderEntry) {
+        if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
             client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
         }
     }
@@ -148,7 +148,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     private void organizableplayscreens_deleteFolder(boolean confirmedAction) {
         if (confirmedAction) {
             serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
-            serverListWidget.setSelected(null);
+            select(null);
             serverListWidgetAccessor.organizableplayscreens_updateAndSave();
         }
         client.setScreen(this);
@@ -174,7 +174,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
 
     @Inject(method = "connect()V", at = @At(value = "RETURN"))
     private void organizableplayscreens_openFolder(CallbackInfo ci) {
-        if (serverListWidget.getSelectedOrNull() instanceof FolderEntry folderEntry) {
+        if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
             serverListWidgetAccessor.organizableplayscreens_setCurrentFolder(folderEntry);
         }
     }
@@ -197,17 +197,17 @@ public abstract class MultiplayerScreenMixin extends Screen {
         MultiplayerServerListWidget.Entry selectedEntry = serverListWidget.getSelectedOrNull();
         if (selectedEntry instanceof MultiplayerServerListWidget.ServerEntry) {
             buttonJoin.setMessage(Text.translatable("selectServer.select"));
-        } else if (selectedEntry instanceof FolderEntry) {
+        } else if (selectedEntry instanceof MultiplayerFolderEntry) {
             buttonJoin.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
             buttonJoin.active = true;
             buttonEdit.active = true;
             buttonDelete.active = true;
         }
         organizableplayscreens_buttonCancel.setMessage(serverListWidgetAccessor.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
-        organizableplayscreens_buttonMoveEntryBack.active = !serverListWidgetAccessor.organizableplayscreens_isRootFolder() && serverListWidget.getSelectedOrNull() != null;
+        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !serverListWidgetAccessor.organizableplayscreens_isRootFolder();
         for (MultiplayerServerListWidget.Entry entry : serverListWidgetAccessor.organizableplayscreens_getCurrentEntries()) {
-            if (entry instanceof FolderEntry folderEntry) {
-                folderEntry.updateButtonActivationStates();
+            if (entry instanceof MultiplayerFolderEntry folderEntry) {
+                folderEntry.updateButtonStates();
             }
         }
     }
