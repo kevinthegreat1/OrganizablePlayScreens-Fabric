@@ -2,6 +2,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.screen.EditFolderScreen;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -25,8 +26,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.function.Consumer;
 
 @Mixin(MultiplayerScreen.class)
 public abstract class MultiplayerScreenMixin extends Screen {
@@ -83,21 +82,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
                     serverListWidgetAccessor.organizableplayscreens_updateAndSave();
                 }
             }
-        }, new ButtonWidget.TooltipSupplier() {
-            private static final Text MOVE_ENTRY_BACK_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveBack");
-
-            @Override
-            public void onTooltip(ButtonWidget button, MatrixStack matrices, int mouseX, int mouseY) {
-                if (button.isHovered()) {
-                    renderOrderedTooltip(matrices, textRenderer.wrapLines(MOVE_ENTRY_BACK_TOOLTIP, width / 2), mouseX, mouseY);
-                }
-            }
-
-            @Override
-            public void supply(Consumer<Text> consumer) {
-                consumer.accept(MOVE_ENTRY_BACK_TOOLTIP);
-            }
-        }));
+        }, OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER));
         addDrawableChild(new ButtonWidget(width - 28, 8, 20, 20, Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
@@ -115,7 +100,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "method_19914", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
-            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
+            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteMultiplayerFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
         }
     }
 

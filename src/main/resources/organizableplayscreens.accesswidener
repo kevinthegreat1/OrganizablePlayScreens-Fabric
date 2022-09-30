@@ -1,4 +1,10 @@
 accessWidener v1 named
+# Singleplayer
+accessible  field   net/minecraft/client/gui/screen/world/SelectWorldScreen levelList   Lnet/minecraft/client/gui/screen/world/WorldListWidget;
+accessible  field   net/minecraft/client/gui/screen/world/WorldListWidget$WorldEntry    level   Lnet/minecraft/world/level/storage/LevelSummary;
+accessible  method  net/minecraft/world/level/storage/SaveVersionInfo   <init>  (IJLjava/lang/String;ILjava/lang/String;Z)V
+
+# Multiplayer
 accessible  field   net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen   serverListWidget    Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;
 accessible  method  net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$ServerEntry <init>  (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;Lnet/minecraft/client/network/ServerInfo;)V
 accessible  method  net/minecraft/client/gui/widget/EntryListWidget ensureSelectedEntryVisible  ()V

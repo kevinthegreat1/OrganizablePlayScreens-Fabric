@@ -1,29 +1,21 @@
 package com.kevinthegreat.organizableplayscreens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry {
-    private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
-    private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
-    private final MinecraftClient client;
+public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry implements Mutable<String> {
     private final MultiplayerScreen screen;
     @NotNull
     private String name;
@@ -42,7 +34,6 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry {
     }
 
     public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
-        client = MinecraftClient.getInstance();
         this.screen = screen;
         this.parent = parent;
         this.name = name;
@@ -57,28 +48,20 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry {
                 ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().remove(entry);
                 ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_updateAndSave();
             }
-        }, new ButtonWidget.TooltipSupplier() {
-            private static final Text MOVE_ENTRY_INTO_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveInto");
-
-            @Override
-            public void onTooltip(ButtonWidget button, MatrixStack matrices, int mouseX, int mouseY) {
-                if (button.isHovered()) {
-                    screen.renderOrderedTooltip(matrices, MinecraftClient.getInstance().textRenderer.wrapLines(MOVE_ENTRY_INTO_TOOLTIP, screen.width / 2), mouseX, mouseY);
-                }
-            }
-
-            @Override
-            public void supply(Consumer<Text> consumer) {
-                consumer.accept(MOVE_ENTRY_INTO_TOOLTIP);
-            }
-        });
+        }, OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER);
     }
 
     public @NotNull String getName() {
         return name;
     }
 
-    public void setName(@NotNull String name) {
+    @Override
+    public @NotNull String getValue() {
+        return name;
+    }
+
+    @Override
+    public void setValue(@NotNull String name) {
         this.name = name;
     }
 
@@ -96,38 +79,7 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry {
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
-        client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
-        if (client.options.getTouchscreen().getValue() || hovered) {
-            RenderSystem.setShaderTexture(0, SERVER_SELECTION_TEXTURE);
-            DrawableHelper.fill(matrices, x, y, x + 32, y + 32, 0xa0909090);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-            int o = mouseX - x;
-            int p = mouseY - y;
-            if (o < 32 && o > 16) {
-                DrawableHelper.drawTexture(matrices, x, y, 0, 32, 32, 32, 256, 256);
-            } else {
-                DrawableHelper.drawTexture(matrices, x, y, 0, 0, 32, 32, 256, 256);
-            }
-            if (index > 0) {
-                if (o < 16 && p < 16) {
-                    DrawableHelper.drawTexture(matrices, x, y, 96, 32, 32, 32, 256, 256);
-                } else {
-                    DrawableHelper.drawTexture(matrices, x, y, 96, 0, 32, 32, 256, 256);
-                }
-            }
-            if (index < ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size() - 1) {
-                if (o < 16 && p > 16) {
-                    DrawableHelper.drawTexture(matrices, x, y, 64, 32, 32, 32, 256, 256);
-                } else {
-                    DrawableHelper.drawTexture(matrices, x, y, 64, 0, 32, 32, 256, 256);
-                }
-            }
-        }
-        buttonMoveInto.x = x + entryWidth - 30;
-        buttonMoveInto.y = y + 6;
-        buttonMoveInto.render(matrices, mouseX, mouseY, tickDelta);
+        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size(), buttonMoveInto);
     }
 
     @Override

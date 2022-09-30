@@ -83,7 +83,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Override
     public boolean organizableplayscreens_setCurrentFolderToParent() {
         if (organizableplayscreens_currentFolder != organizableplayscreens_rootFolder) {
-            FolderEntry oldCurrentFolder = organizableplayscreens_currentFolder;
+            MultiplayerFolderEntry oldCurrentFolder = organizableplayscreens_currentFolder;
             organizableplayscreens_setCurrentFolder(organizableplayscreens_currentFolder.getParent());
             screen.select(oldCurrentFolder);
             return true;

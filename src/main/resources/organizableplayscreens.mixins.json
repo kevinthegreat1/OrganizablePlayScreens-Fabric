@@ -1,14 +1,18 @@
 {
-    "required":           true,
-    "minVersion":         "0.8",
-    "package":            "com.kevinthegreat.organizableplayscreens.mixin",
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.kevinthegreat.organizableplayscreens.mixin",
     "compatibilityLevel": "JAVA_17",
-    "mixins":             [
+    "mixins": [
     ],
-    "client":             [
-        "MultiplayerScreenMixin", "MultiplayerServerListWidgetMixin", "ServerEntryMixin"
+    "client": [
+        "MultiplayerScreenMixin",
+        "MultiplayerServerListWidgetMixin",
+        "SelectWorldScreenMixin",
+        "ServerEntryMixin",
+        "WorldListWidgetMixin"
     ],
-    "injectors":          {
+    "injectors": {
         "defaultRequire": 1
     }
 }
