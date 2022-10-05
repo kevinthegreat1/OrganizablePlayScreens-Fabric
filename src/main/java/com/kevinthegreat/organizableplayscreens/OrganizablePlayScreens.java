@@ -60,10 +60,22 @@ public class OrganizablePlayScreens implements ModInitializer {
         LOGGER.info(MOD_NAME + " initialized.");
     }
 
+    /**
+     * Sorts a list of {@link WorldListWidget.WorldEntry} with {@link net.minecraft.world.level.storage.LevelSummary#compareTo(net.minecraft.world.level.storage.LevelSummary)}.
+     *
+     * @param worldEntries The list of {@link WorldListWidget.WorldEntry} to sort.
+     */
     public static void sortWorldEntries(List<WorldListWidget.WorldEntry> worldEntries) {
         worldEntries.sort(Comparator.comparing(worldEntry -> worldEntry.level));
     }
 
+    /**
+     * Renders a folder entry with the given parameters.
+     *
+     * @param name           The name of the folder.
+     * @param listSize       The size of the entry list that the folder is in.
+     * @param buttonMoveInto The button to move the selected entry into the folder.
+     */
     protected static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
         client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
         client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);

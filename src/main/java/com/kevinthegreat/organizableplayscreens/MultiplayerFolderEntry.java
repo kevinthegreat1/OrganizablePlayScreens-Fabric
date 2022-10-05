@@ -19,10 +19,22 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
     private final MultiplayerScreen screen;
     @NotNull
     private String name;
+    /**
+     * The parent of this folder.
+     */
     private MultiplayerFolderEntry parent;
+    /**
+     * All entries in this folder.
+     */
     @NotNull
     private final List<MultiplayerServerListWidget.Entry> entries;
+    /**
+     * This button moves the selected entry into this folder.
+     */
     private final ButtonWidget buttonMoveInto;
+    /**
+     * Used to detect double-clicking.
+     */
     private long time;
 
     public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent) {
@@ -82,6 +94,14 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size(), buttonMoveInto);
     }
 
+    /**
+     * Handles key presses for this folder.
+     * <p>
+     * The folder is shifted down or up if {@link GLFW#GLFW_KEY_LEFT_SHIFT} and {@link GLFW#GLFW_KEY_DOWN} or {@link GLFW#GLFW_KEY_UP} are pressed, and it is valid to shift.
+     *
+     * @param keyCode the key code of the key that was pressed
+     * @return whether the key press has been consumed (prevents further processing or not)
+     */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (Screen.hasShiftDown()) {
@@ -97,6 +117,13 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    /**
+     * Handles mouse clicks for this folder.
+     * <p>
+     * First, calls mouse click on {@link #buttonMoveInto}.
+     * Then, checks for click on the open and swap buttons.
+     * Finally, handles double-clicking.
+     */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (buttonMoveInto.mouseClicked(mouseX, mouseY, button)) {
@@ -129,10 +156,20 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         return false;
     }
 
+    /**
+     * Swaps the entries at {@code i} and {@code j} and updates and saves the entries.
+     *
+     * @param i the index of the selected entry
+     * @param j the index of the entry to swap with
+     * @see MultiplayerServerListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
+     */
     private void swapEntries(int i, int j) {
         ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_swapEntries(i, j);
     }
 
+    /**
+     * Updates the activation state of {@link #buttonMoveInto}.
+     */
     public void updateButtonStates() {
         MultiplayerServerListWidget.Entry entry = screen.serverListWidget.getSelectedOrNull();
         buttonMoveInto.active = entry != null && entry != this;

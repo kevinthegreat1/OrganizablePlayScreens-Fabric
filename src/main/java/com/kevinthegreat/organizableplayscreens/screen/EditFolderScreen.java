@@ -13,8 +13,20 @@ import org.lwjgl.glfw.GLFW;
 
 public class EditFolderScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
+    /**
+     * This is called when this screen should be closed.
+     * <p>
+     * Calling this with true will save the folder name.
+     * Calling this with false will not change anything.
+     */
     private final BooleanConsumer callback;
+    /**
+     * The name string to be edited.
+     */
     private final Mutable<String> folderName;
+    /**
+     * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
+     */
     private final boolean newFolder;
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
@@ -45,6 +57,13 @@ public class EditFolderScreen extends Screen {
         nameField.tick();
     }
 
+    /**
+     * Handles key presses for the screen. Saves and closes the screen if the done button is active, the name text field is not focused, and {@link GLFW#GLFW_KEY_ENTER} or {@link GLFW#GLFW_KEY_KP_ENTER} is pressed.
+     *
+     * @param keyCode the key code of the key that was pressed
+     * @return whether the key press has been consumed or not (prevents further processing or not)
+     * @see #saveAndClose()
+     */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!doneButton.active || getFocused() != nameField || keyCode != GLFW.GLFW_KEY_ENTER && keyCode != GLFW.GLFW_KEY_KP_ENTER) {
@@ -55,6 +74,9 @@ public class EditFolderScreen extends Screen {
         }
     }
 
+    /**
+     * Saves the name in the text field when reinitializing the screen.
+     */
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         String folderName = nameField.getText();
@@ -62,6 +84,9 @@ public class EditFolderScreen extends Screen {
         nameField.setText(folderName);
     }
 
+    /**
+     * Sets the name to the folder and calls the callback with true.
+     */
     private void saveAndClose() {
         folderName.setValue(nameField.getText());
         callback.accept(true);
@@ -72,6 +97,11 @@ public class EditFolderScreen extends Screen {
         client.keyboard.setRepeatEvents(false);
     }
 
+    /**
+     * Activates the done button when creating a new folder or when the name has been edited.
+     *
+     * @param text the text to check for changes
+     */
     private void updateDoneButton(String text) {
         doneButton.active = newFolder || !folderName.getValue().equals(text);
     }

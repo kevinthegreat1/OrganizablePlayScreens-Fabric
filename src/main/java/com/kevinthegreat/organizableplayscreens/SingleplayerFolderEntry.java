@@ -19,12 +19,27 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
     private final SelectWorldScreen screen;
     @NotNull
     private String name;
+    /**
+     * The parent of this folder.
+     */
     private SingleplayerFolderEntry parent;
+    /**
+     * All folder entries in this folder.
+     */
     @NotNull
     private final List<SingleplayerFolderEntry> folderEntries;
+    /**
+     * All world entries in this folder.
+     */
     @NotNull
     private final List<WorldListWidget.WorldEntry> worldEntries;
+    /**
+     * This button moves the selected entry into this folder.
+     */
     private final ButtonWidget buttonMoveInto;
+    /**
+     * Used to detect double-clicking.
+     */
     private long time;
 
     public SingleplayerFolderEntry(SelectWorldScreen screen, SingleplayerFolderEntry parent) {
@@ -93,6 +108,14 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
         OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size(), buttonMoveInto);
     }
 
+    /**
+     * Handles key presses for this folder.
+     * <p>
+     * The folder is opened if the key is {@link GLFW#GLFW_KEY_ENTER}. Then, the folder is shifted down or up if {@link GLFW#GLFW_KEY_LEFT_SHIFT} and {@link GLFW#GLFW_KEY_DOWN} or {@link GLFW#GLFW_KEY_UP} are pressed, and it is valid to shift.
+     *
+     * @param keyCode the key code of the key that was pressed
+     * @return whether the key press has been consumed (prevents further processing or not)
+     */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
@@ -109,6 +132,13 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    /**
+     * Handles mouse clicks for this folder.
+     * <p>
+     * First, calls mouse click on {@link #buttonMoveInto}.
+     * Then, checks for click on the open and swap buttons.
+     * Finally, handles double-clicking.
+     */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (buttonMoveInto.mouseClicked(mouseX, mouseY, button)) {
@@ -141,10 +171,20 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
         return false;
     }
 
+    /**
+     * Swaps the entries at {@code i} and {@code j} and updates and saves the entries.
+     *
+     * @param i the index of the selected entry
+     * @param j the index of the entry to swap with
+     * @see WorldListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
+     */
     private void swapEntries(int i, int j) {
         ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_swapEntries(i, j);
     }
 
+    /**
+     * Updates the activation state of {@link #buttonMoveInto}.
+     */
     public void updateButtonStates() {
         WorldListWidget.Entry entry = screen.levelList.getSelectedOrNull();
         buttonMoveInto.active = entry != null && entry != this;

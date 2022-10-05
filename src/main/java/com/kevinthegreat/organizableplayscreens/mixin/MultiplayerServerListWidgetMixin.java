@@ -43,10 +43,21 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Shadow
     protected abstract void updateEntries();
 
+    /**
+     * The root folder. Should contain all entries.
+     */
     @NotNull
     private final MultiplayerFolderEntry organizableplayscreens_rootFolder = new MultiplayerFolderEntry(screen, null, "root");
+    /**
+     * The current folder. Only entries in this folder will be displayed.
+     */
     @NotNull
     private MultiplayerFolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
+    /**
+     * The path of {@link #organizableplayscreens_currentFolder currentFolder}.
+     * <p>
+     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     */
     private String organizableplayscreens_currentPath;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -73,6 +84,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         return organizableplayscreens_currentPath;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_setCurrentFolder(@NotNull MultiplayerFolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
@@ -80,6 +94,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         updateEntries();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean organizableplayscreens_setCurrentFolderToParent() {
         if (organizableplayscreens_currentFolder != organizableplayscreens_rootFolder) {
@@ -91,6 +108,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_loadFile() {
         try {
@@ -107,6 +127,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_saveFile() {
         try {
@@ -121,12 +144,21 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_updateAndSave() {
         updateEntries();
         organizableplayscreens_saveFile();
     }
 
+    /**
+     * Reads the folders and servers from {@code nbtCompound} and adds them to {@code folder}.
+     *
+     * @param folder      the folder to add the entries to
+     * @param nbtCompound the NBT compound to read from
+     */
     private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound) {
         NbtList nbtList = nbtCompound.getList("entries", 10);
         folder.getEntries().clear();
@@ -148,6 +180,12 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
     }
 
+    /**
+     * Writes the entries in {@code folder} to a NBT compound.
+     *
+     * @param folder the folder to read from
+     * @return the NBT compound with the entries
+     */
     private NbtCompound organizableplayscreens_toNbt(MultiplayerFolderEntry folder) {
         NbtList nbtList = new NbtList();
         for (MultiplayerServerListWidget.Entry entry : folder.getEntries()) {
@@ -170,6 +208,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         return nbtCompound;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_swapEntries(int i, int j) {
         Collections.swap(organizableplayscreens_currentFolder.getEntries(), i, j);
@@ -178,6 +219,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         ensureSelectedEntryVisible();
     }
 
+    /**
+     * Clears the displayed entries and displays all entries in {@link #organizableplayscreens_currentFolder}, {@link #scanningEntry}, and {@link #lanServers}.
+     */
     @Inject(method = "updateEntries", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_updateEntries(CallbackInfo ci) {
         clearEntries();
@@ -191,6 +235,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         ci.cancel();
     }
 
+    /**
+     * Updates the path of {@link #organizableplayscreens_currentFolder currentFolder}.
+     */
     private void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
         MultiplayerFolderEntry folder = organizableplayscreens_currentFolder;

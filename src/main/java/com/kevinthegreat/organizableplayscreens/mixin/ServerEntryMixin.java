@@ -17,11 +17,17 @@ public abstract class ServerEntryMixin {
     @Final
     MultiplayerServerListWidget field_19117;
 
+    /**
+     * Gets the size of our entry list instead of the vanilla one.
+     */
     @Redirect(method = {"render", "keyPressed", "mouseClicked"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/ServerList;size()I"))
     private int organizableplayscreens_size(ServerList instance) {
         return ((MultiplayerServerListWidgetAccessor) field_19117).organizableplayscreens_getCurrentEntries().size();
     }
 
+    /**
+     * Swaps entries with our entry list instead of the vanilla one.
+     */
     @Inject(method = "swapEntries", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_swapEntries(int i, int j, CallbackInfo ci) {
         ((MultiplayerServerListWidgetAccessor) field_19117).organizableplayscreens_swapEntries(i, j);

@@ -49,10 +49,27 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     @Shadow
     public abstract void setSelected(@Nullable WorldListWidget.Entry entry);
 
+    /**
+     * A completable future showing whether folders and worlds have been loaded.
+     */
     private CompletableFuture<Void> organizableplayscreens_loadedFuture;
+    /**
+     * The root folder. Should contain all entries.
+     */
     private final SingleplayerFolderEntry organizableplayscreens_rootFolder = new SingleplayerFolderEntry(parent, null, "root");
+    /**
+     * The current folder. Only entries in this folder will be displayed.
+     */
     private SingleplayerFolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
+    /**
+     * A sorted map of {@link net.minecraft.client.gui.screen.world.WorldListWidget.WorldEntry} to {@link SingleplayerFolderEntry} used for searching worlds and quickly determining which folder a world is in.
+     */
     private final SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_worlds = new TreeMap<>(Comparator.comparing(worldEntry -> worldEntry.level));
+    /**
+     * The path of {@link #organizableplayscreens_currentFolder currentFolder}.
+     * <p>
+     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     */
     private String organizableplayscreens_currentPath;
 
     public WorldListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -88,6 +105,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         return organizableplayscreens_currentPath;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_setCurrentFolder(@NotNull SingleplayerFolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
@@ -95,6 +115,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         organizableplayscreens_updateEntries(parent.getSearchFilter().get());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean organizableplayscreens_setCurrentFolderToParent() {
         if (organizableplayscreens_currentFolder != organizableplayscreens_rootFolder) {
@@ -106,6 +129,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         return false;
     }
 
+    /**
+     * Loads and displays folders and worlds from {@code oldWidget} asynchronously after it finishes loading folders and worlds and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
+     */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int top, int bottom, int itemHeight, Supplier<String> searchFilter, WorldListWidget oldWidget, CallbackInfo ci) {
         showLoadingScreen();
@@ -118,6 +144,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }, client);
     }
 
+    /**
+     * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list asynchronously and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
+     */
     @Inject(method = "loadAndShow", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
     public void organizableplayscreens_loadFile(Supplier<String> searchFilter, CallbackInfo ci) {
         showLoadingScreen();
@@ -133,6 +162,13 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         ci.cancel();
     }
 
+    /**
+     * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list.
+     *
+     * @param searchFilter the search filter to apply when displaying the entries
+     * @param nbtCompound  the NBT compound to read from
+     * @param levels       the level list containing all the {@link LevelSummary}
+     */
     private void organizableplayscreens_fromNbtAndUpdate(Supplier<String> searchFilter, NbtCompound nbtCompound, List<LevelSummary> levels) {
         levels = new ArrayList<>(levels);
         if (nbtCompound != null) {
@@ -147,6 +183,13 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         organizableplayscreens_updateEntries(searchFilter.get());
     }
 
+    /**
+     * Reads the folders and worlds from {@code nbtCompound} and the vanilla level list and adds them to {@code folder}.
+     *
+     * @param folder      the folder to add the entries to
+     * @param nbtCompound the NBT compound to read from
+     * @param levels      the level list containing all the {@link LevelSummary}
+     */
     private void organizableplayscreens_fromNbt(SingleplayerFolderEntry folder, NbtCompound nbtCompound, List<LevelSummary> levels) {
         NbtList nbtList = nbtCompound.getList("entries", 10);
         folder.getWorldEntries().clear();
@@ -172,6 +215,13 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
     }
 
+    /**
+     * Reads the folders and worlds from {@code oldFolder} and adds them to {@code newFolder}.
+     *
+     * @param newFolder        the new folder to add the entries to
+     * @param oldFolder        the old folder to read from
+     * @param oldCurrentFolder the old current folder to set the new current folder
+     */
     private void organizableplayscreens_fromFolder(SingleplayerFolderEntry newFolder, SingleplayerFolderEntry oldFolder, SingleplayerFolderEntry oldCurrentFolder) {
         newFolder.getWorldEntries().clear();
         newFolder.getFolderEntries().clear();
@@ -190,12 +240,18 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_updateAndSave() {
         organizableplayscreens_updateEntries(parent.getSearchFilter().get());
         organizableplayscreens_saveFile();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_saveFile() {
         try {
@@ -210,6 +266,12 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
     }
 
+    /**
+     * Writes the entries in {@code folder} to a NBT compound.
+     *
+     * @param folder the folder to read from
+     * @return the NBT compound with the entries
+     */
     private NbtCompound organizableplayscreens_toNbt(SingleplayerFolderEntry folder) {
         NbtList nbtList = new NbtList();
         for (SingleplayerFolderEntry folderEntry : folder.getFolderEntries()) {
@@ -232,12 +294,21 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         return nbtCompound;
     }
 
+    /**
+     * Handles key presses for the selected entry.
+     *
+     * @param keyCode the key code that was pressed
+     * @return whether the key press has been consumed (prevents further processing or not)
+     */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         WorldListWidget.Entry entry = getSelectedOrNull();
         return entry != null && entry.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void organizableplayscreens_swapEntries(int i, int j) {
         Collections.swap(organizableplayscreens_currentFolder.getFolderEntries(), i, j);
@@ -246,12 +317,18 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         ensureSelectedEntryVisible();
     }
 
+    /**
+     * Filters worlds with specified search string.
+     */
     @Inject(method = "filter", at = @At("HEAD"), cancellable = true)
     private void organizableplayscreens_filter(String search, CallbackInfo ci) {
         organizableplayscreens_updateEntries(search);
         ci.cancel();
     }
 
+    /**
+     * Clears the displayed entries, sets {@link #organizableplayscreens_currentFolder currentFolder} to the folder that the selected entry is in if {@code search} is empty and the selected entry is a world entry, and displays all entries in {@link #organizableplayscreens_currentFolder currentFolder} or all entries in {@link #organizableplayscreens_worlds worlds} with the search filter applied if it is not empty.
+     */
     private void organizableplayscreens_updateEntries(String search) {
         clearEntries();
         if (search.isEmpty()) {
@@ -279,6 +356,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         narrateScreenIfNarrationEnabled();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
         SingleplayerFolderEntry folder;
