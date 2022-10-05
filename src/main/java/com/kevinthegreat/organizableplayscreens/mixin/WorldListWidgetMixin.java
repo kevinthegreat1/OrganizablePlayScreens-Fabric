@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 @Mixin(WorldListWidget.class)
 public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldListWidget.Entry> implements WorldListWidgetAccessor {
@@ -36,6 +35,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     @Shadow
     @Nullable
     private CompletableFuture<List<LevelSummary>> levelsFuture;
+    @Shadow
+    private String search;
 
     @Shadow
     protected abstract boolean shouldShow(String search, LevelSummary summary);
@@ -112,7 +113,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     public void organizableplayscreens_setCurrentFolder(@NotNull SingleplayerFolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
         setSelected(null);
-        organizableplayscreens_updateEntries(parent.getSearchFilter().get());
+        organizableplayscreens_updateEntries();
     }
 
     /**
@@ -133,43 +134,49 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      * Loads and displays folders and worlds from {@code oldWidget} asynchronously after it finishes loading folders and worlds and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
      */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
-    private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int top, int bottom, int itemHeight, Supplier<String> searchFilter, WorldListWidget oldWidget, CallbackInfo ci) {
+    private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int top, int bottom, int itemHeight, String search, WorldListWidget oldWidget, CallbackInfo ci) {
         showLoadingScreen();
         organizableplayscreens_loadedFuture = ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_loadedFuture.thenRunAsync(() -> {
             organizableplayscreens_worlds.clear();
             organizableplayscreens_fromFolder(organizableplayscreens_rootFolder, ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_rootFolder, ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_currentFolder);
             organizableplayscreens_currentPath = ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_currentPath;
-            organizableplayscreens_updateEntries(searchFilter.get());
+            organizableplayscreens_updateEntries();
             setSelected(null);
         }, client);
     }
 
     /**
+     * Loads and displays folders and worlds asynchronously from {@code organizable_worlds.dat} and the vanilla level list during init.
+     */
+    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
+    public void organizableplayscreens_loadFileOnInit(CallbackInfo ci) {
+        organizableplayscreens_loadFile(ci);
+    }
+
+    /**
      * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list asynchronously and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
      */
-    @Inject(method = "loadAndShow", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
-    public void organizableplayscreens_loadFile(Supplier<String> searchFilter, CallbackInfo ci) {
+    @Inject(method = "load", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
+    public void organizableplayscreens_loadFile(CallbackInfo ci) {
         showLoadingScreen();
         organizableplayscreens_rootFolder.getFolderEntries().clear();
         organizableplayscreens_rootFolder.getWorldEntries().clear();
         organizableplayscreens_loadedFuture = levelsFuture.thenAcceptAsync((levels -> {
             try {
-                organizableplayscreens_fromNbtAndUpdate(searchFilter, NbtIo.read(new File(client.runDirectory, "organizable_worlds.dat")), levels);
+                organizableplayscreens_fromNbtAndUpdate(NbtIo.read(new File(client.runDirectory, "organizable_worlds.dat")), levels);
             } catch (Exception e) {
                 OrganizablePlayScreens.LOGGER.error("Couldn't load world and folder list", e);
             }
         }), client);
-        ci.cancel();
     }
 
     /**
      * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list.
      *
-     * @param searchFilter the search filter to apply when displaying the entries
-     * @param nbtCompound  the NBT compound to read from
-     * @param levels       the level list containing all the {@link LevelSummary}
+     * @param nbtCompound the NBT compound to read from
+     * @param levels      the level list containing all the {@link LevelSummary}
      */
-    private void organizableplayscreens_fromNbtAndUpdate(Supplier<String> searchFilter, NbtCompound nbtCompound, List<LevelSummary> levels) {
+    private void organizableplayscreens_fromNbtAndUpdate(NbtCompound nbtCompound, List<LevelSummary> levels) {
         levels = new ArrayList<>(levels);
         if (nbtCompound != null) {
             organizableplayscreens_fromNbt(organizableplayscreens_rootFolder, nbtCompound, levels);
@@ -180,7 +187,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
             organizableplayscreens_currentFolder.getWorldEntries().add(worldEntry);
         }
         OrganizablePlayScreens.sortWorldEntries(organizableplayscreens_currentFolder.getWorldEntries());
-        organizableplayscreens_updateEntries(searchFilter.get());
+        organizableplayscreens_updateEntries();
     }
 
     /**
@@ -245,7 +252,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      */
     @Override
     public void organizableplayscreens_updateAndSave() {
-        organizableplayscreens_updateEntries(parent.getSearchFilter().get());
+        organizableplayscreens_updateEntries();
         organizableplayscreens_saveFile();
     }
 
@@ -307,6 +314,15 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     /**
+     * Updates the displayed entries with specified search string.
+     */
+    @Inject(method = "showSummaries", at = @At("HEAD"), cancellable = true)
+    private void organizableplayscreens_show(String search, List<LevelSummary> summaries, CallbackInfo ci) {
+        organizableplayscreens_updateEntries(search);
+        ci.cancel();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -318,12 +334,10 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     /**
-     * Filters worlds with specified search string.
+     * Updates the displayed entries with the stored search string.
      */
-    @Inject(method = "filter", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_filter(String search, CallbackInfo ci) {
+    private void organizableplayscreens_updateEntries() {
         organizableplayscreens_updateEntries(search);
-        ci.cancel();
     }
 
     /**
@@ -362,7 +376,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     public void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
         SingleplayerFolderEntry folder;
-        if (parent.getSearchFilter().get().isEmpty()) {
+        if (search.isEmpty()) {
             folder = organizableplayscreens_currentFolder;
         } else if (getSelectedOrNull() instanceof WorldListWidget.WorldEntry worldEntry) {
             folder = organizableplayscreens_worlds.get(worldEntry);

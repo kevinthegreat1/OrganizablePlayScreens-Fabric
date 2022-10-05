@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.function.Supplier;
+import java.util.Comparator;
 
 @SuppressWarnings("JavadocReference")
 @Mixin(SelectWorldScreen.class)
@@ -42,10 +42,6 @@ public abstract class SelectWorldScreenMixin extends Screen {
     protected TextFieldWidget searchBox;
     @Shadow
     public WorldListWidget levelList;
-
-    @Shadow
-    public abstract Supplier<String> getSearchFilter();
-
     /**
      * An accessor to access methods in {@link WorldListWidgetMixin}
      */
@@ -261,7 +257,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
             selectButton.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
             recreateButton.active = false;
         }
-        boolean notSearching = getSearchFilter().get().isEmpty();
+        boolean notSearching = searchBox.getText().isEmpty();
         worldListWidgetAccessor.organizableplayscreens_updateCurrentPath();
         searchBox.y = worldListWidgetAccessor.organizableplayscreens_getCurrentPath().isEmpty() ? 22 : 24;
         organizableplayscreens_buttonBack.active = notSearching;
