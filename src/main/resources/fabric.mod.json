@@ -15,6 +15,7 @@
   },
 
   "license": "MIT",
+  "icon": "assets/organizableplayscreens/icon.png",
 
   "environment": "client",
   "entrypoints": {
