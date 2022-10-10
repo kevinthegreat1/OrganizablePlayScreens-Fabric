@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
+import com.kevinthegreat.organizableplayscreens.Compatibility;
 import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
@@ -227,7 +228,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent() && !Compatibility.essential_preventMultiplayerFeatures()) {
             cir.setReturnValue(true);
             cir.cancel();
         }
@@ -248,6 +249,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "updateButtonActivationStates", at = @At(value = "RETURN"))
     private void organizableplayscreens_updateButtonActivationStates(CallbackInfo ci) {
+        if (Compatibility.essential_preventMultiplayerFeatures()) {
+            return;
+        }
         MultiplayerServerListWidget.Entry selectedEntry = serverListWidget.getSelectedOrNull();
         if (selectedEntry instanceof MultiplayerServerListWidget.ServerEntry) {
             buttonJoin.setMessage(Text.translatable("selectServer.select"));

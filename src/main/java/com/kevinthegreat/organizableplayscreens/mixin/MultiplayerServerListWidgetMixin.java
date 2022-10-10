@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
+import com.kevinthegreat.organizableplayscreens.Compatibility;
 import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
@@ -23,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Mixin(MultiplayerServerListWidget.class)
@@ -42,6 +44,8 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
 
     @Shadow
     protected abstract void updateEntries();
+
+    private static final Comparator<MultiplayerServerListWidget.ServerEntry> serverEntryComparator = Comparator.comparing((MultiplayerServerListWidget.ServerEntry entry) -> entry.getServer().address).thenComparing(entry -> entry.getServer().name);
 
     /**
      * The root folder. Should contain all entries.
@@ -115,11 +119,15 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     public void organizableplayscreens_loadFile() {
         try {
             NbtCompound nbtCompound = NbtIo.read(new File(client.runDirectory, "organizable_servers.dat"));
+            List<MultiplayerServerListWidget.ServerEntry> serversSorted = new ArrayList<>(servers);
+            serversSorted.sort(serverEntryComparator);
             if (nbtCompound != null) {
-                organizableplayscreens_fromNbt(organizableplayscreens_rootFolder, nbtCompound);
-            } else {
-                organizableplayscreens_rootFolder.getEntries().clear();
-                organizableplayscreens_rootFolder.getEntries().addAll(servers);
+                organizableplayscreens_fromNbt(organizableplayscreens_rootFolder, nbtCompound, serversSorted);
+            }
+            for (MultiplayerServerListWidget.ServerEntry serverEntry : servers) {
+                if (serversSorted.contains(serverEntry)) {
+                    organizableplayscreens_currentFolder.getEntries().add(serverEntry);
+                }
             }
             updateEntries();
         } catch (Exception e) {
@@ -159,22 +167,24 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      * @param folder      the folder to add the entries to
      * @param nbtCompound the NBT compound to read from
      */
-    private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound) {
+    private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound, List<MultiplayerServerListWidget.ServerEntry> serversSorted) {
         NbtList nbtList = nbtCompound.getList("entries", 10);
         folder.getEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtEntry = nbtList.getCompound(i);
             if (!nbtEntry.getBoolean("type")) {
                 if (!nbtEntry.getBoolean("hidden")) {
-                    ServerInfo serverInfo = ServerInfo.fromNbt(nbtEntry);
-                    folder.getEntries().add(((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, serverInfo));
+                    int index = Collections.binarySearch(serversSorted, ((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
+                    if (index >= 0) {
+                        folder.getEntries().add(serversSorted.remove(index));
+                    }
                 }
             } else {
                 MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
                 if (nbtEntry.getBoolean("current")) {
                     organizableplayscreens_currentFolder = folderEntry;
                 }
-                organizableplayscreens_fromNbt(folderEntry, nbtEntry);
+                organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                 folder.getEntries().add(folderEntry);
             }
         }
@@ -190,7 +200,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         NbtList nbtList = new NbtList();
         for (MultiplayerServerListWidget.Entry entry : folder.getEntries()) {
             if (entry instanceof MultiplayerServerListWidget.ServerEntry serverEntry) {
-                NbtCompound nbtEntry = serverEntry.getServer().toNbt();
+                NbtCompound nbtEntry = new NbtCompound();
+                nbtEntry.putString("ip", serverEntry.getServer().address);
+                nbtEntry.putString("name", serverEntry.getServer().name);
                 nbtEntry.putBoolean("hidden", false);
                 nbtList.add(nbtEntry);
             } else if (entry instanceof MultiplayerFolderEntry folderEntry) {
@@ -224,6 +236,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      */
     @Inject(method = "updateEntries", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_updateEntries(CallbackInfo ci) {
+        if (Compatibility.essential_preventMultiplayerFeatures()) {
+            return;
+        }
         clearEntries();
         children().addAll(organizableplayscreens_currentFolder.getEntries());
         children().add(scanningEntry);
