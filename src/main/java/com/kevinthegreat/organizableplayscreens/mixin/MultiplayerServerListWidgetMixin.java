@@ -45,6 +45,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Shadow
     protected abstract void updateEntries();
 
+    /**
+     * A comparator used to sort and search for server entries by address and then name.
+     */
     private static final Comparator<MultiplayerServerListWidget.ServerEntry> serverEntryComparator = Comparator.comparing((MultiplayerServerListWidget.ServerEntry entry) -> entry.getServer().address).thenComparing(entry -> entry.getServer().name);
 
     /**
@@ -162,7 +165,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     /**
-     * Reads the folders and servers from {@code nbtCompound} and adds them to {@code folder}.
+     * Reads the folders and servers from {@code nbtCompound} and the vanilla server list and adds them to {@code folder}.
      *
      * @param folder      the folder to add the entries to
      * @param nbtCompound the NBT compound to read from

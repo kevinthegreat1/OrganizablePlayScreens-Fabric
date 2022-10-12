@@ -146,7 +146,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     /**
-     * Loads and displays folders and worlds asynchronously from {@code organizable_worlds.dat} and the vanilla level list during init.
+     * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list asynchronously during init and sets {@link #organizableplayscreens_loadedFuture loadedFuture}. The vanilla level list stores the level summaries while {@code organizable_worlds.dat} stores the folder structure.
      */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
     public void organizableplayscreens_loadFileOnInit(CallbackInfo ci) {
@@ -154,7 +154,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     /**
-     * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list asynchronously and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
+     * Loads and displays folders and worlds from {@code organizable_worlds.dat} and the vanilla level list asynchronously and sets {@link #organizableplayscreens_loadedFuture loadedFuture}. The vanilla level list stores the level summaries while {@code organizable_worlds.dat} stores the folder structure.
      */
     @Inject(method = "load", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     public void organizableplayscreens_loadFile(CallbackInfo ci) {

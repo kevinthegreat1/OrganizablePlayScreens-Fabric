@@ -10,7 +10,7 @@ import java.util.List;
 @SuppressWarnings("JavadocReference")
 public interface MultiplayerServerListWidgetAccessor {
     /**
-     * Loads and displays folders and servers from {@code organizable_servers.dat}.
+     * Loads and displays folders and servers from {@code organizable_servers.dat} and the vanilla server list. The vanilla server list stores the server entries while {@code organizable_servers.dat} stores the folder structure.
      */
     void organizableplayscreens_loadFile();
 
