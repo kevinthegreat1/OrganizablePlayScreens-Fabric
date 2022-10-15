@@ -188,6 +188,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
         OrganizablePlayScreens.sortWorldEntries(organizableplayscreens_currentFolder.getWorldEntries());
         organizableplayscreens_updateEntries();
+        setSelected(null);
     }
 
     /**
