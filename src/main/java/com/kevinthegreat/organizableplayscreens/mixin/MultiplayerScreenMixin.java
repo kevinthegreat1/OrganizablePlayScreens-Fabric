@@ -1,10 +1,10 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.Compatibility;
-import com.kevinthegreat.organizableplayscreens.MultiplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.screen.EditFolderScreen;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;

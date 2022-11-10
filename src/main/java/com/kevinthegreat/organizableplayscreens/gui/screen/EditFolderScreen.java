@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens.screen;
+package com.kevinthegreat.organizableplayscreens.gui.screen;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;

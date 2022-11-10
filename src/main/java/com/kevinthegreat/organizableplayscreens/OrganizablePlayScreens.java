@@ -76,7 +76,7 @@ public class OrganizablePlayScreens implements ModInitializer {
      * @param listSize       The size of the entry list that the folder is in.
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
-    protected static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
+    public static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
         client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
         client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
         if (client.options.getTouchscreen().getValue() || hovered) {

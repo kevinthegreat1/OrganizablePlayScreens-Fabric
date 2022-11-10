@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.option.ServerList;
 import org.spongepowered.asm.mixin.Final;

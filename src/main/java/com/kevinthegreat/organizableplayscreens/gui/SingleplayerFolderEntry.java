@@ -1,5 +1,6 @@
-package com.kevinthegreat.organizableplayscreens;
+package com.kevinthegreat.organizableplayscreens.gui;
 
+import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;

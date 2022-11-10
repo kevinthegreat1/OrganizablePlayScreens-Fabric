@@ -1,9 +1,9 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.SingleplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.WorldListWidgetAccessor;
-import com.kevinthegreat.organizableplayscreens.screen.EditFolderScreen;
+import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -25,8 +25,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Comparator;
 
 @SuppressWarnings("JavadocReference")
 @Mixin(SelectWorldScreen.class)
@@ -207,7 +205,8 @@ public abstract class SelectWorldScreenMixin extends Screen {
             worldListWidgetAccessor.organizableplayscreens_getCurrentFolderEntries().remove(folder);
             levelList.setSelected(null);
             worldListWidgetAccessor.organizableplayscreens_updateAndSave();
-        } client.setScreen(this);
+        }
+        client.setScreen(this);
     }
 
     /**

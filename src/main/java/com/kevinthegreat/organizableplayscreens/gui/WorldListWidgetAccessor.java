@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens;
+package com.kevinthegreat.organizableplayscreens.gui;
 
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 
