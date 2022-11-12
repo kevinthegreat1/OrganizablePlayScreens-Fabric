@@ -1,7 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.Compatibility;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;

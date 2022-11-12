@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens;
+package com.kevinthegreat.organizableplayscreens.compatibility;
 
 import gg.essential.api.EssentialAPI;
 import net.fabricmc.loader.api.FabricLoader;
