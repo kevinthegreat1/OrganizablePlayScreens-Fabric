@@ -16,5 +16,8 @@
     "organizableplayscreens:options.moveEntryBackButton": "Move Entry Back Button",
     "organizableplayscreens:options.newFolderButton": "New Folder Button",
     "organizableplayscreens:options.optionsButton": "Options Button",
-    "organizableplayscreens:options.moveEntryIntoButton": "Move Entry Into Button"
+    "organizableplayscreens:options.moveEntryIntoButton": "Move Entry Into Button",
+    "organizableplayscreens:options.buttonType": "Button Type",
+    "organizableplayscreens:options.textField": "Text Field",
+    "organizableplayscreens:options.slider": "Slider"
 }

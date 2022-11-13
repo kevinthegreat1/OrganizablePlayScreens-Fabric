@@ -19,31 +19,34 @@ import net.minecraft.util.Util;
 import java.io.*;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntSupplier;
 
 public class OrganizablePlayScreensOptions {
-    private static final Consumer<Integer> EMPTY_CONSUMER = value -> {
+    private static final Consumer<Integer> EMPTY_INT_CONSUMER = value -> {
     };
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Text X = Text.translatable("organizableplayscreens:options.x");
-    private static final Text Y = Text.translatable("organizableplayscreens:options.y");
+    public static final Text X = Text.translatable("organizableplayscreens:options.x");
+    public static final Text Y = Text.translatable("organizableplayscreens:options.y");
     public static final String[] KEYS = new String[]{"organizableplayscreens:options.backButton", "organizableplayscreens:options.moveEntryBackButton", "organizableplayscreens:options.newFolderButton", "organizableplayscreens:options.optionsButton", "organizableplayscreens:options.moveEntryIntoButton"};
-    private static final SimpleOption.ValueTextGetter<Integer> LEFT_RELATIVE_TEXT_GETTER = (optionText, value) -> GameOptions.getGenericValueText(X, value);
-    private static final SimpleOption.ValueTextGetter<Integer> RIGHT_RELATIVE_TEXT_GETTER = (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelative(value));
-    private static final SimpleOption.ValueTextGetter<Integer> RIGHT_RELATIVE_LIST_WIDGET_TEXT_GETTER = (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelativeListWidget(value));
-    private static final SimpleOption.ValueTextGetter<Integer> TOP_RELATIVE_TEXT_GETTER = (optionText, value) -> GameOptions.getGenericValueText(Y, value);
     private final File optionsFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), OrganizablePlayScreens.MOD_ID + ".json");
-    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), LEFT_RELATIVE_TEXT_GETTER, createLeftRelativeWidthCallbacks(), 8, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), TOP_RELATIVE_TEXT_GETTER, createTopRelativeHeightCallbacks(), 8, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), LEFT_RELATIVE_TEXT_GETTER, createLeftRelativeWidthCallbacks(), 36, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), TOP_RELATIVE_TEXT_GETTER, createTopRelativeHeightCallbacks(), 8, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), RIGHT_RELATIVE_TEXT_GETTER, createRightRelativeWidthCallbacks(), -56, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), TOP_RELATIVE_TEXT_GETTER, createTopRelativeHeightCallbacks(), 8, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), RIGHT_RELATIVE_TEXT_GETTER, createRightRelativeWidthCallbacks(), -28, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), TOP_RELATIVE_TEXT_GETTER, createTopRelativeHeightCallbacks(), 8, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), RIGHT_RELATIVE_LIST_WIDGET_TEXT_GETTER, createRightRelativeListWidgetCallbacks(), -30, EMPTY_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), TOP_RELATIVE_TEXT_GETTER, new SimpleOption.ValidatingIntSliderCallbacks(0, 12), 6, EMPTY_CONSUMER);
+    public final SimpleOption<Boolean> buttonType = new SimpleOption<>("organizableplayscreens:options.buttonType", SimpleOption.emptyTooltip(), (optionText, value) -> Text.translatable(value ? "organizableplayscreens:options.textField" : "organizableplayscreens:options.slider"), SimpleOption.BOOLEAN, false, value -> {
+        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen organizablePlayScreensOptionsScreen) {
+            organizablePlayScreensOptionsScreen.clearAndInit();
+        }
+    });
+    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 36, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -56, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -28, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT_LIST_WIDGET.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT_LIST_WIDGET, buttonType), -30, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(() -> 0, () -> 12, Integer::parseInt, String::valueOf, buttonType), 6, EMPTY_INT_CONSUMER);
     @SuppressWarnings("SuspiciousNameCombination")
-    public final List<List<Pair<String, SimpleOption<?>>>> optionsArray = List.of(List.of(new Pair<>("backButton_x", backButtonX), new Pair<>("backButton_y", backButtonY)), List.of(new Pair<>("moveEntryBackButton_x", moveEntryBackButtonX), new Pair<>("moveEntryBackButton_y", moveEntryBackButtonY)), List.of(new Pair<>("newFolderButton_x", newFolderButtonX), new Pair<>("newFolderButton_y", newFolderButtonY)), List.of(new Pair<>("optionsButton_x", optionsButtonX), new Pair<>("optionsButton_y", optionsButtonY)), List.of(new Pair<>("moveEntryIntoButton_x", moveEntryIntoButtonX), new Pair<>("moveEntryIntoButton_y", moveEntryIntoButtonY)));
+    public final List<List<Pair<String, SimpleOption<?>>>> optionsArray = List.of(List.of(new Pair<>("backButton_x", backButtonX), new Pair<>("backButton_y", backButtonY)), List.of(new Pair<>("moveEntryBackButton_x", moveEntryBackButtonX), new Pair<>("moveEntryBackButton_y", moveEntryBackButtonY)), List.of(new Pair<>("newFolderButton_x", newFolderButtonX), new Pair<>("newFolderButton_y", newFolderButtonY)), List.of(new Pair<>("optionsButton_x", optionsButtonX), new Pair<>("optionsButton_y", optionsButtonY)), List.of(new Pair<>("moveEntryIntoButton_x", moveEntryIntoButtonX), new Pair<>("moveEntryIntoButton_y", moveEntryIntoButtonY)), List.of(new Pair<>("buttonType", buttonType)));
 
     public OrganizablePlayScreensOptions() {
         load();
@@ -69,22 +72,6 @@ public class OrganizablePlayScreensOptions {
             return selectWorldScreen.levelList.getRowRight();
         }
         return screen == null ? Integer.MAX_VALUE - 1 : screen.width * 5 / 6;
-    }
-
-    private MaxSuppliableIntSliderCallbacks createLeftRelativeWidthCallbacks() {
-        return new MaxSuppliableIntSliderCallbacks(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - 20);
-    }
-
-    private MinSuppliableIntSliderCallbacks createRightRelativeWidthCallbacks() {
-        return new MinSuppliableIntSliderCallbacks(() -> MinecraftClient.getInstance().currentScreen == null ? Integer.MIN_VALUE : -MinecraftClient.getInstance().currentScreen.width, -20);
-    }
-
-    private BothSuppliableIntSliderCallbacks createRightRelativeListWidgetCallbacks() {
-        return new BothSuppliableIntSliderCallbacks(() -> -getListWidgetRight(), () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - getListWidgetRight() - 20);
-    }
-
-    private MaxSuppliableIntSliderCallbacks createTopRelativeHeightCallbacks() {
-        return new MaxSuppliableIntSliderCallbacks(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.height - 20);
     }
 
     public void load() {
@@ -163,6 +150,26 @@ public class OrganizablePlayScreensOptions {
 
     public <T> void reset(SimpleOption<T> option) {
         option.setValue(option.defaultValue);
+    }
+
+    public enum ScreenRelativeCallbacks {
+        LEFT(() -> 0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - 20, Integer::parseInt, String::valueOf, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
+        RIGHT(() -> MinecraftClient.getInstance().currentScreen == null ? Integer.MIN_VALUE : -MinecraftClient.getInstance().currentScreen.width, () -> -20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - MinecraftClient.getInstance().currentScreen.width, value -> String.valueOf(fromRightRelative(value)), (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelative(value))),
+        RIGHT_LIST_WIDGET(() -> -getListWidgetRight(), () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - getListWidgetRight() - 20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - getListWidgetRight(), value -> String.valueOf(fromRightRelativeListWidget(value)), (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelativeListWidget(value))),
+        TOP(() -> 0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.height - 20, Integer::parseInt, String::valueOf, (optionText, value) -> GameOptions.getGenericValueText(Y, value));
+        public final IntSupplier minSupplier;
+        public final IntSupplier maxSupplier;
+        public final Function<String, Integer> valueParser;
+        public final Function<Integer, String> valueGetter;
+        public final SimpleOption.ValueTextGetter<Integer> valueTextGetter;
+
+        ScreenRelativeCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> valueParser, Function<Integer, String> valueGetter, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
+            this.minSupplier = minSupplier;
+            this.maxSupplier = maxSupplier;
+            this.valueParser = valueParser;
+            this.valueGetter = valueGetter;
+            this.valueTextGetter = valueTextGetter;
+        }
     }
 }
 

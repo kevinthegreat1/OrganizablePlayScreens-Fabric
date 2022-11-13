@@ -12,4 +12,6 @@ accessible  method  net/minecraft/client/gui/widget/EntryListWidget getRowTop   
 
 # Options
 accessible  field   net/minecraft/client/option/SimpleOption    defaultValue    Ljava/lang/Object;
+accessible  field   net/minecraft/client/option/SimpleOption    textGetter  Ljava/util/function/Function;
+accessible  class   net/minecraft/client/option/SimpleOption$SliderCallbacks
 extendable  class   net/minecraft/client/option/SimpleOption$IntSliderCallbacks
