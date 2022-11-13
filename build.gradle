@@ -21,6 +21,7 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 
+	maven { url "https://maven.terraformersmc.com/releases/" }
     maven { url "https://repo.essential.gg/repository/maven-public/" }
 }
 
@@ -38,6 +39,7 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
+	modApi "com.terraformersmc:modmenu:4.1.0"
 	modImplementation "gg.essential:essential-1.19.2-fabric:5155+gf6c1d3696"
 }
 

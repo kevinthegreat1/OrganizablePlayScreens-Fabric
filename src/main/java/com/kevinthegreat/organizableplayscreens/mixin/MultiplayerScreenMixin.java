@@ -5,6 +5,8 @@ import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
+import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -13,6 +15,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
@@ -80,7 +83,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Adds 'back', 'move entry back', and 'new folder' buttons to the screen.
+     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
@@ -88,12 +91,13 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;updateButtonActivationStates()V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
-        addDrawableChild(new ButtonWidget(8, 8, 20, 20, Text.of("←"), buttonWidget -> {
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        addDrawableChild(new ButtonWidget(options.backButtonX.getValue(), options.backButtonY.getValue(), 20, 20, Text.of("←"), buttonWidget -> {
             if (!serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
             }
         }));
-        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(new ButtonWidget(36, 8, 20, 20, Text.of("←+"), buttonWidget -> {
+        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(new ButtonWidget(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20, Text.of("←+"), buttonWidget -> {
             if (!serverListWidgetAccessor.organizableplayscreens_isRootFolder()) {
                 MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
                 if (entry != null) {
@@ -107,11 +111,12 @@ public abstract class MultiplayerScreenMixin extends Screen {
                 }
             }
         }, OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER));
-        addDrawableChild(new ButtonWidget(width - 28, 8, 20, 20, Text.of("+"), buttonWidget -> {
+        addDrawableChild(new ButtonWidget(options.getNewFolderButtonX(), options.newFolderButtonY.getValue(), 20, 20, Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             select(organizableplayscreens_newFolder);
         }));
+        addDrawableChild(new TexturedButtonWidget(options.getOptionsButtonX(), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
     /**

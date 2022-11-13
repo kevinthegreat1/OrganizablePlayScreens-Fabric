@@ -106,7 +106,7 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size(), buttonMoveInto);
+        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size(), buttonMoveInto);
     }
 
     /**

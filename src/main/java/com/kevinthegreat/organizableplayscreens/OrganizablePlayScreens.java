@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
+import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
@@ -23,7 +24,8 @@ public class OrganizablePlayScreens implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
-    private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
+    private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/textures/server_selection.png");
+    public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier("organizableplayscreens:textures/gui/options_button.png");
     public static final ButtonWidget.TooltipSupplier MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER = new ButtonWidget.TooltipSupplier() {
         private static final Text MOVE_ENTRY_INTO_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveInto");
 
@@ -54,6 +56,17 @@ public class OrganizablePlayScreens implements ModInitializer {
             consumer.accept(MOVE_ENTRY_BACK_TOOLTIP);
         }
     };
+    private static OrganizablePlayScreens instance;
+    public final OrganizablePlayScreensOptions options;
+
+    public OrganizablePlayScreens() {
+        instance = this;
+        options = new OrganizablePlayScreensOptions();
+    }
+
+    public static OrganizablePlayScreens getInstance() {
+        return instance;
+    }
 
     @Override
     public void onInitialize() {
@@ -76,7 +89,7 @@ public class OrganizablePlayScreens implements ModInitializer {
      * @param listSize       The size of the entry list that the folder is in.
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
-    public static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
+    public static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
         client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
         client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
         if (client.options.getTouchscreen().getValue() || hovered) {
@@ -106,8 +119,9 @@ public class OrganizablePlayScreens implements ModInitializer {
                 }
             }
         }
-        buttonMoveInto.x = x + entryWidth - 30;
-        buttonMoveInto.y = y + 6;
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        buttonMoveInto.x = options.getMoveEntryIntoButtonX();
+        buttonMoveInto.y = y + options.moveEntryIntoButtonY.getValue();
         buttonMoveInto.render(matrices, mouseX, mouseY, tickDelta);
     }
 }

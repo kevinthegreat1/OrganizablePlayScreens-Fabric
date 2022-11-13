@@ -21,6 +21,9 @@
   "entrypoints": {
     "main": [
       "com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens"
+    ],
+    "modmenu": [
+      "com.kevinthegreat.organizableplayscreens.compatibility.ModMenuCompat"
     ]
   },
   "mixins": [

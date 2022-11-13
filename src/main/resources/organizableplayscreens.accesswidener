@@ -9,3 +9,7 @@ accessible  field   net/minecraft/client/gui/screen/multiplayer/MultiplayerScree
 accessible  method  net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$ServerEntry <init>  (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;Lnet/minecraft/client/network/ServerInfo;)V
 accessible  method  net/minecraft/client/gui/widget/EntryListWidget ensureSelectedEntryVisible  ()V
 accessible  method  net/minecraft/client/gui/widget/EntryListWidget getRowTop   (I)I
+
+# Options
+accessible  field   net/minecraft/client/option/SimpleOption    defaultValue    Ljava/lang/Object;
+extendable  class   net/minecraft/client/option/SimpleOption$IntSliderCallbacks

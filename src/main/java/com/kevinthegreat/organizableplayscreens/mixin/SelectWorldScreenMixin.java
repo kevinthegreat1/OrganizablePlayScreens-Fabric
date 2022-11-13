@@ -4,6 +4,8 @@ import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
+import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -13,6 +15,7 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -79,7 +82,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Adds 'back', 'move entry back', and 'new folder' buttons to the screen.
+     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
@@ -87,12 +90,13 @@ public abstract class SelectWorldScreenMixin extends Screen {
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Z)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
-        organizableplayscreens_buttonBack = addDrawableChild(new ButtonWidget(8, 8, 20, 20, Text.of("←"), buttonWidget -> {
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        organizableplayscreens_buttonBack = addDrawableChild(new ButtonWidget(options.backButtonX.getValue(), options.backButtonY.getValue(), 20, 20, Text.of("←"), buttonWidget -> {
             if (!worldListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
             }
         }));
-        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(new ButtonWidget(36, 8, 20, 20, Text.of("←+"), buttonWidget -> {
+        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(new ButtonWidget(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20, Text.of("←+"), buttonWidget -> {
             if (!worldListWidgetAccessor.organizableplayscreens_isRootFolder()) {
                 WorldListWidget.Entry entry = levelList.getSelectedOrNull();
                 SingleplayerFolderEntry parentFolder = worldListWidgetAccessor.organizableplayscreens_getCurrentFolder().getParent();
@@ -110,11 +114,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 worldListWidgetAccessor.organizableplayscreens_updateAndSave();
             }
         }, OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER));
-        organizableplayscreens_buttonNewFolder = addDrawableChild(new ButtonWidget(width - 28, 8, 20, 20, Text.of("+"), buttonWidget -> {
+        organizableplayscreens_buttonNewFolder = addDrawableChild(new ButtonWidget(options.getNewFolderButtonX(), options.newFolderButtonY.getValue(), 20, 20, Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new SingleplayerFolderEntry((SelectWorldScreen) (Object) this, worldListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             levelList.setSelected(organizableplayscreens_newFolder);
         }));
+        addDrawableChild(new TexturedButtonWidget(options.getOptionsButtonX(), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
     /**
