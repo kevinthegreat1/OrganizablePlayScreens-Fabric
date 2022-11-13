@@ -8,7 +8,11 @@ import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
+
+import java.util.List;
 
 public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     private final OrganizablePlayScreensOptions options;
@@ -26,12 +30,12 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     protected void init() {
         super.init();
         int i = 0;
-        for (SimpleOption<?>[] optionRow : options.asArray()) {
+        for (List<Pair<String, SimpleOption<?>>> optionRow : options.optionsArray) {
             int j = 0;
-            int y = height / 6 + i * 38;
-            for (SimpleOption<?> option : optionRow) {
+            int y = height / 6 - 1 + i * 36;
+            for (Pair<String, SimpleOption<?>> namedOption : optionRow) {
                 int x = width / 2 - 155 + j * 135;
-                addDrawableChild(option.createButton(gameOptions, x, y, 125));
+                addDrawableChild(namedOption.getRight().createButton(gameOptions, x, y, 125));
                 j++;
             }
             addDrawableChild(new ButtonWidget(width / 2 - 155 + j * 135, y, 40, 20, Text.translatable("controls.reset"), (buttonWidget) -> {
@@ -40,6 +44,10 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
             }));
             i++;
         }
+        addDrawableChild(new ButtonWidget(width / 2 - 100, height - 28, 200, 20, ScreenTexts.DONE, (buttonWidget) -> {
+            options.save();
+            client.setScreen(parent);
+        }));
     }
 
     @Override
@@ -49,8 +57,13 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
             drawCenteredText(matrices, textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
-            i += 38;
+            i += 36;
         }
         super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void removed() {
+        options.save();
     }
 }
