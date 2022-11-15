@@ -10,7 +10,7 @@ public class OptionIntTextFieldWidgetImpl extends OptionTextFieldWidgetImpl<Inte
 
     @Override
     public @NotNull String getValueString() {
-        return ((BothSuppliableIntSliderCallbacks) callbacks).valueGetter().apply(option.getValue());
+        return String.valueOf(((BothSuppliableIntSliderCallbacks) callbacks).valueGetter().apply(option.getValue()));
     }
 
     @Override

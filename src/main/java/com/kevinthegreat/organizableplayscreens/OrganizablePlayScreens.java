@@ -120,7 +120,7 @@ public class OrganizablePlayScreens implements ModInitializer {
             }
         }
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        buttonMoveInto.x = options.getMoveEntryIntoButtonX();
+        buttonMoveInto.x = options.getValue(options.moveEntryIntoButtonX);
         buttonMoveInto.y = y + options.moveEntryIntoButtonY.getValue();
         buttonMoveInto.render(matrices, mouseX, mouseY, tickDelta);
     }

@@ -111,12 +111,12 @@ public abstract class MultiplayerScreenMixin extends Screen {
                 }
             }
         }, OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER));
-        addDrawableChild(new ButtonWidget(options.getNewFolderButtonX(), options.newFolderButtonY.getValue(), 20, 20, Text.of("+"), buttonWidget -> {
+        addDrawableChild(new ButtonWidget(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20, Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             select(organizableplayscreens_newFolder);
         }));
-        addDrawableChild(new TexturedButtonWidget(options.getOptionsButtonX(), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
+        addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
     /**
