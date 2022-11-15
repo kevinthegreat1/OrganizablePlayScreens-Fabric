@@ -14,7 +14,7 @@
     "issues": "https://github.com/kevinthegreat1/OrganizablePlayScreens-Fabric/issues"
   },
 
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "icon": "assets/organizableplayscreens/icon.png",
 
   "environment": "client",
