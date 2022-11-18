@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
+import com.google.common.collect.ImmutableList;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.MinecraftClient;
@@ -22,6 +23,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     private static final Text X_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.X, Text.of(""));
     private static final Text Y_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.Y, Text.of(""));
     private final OrganizablePlayScreensOptions options;
+    private List<ButtonWidget> resetButtons;
 
     public OrganizablePlayScreensOptionsScreen(Screen parent) {
         super(parent, MinecraftClient.getInstance().options, Text.translatable("organizableplayscreens:options.title"));
@@ -36,6 +38,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     protected void init() {
         super.init();
         int i = 0;
+        ImmutableList.Builder<ButtonWidget> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
         for (List<Pair<String, SimpleOption<?>>> optionRow : options.optionsArray) {
             int j = 0;
             int y = height / 6 - 1 + i * 36;
@@ -44,19 +47,23 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
                 addDrawableChild(namedOption.getRight().createButton(gameOptions, x, y, 125));
                 j++;
             }
-            addDrawableChild(new ButtonWidget(width / 2 - 155 + j * 135, y, 40, 20, Text.translatable("controls.reset"), (buttonWidget) -> {
+            ButtonWidget resetButton = new ButtonWidget(width / 2 - 155 + j * 135, y, 40, 20, Text.translatable("controls.reset"), (buttonWidget) -> {
                 options.reset(optionRow);
                 clearAndInit();
-            }));
+            });
+            resetButtonsBuilder.add(resetButton);
+            addDrawableChild(resetButton);
             if (i++ == 4) {
                 break;
             }
         }
+        resetButtons = resetButtonsBuilder.build();
         addDrawableChild(options.buttonType.createButton(gameOptions, width / 2 - 155, height - 28, 150));
         addDrawableChild(new ButtonWidget(width / 2 + 5, height - 28, 150, 20, ScreenTexts.DONE, (buttonWidget) -> {
             options.save();
             client.setScreen(parent);
         }));
+        options.updateResetButtons();
     }
 
     public void clearAndInit() {
@@ -87,5 +94,9 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     @Override
     public void removed() {
         options.save();
+    }
+
+    public void updateResetButton(int resetButtonIndex, boolean active) {
+        resetButtons.get(resetButtonIndex).active = active;
     }
 }

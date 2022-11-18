@@ -18,7 +18,6 @@ import net.minecraft.util.Util;
 
 import java.io.*;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.UnaryOperator;
@@ -28,8 +27,6 @@ import java.util.function.UnaryOperator;
  * The options are serialized and deserialized with Codec and Gson and saved in {@code /config/organizableplayscreens.json}.
  */
 public class OrganizablePlayScreensOptions {
-    private static final Consumer<Integer> EMPTY_INT_CONSUMER = value -> {
-    };
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final Text X = Text.translatable("organizableplayscreens:options.x");
     public static final Text Y = Text.translatable("organizableplayscreens:options.y");
@@ -40,16 +37,16 @@ public class OrganizablePlayScreensOptions {
             organizablePlayScreensOptionsScreen.clearAndInit();
         }
     });
-    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 36, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -56, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -28, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT_LIST_WIDGET.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT_LIST_WIDGET, buttonType), -30, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(0, 12, buttonType), 6, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, value -> updateResetButton(0));
+    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, value -> updateResetButton(0));
+    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 36, value -> updateResetButton(1));
+    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, value -> updateResetButton(1));
+    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -56, value -> updateResetButton(2));
+    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, value -> updateResetButton(2));
+    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -28, value -> updateResetButton(3));
+    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, value -> updateResetButton(3));
+    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT_LIST_WIDGET.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT_LIST_WIDGET, buttonType), -30, value -> updateResetButton(4));
+    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(0, 12, buttonType), 6, value -> updateResetButton(4));
     @SuppressWarnings("SuspiciousNameCombination")
     public final List<List<Pair<String, SimpleOption<?>>>> optionsArray = List.of(List.of(new Pair<>("backButton_x", backButtonX), new Pair<>("backButton_y", backButtonY)), List.of(new Pair<>("moveEntryBackButton_x", moveEntryBackButtonX), new Pair<>("moveEntryBackButton_y", moveEntryBackButtonY)), List.of(new Pair<>("newFolderButton_x", newFolderButtonX), new Pair<>("newFolderButton_y", newFolderButtonY)), List.of(new Pair<>("optionsButton_x", optionsButtonX), new Pair<>("optionsButton_y", optionsButtonY)), List.of(new Pair<>("moveEntryIntoButton_x", moveEntryIntoButtonX), new Pair<>("moveEntryIntoButton_y", moveEntryIntoButtonY)), List.of(new Pair<>("buttonType", buttonType)));
 
@@ -183,6 +180,31 @@ public class OrganizablePlayScreensOptions {
      */
     public int getValue(SimpleOption<Integer> option) {
         return option.getCallbacks() instanceof BothSuppliableIntSliderCallbacks suppliableCallbacks ? suppliableCallbacks.displayValueGetter().apply(option.getValue()) : option.getValue();
+    }
+
+    /**
+     * Updates all the reset buttons.
+     *
+     * @see #updateResetButton(int)
+     */
+    public void updateResetButtons() {
+        for (int i = 0; i < 5; i++) {
+            updateResetButton(i);
+        }
+    }
+
+    /**
+     * Updates the reset button for this option.
+     * Activates the reset button if any option in the row is not its default value.
+     * Deactivates the reset button if all options are their default values.
+     *
+     * @param row the row to update
+     */
+    public void updateResetButton(int row) {
+        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
+            List<Pair<String, SimpleOption<?>>> optionRow = optionsArray.get(row);
+            optionsScreen.updateResetButton(row, optionRow.stream().map(Pair::getRight).anyMatch(option -> option.getValue() != option.defaultValue));
+        }
     }
 
     /**
