@@ -15,6 +15,9 @@ import net.minecraft.util.Pair;
 
 import java.util.List;
 
+/**
+ * The options screen for Organizable Play Screens.
+ */
 public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     private static final Text X_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.X, Text.of(""));
     private static final Text Y_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.Y, Text.of(""));

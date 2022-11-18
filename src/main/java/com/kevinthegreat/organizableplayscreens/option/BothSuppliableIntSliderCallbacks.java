@@ -12,6 +12,23 @@ import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.UnaryOperator;
 
+/**
+ * A {@link SimpleOption.IntSliderCallbacks} implementation with suppliable min and max (both inclusive) bounds,
+ * custom value parser and value getter, and the button type to use.
+ *
+ * <p>This can be used to have dynamic lower and upper bounds for an option.
+ * This supports custom display value parser and display value getter
+ * used to parse user inputted string and get display value from option value, respectively.
+ * This supports two button types: slider and text field, both with the same functionality.
+ *
+ * @param minSupplier        supplier for the minimum value of the option
+ * @param maxSupplier        supplier for the maximum value of the option
+ * @param displayValueParser function to parse option value from display value string
+ * @param displayValueGetter function to transform option value to display value
+ * @param buttonType         the type of button that will be created by the option.
+ *                           If the option value is {@code false}, the button will be a slider, and
+ *                           if the option value is {@code true}, the button will be a text field.
+ */
 public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, UnaryOperator<Integer> displayValueGetter, SimpleOption<Boolean> buttonType) implements SimpleOption.IntSliderCallbacks {
     public BothSuppliableIntSliderCallbacks(int minInclusive, int maxInclusive, SimpleOption<Boolean> buttonType) {
         this(() -> minInclusive, () -> maxInclusive, Integer::parseInt, UnaryOperator.identity(), buttonType);

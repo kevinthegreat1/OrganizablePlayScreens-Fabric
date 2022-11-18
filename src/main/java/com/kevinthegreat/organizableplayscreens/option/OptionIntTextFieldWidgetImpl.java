@@ -3,6 +3,11 @@ package com.kevinthegreat.organizableplayscreens.option;
 import net.minecraft.client.option.SimpleOption;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A {@link OptionTextFieldWidgetImpl} implementation for use with integer {@link SimpleOption} and
+ * {@link BothSuppliableIntSliderCallbacks} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
+ */
+@SuppressWarnings("JavadocReference")
 public class OptionIntTextFieldWidgetImpl extends OptionTextFieldWidgetImpl<Integer> {
     public OptionIntTextFieldWidgetImpl(int x, int y, int width, int height, SimpleOption<Integer> option, BothSuppliableIntSliderCallbacks callbacks, SimpleOption.TooltipFactory<Integer> tooltipFactory) {
         super(x, y, width, height, option, callbacks, tooltipFactory);

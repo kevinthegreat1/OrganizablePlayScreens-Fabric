@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * A text field widget for use with {@link SimpleOption} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
+ * @param <N> the type of number for the option
+ */
+@SuppressWarnings("JavadocReference")
 public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFieldWidget implements OrderableTooltip {
     protected final SimpleOption<N> option;
     protected final SimpleOption.SliderCallbacks<N> callbacks;

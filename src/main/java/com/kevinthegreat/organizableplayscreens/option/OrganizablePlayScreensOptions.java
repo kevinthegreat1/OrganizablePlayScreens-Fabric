@@ -23,6 +23,10 @@ import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.UnaryOperator;
 
+/**
+ * Holds all options for Organizable Play Screens.
+ * The options are serialized and deserialized with Codec and Gson and saved in {@code /config/organizableplayscreens.json}.
+ */
 public class OrganizablePlayScreensOptions {
     private static final Consumer<Integer> EMPTY_INT_CONSUMER = value -> {
     };
@@ -53,14 +57,34 @@ public class OrganizablePlayScreensOptions {
         load();
     }
 
+    /**
+     * Calculates display value for a right relative value.
+     *
+     * @param value the right relative value
+     * @return the display value
+     * @see ScreenRelativeCallbacks#RIGHT
+     */
     private static int fromRightRelative(int value) {
         return MinecraftClient.getInstance().currentScreen == null ? 0 : MinecraftClient.getInstance().currentScreen.width + value;
     }
 
+    /**
+     * Calculates display value for a right list widget relative value.
+     *
+     * @param value the right list widget relative value
+     * @return the display value
+     * @see ScreenRelativeCallbacks#RIGHT_LIST_WIDGET
+     */
     private static int fromRightRelativeListWidget(int value) {
         return getListWidgetRight() + value;
     }
 
+    /**
+     * Gets the right of the list widget.
+     *
+     * @return the right of the list widget, or {@code 5/6} of the screen width if the list widget could not be found
+     * @see #fromRightRelativeListWidget(int)
+     */
     private static int getListWidgetRight() {
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
@@ -75,6 +99,9 @@ public class OrganizablePlayScreensOptions {
         return screen == null ? Integer.MAX_VALUE - 1 : screen.width * 5 / 6;
     }
 
+    /**
+     * Loads options from {@code /config/organizable-play-screens.json} with Gson.
+     */
     public void load() {
         if (!optionsFile.exists()) {
             return;
@@ -96,12 +123,22 @@ public class OrganizablePlayScreensOptions {
         }
     }
 
+    /**
+     * Parses an option from a {@link JsonObject} with Codec.
+     *
+     * @param optionsJson the {@link JsonObject} to parse from
+     * @param name        the name of the option
+     * @param option      the option to parse to
+     */
     private <T> void parseOption(JsonObject optionsJson, String name, SimpleOption<T> option) {
         DataResult<T> dataResult = option.getCodec().parse(JsonOps.INSTANCE, optionsJson.get(name));
         dataResult.error().ifPresent(error -> OrganizablePlayScreens.LOGGER.error("Error parsing option value " + optionsJson.get(name) + " for option " + name + ": " + error));
         dataResult.result().ifPresent(option::setValue);
     }
 
+    /**
+     * Saves options to {@code /config/organizable-play-screens.json} with Gson.
+     */
     public void save() {
         JsonObject optionsJson = new JsonObject();
         for (List<Pair<String, SimpleOption<?>>> optionRow : optionsArray) {
@@ -125,35 +162,91 @@ public class OrganizablePlayScreensOptions {
         Util.backupAndReplace(optionsFile, tempFile, backup);
     }
 
+    /**
+     * Saves an option to a {@link JsonObject} with Codec.
+     *
+     * @param optionsJson the {@link JsonObject} to save to
+     * @param name        the name of the option
+     * @param option      the option to save
+     */
     private <T> void saveOption(JsonObject optionsJson, String name, SimpleOption<T> option) {
         DataResult<JsonElement> dataResult = option.getCodec().encodeStart(JsonOps.INSTANCE, option.getValue());
         dataResult.error().ifPresent(error -> OrganizablePlayScreens.LOGGER.error("Error encoding option value " + option.getValue() + " for option " + name + ": " + error));
         dataResult.result().ifPresent(optionJson -> optionsJson.add(name, optionJson));
     }
 
+    /**
+     * Gets the value for an integer {@link SimpleOption}.
+     *
+     * @param option the option to get the value from
+     * @return the value
+     */
     public int getValue(SimpleOption<Integer> option) {
         return option.getCallbacks() instanceof BothSuppliableIntSliderCallbacks suppliableCallbacks ? suppliableCallbacks.displayValueGetter().apply(option.getValue()) : option.getValue();
     }
 
+    /**
+     * Resets a list of options to their default values.
+     *
+     * @param options the options to reset
+     */
     public void reset(List<Pair<String, SimpleOption<?>>> options) {
         for (Pair<String, SimpleOption<?>> option : options) {
             reset(option.getRight());
         }
     }
 
+    /**
+     * Resets an option to its default value.
+     *
+     * @param option the option to reset
+     */
     public <T> void reset(SimpleOption<T> option) {
         option.setValue(option.defaultValue);
     }
 
+    /**
+     * A helper enum for creating {@link BothSuppliableIntSliderCallbacks} for options regarding button locations in screens.
+     * Locations are stored as relative to different parts of the screen to make different screen sizes work.
+     * Buttons need to be 20 by 20 pixels for this to bound values correctly.
+     */
     public enum ScreenRelativeCallbacks {
+        /**
+         * This will store option values relative to the left side of a screen.
+         */
         LEFT(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - 20, X),
+        /**
+         * This will store option values relative to the right side of a screen.
+         */
         RIGHT(() -> MinecraftClient.getInstance().currentScreen == null ? Integer.MIN_VALUE : -MinecraftClient.getInstance().currentScreen.width, -20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - MinecraftClient.getInstance().currentScreen.width, OrganizablePlayScreensOptions::fromRightRelative, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
+        /**
+         * This will store option values relative to the right side of the list widget in a screen.
+         * The right side of list widget will be assumed to be {@code 5/6} of the screen width if a {@link MultiplayerScreen} or a {@link SelectWorldScreen} could not be found.
+         */
         RIGHT_LIST_WIDGET(() -> -getListWidgetRight(), () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - getListWidgetRight() - 20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - getListWidgetRight(), OrganizablePlayScreensOptions::fromRightRelativeListWidget, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
+        /**
+         * This will store option values relative to the top of a screen.
+         */
         TOP(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.height - 20, Y);
+        /**
+         * Supplier for the minimum value of the option.
+         */
         public final IntSupplier minSupplier;
+        /**
+         * Supplier for the maximum value of the option.
+         */
         public final IntSupplier maxSupplier;
+        /**
+         * Function to parse option value from display value string.
+         */
         public final Function<String, Integer> displayValueParser;
+        /**
+         * Function to transform option value to display value.
+         */
         public final UnaryOperator<Integer> displayValueGetter;
+        /**
+         * Getter for the display text of an option value.
+         */
         public final SimpleOption.ValueTextGetter<Integer> displayValueTextGetter;
 
         ScreenRelativeCallbacks(int minInclusive, IntSupplier maxSupplier, Text displayTextPrefix) {
