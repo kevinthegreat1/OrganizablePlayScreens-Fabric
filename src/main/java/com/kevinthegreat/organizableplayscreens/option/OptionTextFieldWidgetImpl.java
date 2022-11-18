@@ -23,24 +23,24 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFi
         setChangedListener(string -> {
             if (string.isEmpty()) {
                 string = "0";
-                setText(getValueString());
+                setText(getDisplayValueString());
             }
-            N value = applyValue(string);
+            N value = parseValue(string);
             if (value.equals(option.getValue())) {
                 return;
             }
             option.setValue(value);
-            setText(getValueString());
+            setText(getDisplayValueString());
             setMessage(option.textGetter.apply(option.getValue()));
         });
-        setText(getValueString());
+        setText(getDisplayValueString());
     }
 
-    public abstract @NotNull String getValueString();
+    public abstract @NotNull String getDisplayValueString();
 
     public abstract boolean isValid(String value);
 
-    public abstract @NotNull N applyValue(String value);
+    public abstract @NotNull N parseValue(String value);
 
     @Override
     public List<OrderedText> getOrderedTooltip() {

@@ -9,8 +9,8 @@ public class OptionIntTextFieldWidgetImpl extends OptionTextFieldWidgetImpl<Inte
     }
 
     @Override
-    public @NotNull String getValueString() {
-        return String.valueOf(((BothSuppliableIntSliderCallbacks) callbacks).valueGetter().apply(option.getValue()));
+    public @NotNull String getDisplayValueString() {
+        return String.valueOf(((BothSuppliableIntSliderCallbacks) callbacks).displayValueGetter().apply(option.getValue()));
     }
 
     @Override
@@ -27,7 +27,7 @@ public class OptionIntTextFieldWidgetImpl extends OptionTextFieldWidgetImpl<Inte
     }
 
     @Override
-    public @NotNull Integer applyValue(String string) {
-        return ((BothSuppliableIntSliderCallbacks) callbacks).valueParser().apply(string);
+    public @NotNull Integer parseValue(String string) {
+        return ((BothSuppliableIntSliderCallbacks) callbacks).displayValueParser().apply(string);
     }
 }

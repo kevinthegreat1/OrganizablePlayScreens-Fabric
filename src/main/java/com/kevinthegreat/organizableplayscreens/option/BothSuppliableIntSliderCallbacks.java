@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 
-public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> valueParser, Function<Integer, Integer> valueGetter, SimpleOption<Boolean> buttonType) implements SimpleOption.IntSliderCallbacks {
+public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, Function<Integer, Integer> displayValueGetter, SimpleOption<Boolean> buttonType) implements SimpleOption.IntSliderCallbacks {
     public BothSuppliableIntSliderCallbacks(int minInclusive, int maxInclusive, SimpleOption<Boolean> buttonType) {
         this(() -> minInclusive, () -> maxInclusive, Integer::parseInt, Function.identity(), buttonType);
     }
 
     public BothSuppliableIntSliderCallbacks(OrganizablePlayScreensOptions.ScreenRelativeCallbacks screenRelativeCallbacks, SimpleOption<Boolean> buttonType) {
-        this(screenRelativeCallbacks.minSupplier, screenRelativeCallbacks.maxSupplier, screenRelativeCallbacks.valueParser, screenRelativeCallbacks.valueGetter, buttonType);
+        this(screenRelativeCallbacks.minSupplier, screenRelativeCallbacks.maxSupplier, screenRelativeCallbacks.displayValueParser, screenRelativeCallbacks.displayValueGetter, buttonType);
     }
 
     @Override

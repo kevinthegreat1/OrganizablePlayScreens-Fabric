@@ -35,16 +35,16 @@ public class OrganizablePlayScreensOptions {
             organizablePlayScreensOptionsScreen.clearAndInit();
         }
     });
-    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 36, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -56, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -28, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT_LIST_WIDGET.valueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT_LIST_WIDGET, buttonType), -30, EMPTY_INT_CONSUMER);
-    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.valueTextGetter, new BothSuppliableIntSliderCallbacks(0, 12, buttonType), 6, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> backButtonY = new SimpleOption<>(KEYS[0] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryBackButtonX = new SimpleOption<>(KEYS[1] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 36, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryBackButtonY = new SimpleOption<>(KEYS[1] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> newFolderButtonX = new SimpleOption<>(KEYS[2] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -56, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> newFolderButtonY = new SimpleOption<>(KEYS[2] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> optionsButtonX = new SimpleOption<>(KEYS[3] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT, buttonType), -28, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> optionsButtonY = new SimpleOption<>(KEYS[3] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.TOP, buttonType), 8, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryIntoButtonX = new SimpleOption<>(KEYS[4] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.RIGHT_LIST_WIDGET.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.RIGHT_LIST_WIDGET, buttonType), -30, EMPTY_INT_CONSUMER);
+    public final SimpleOption<Integer> moveEntryIntoButtonY = new SimpleOption<>(KEYS[4] + ".y", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.TOP.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(0, 12, buttonType), 6, EMPTY_INT_CONSUMER);
     @SuppressWarnings("SuspiciousNameCombination")
     public final List<List<Pair<String, SimpleOption<?>>>> optionsArray = List.of(List.of(new Pair<>("backButton_x", backButtonX), new Pair<>("backButton_y", backButtonY)), List.of(new Pair<>("moveEntryBackButton_x", moveEntryBackButtonX), new Pair<>("moveEntryBackButton_y", moveEntryBackButtonY)), List.of(new Pair<>("newFolderButton_x", newFolderButtonX), new Pair<>("newFolderButton_y", newFolderButtonY)), List.of(new Pair<>("optionsButton_x", optionsButtonX), new Pair<>("optionsButton_y", optionsButtonY)), List.of(new Pair<>("moveEntryIntoButton_x", moveEntryIntoButtonX), new Pair<>("moveEntryIntoButton_y", moveEntryIntoButtonY)), List.of(new Pair<>("buttonType", buttonType)));
 
@@ -131,7 +131,7 @@ public class OrganizablePlayScreensOptions {
     }
 
     public int getValue(SimpleOption<Integer> option) {
-        return option.getCallbacks() instanceof BothSuppliableIntSliderCallbacks suppliableCallbacks ? suppliableCallbacks.valueGetter().apply(option.getValue()) : option.getValue();
+        return option.getCallbacks() instanceof BothSuppliableIntSliderCallbacks suppliableCallbacks ? suppliableCallbacks.displayValueGetter().apply(option.getValue()) : option.getValue();
     }
 
     public void reset(List<Pair<String, SimpleOption<?>>> options) {
@@ -151,24 +151,24 @@ public class OrganizablePlayScreensOptions {
         TOP(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.height - 20, (optionText, value) -> GameOptions.getGenericValueText(Y, value));
         public final IntSupplier minSupplier;
         public final IntSupplier maxSupplier;
-        public final Function<String, Integer> valueParser;
-        public final Function<Integer, Integer> valueGetter;
-        public final SimpleOption.ValueTextGetter<Integer> valueTextGetter;
+        public final Function<String, Integer> displayValueParser;
+        public final Function<Integer, Integer> displayValueGetter;
+        public final SimpleOption.ValueTextGetter<Integer> displayValueTextGetter;
 
-        ScreenRelativeCallbacks(int minInclusive, IntSupplier maxSupplier, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
-            this(() -> minInclusive, maxSupplier, Integer::parseInt, Function.identity(), valueTextGetter);
+        ScreenRelativeCallbacks(int minInclusive, IntSupplier maxSupplier, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
+            this(() -> minInclusive, maxSupplier, Integer::parseInt, Function.identity(), displayValueTextGetter);
         }
 
-        ScreenRelativeCallbacks(IntSupplier minSupplier, int maxInclusive, Function<String, Integer> valueParser, Function<Integer, Integer> valueGetter, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
-            this(minSupplier, () -> maxInclusive, valueParser, valueGetter, valueTextGetter);
+        ScreenRelativeCallbacks(IntSupplier minSupplier, int maxInclusive, Function<String, Integer> displayValueParser, Function<Integer, Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
+            this(minSupplier, () -> maxInclusive, displayValueParser, displayValueGetter, displayValueTextGetter);
         }
 
-        ScreenRelativeCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> valueParser, Function<Integer, Integer> valueGetter, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
+        ScreenRelativeCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, Function<Integer, Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
             this.minSupplier = minSupplier;
             this.maxSupplier = maxSupplier;
-            this.valueParser = valueParser;
-            this.valueGetter = valueGetter;
-            this.valueTextGetter = valueTextGetter;
+            this.displayValueParser = displayValueParser;
+            this.displayValueGetter = displayValueGetter;
+            this.displayValueTextGetter = displayValueTextGetter;
         }
     }
 }
