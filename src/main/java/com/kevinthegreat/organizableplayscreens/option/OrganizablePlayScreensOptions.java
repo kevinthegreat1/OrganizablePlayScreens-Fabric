@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.UnaryOperator;
 
 public class OrganizablePlayScreensOptions {
     private static final Consumer<Integer> EMPTY_INT_CONSUMER = value -> {
@@ -146,29 +147,29 @@ public class OrganizablePlayScreensOptions {
 
     public enum ScreenRelativeCallbacks {
         LEFT(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - 20, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
-        RIGHT(() -> MinecraftClient.getInstance().currentScreen == null ? Integer.MIN_VALUE : -MinecraftClient.getInstance().currentScreen.width, -20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - MinecraftClient.getInstance().currentScreen.width, OrganizablePlayScreensOptions::fromRightRelative, (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelative(value))),
-        RIGHT_LIST_WIDGET(() -> -getListWidgetRight(), () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - getListWidgetRight() - 20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - getListWidgetRight(), OrganizablePlayScreensOptions::fromRightRelativeListWidget, (optionText, value) -> GameOptions.getGenericValueText(X, fromRightRelativeListWidget(value))),
+        RIGHT(() -> MinecraftClient.getInstance().currentScreen == null ? Integer.MIN_VALUE : -MinecraftClient.getInstance().currentScreen.width, -20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - MinecraftClient.getInstance().currentScreen.width, OrganizablePlayScreensOptions::fromRightRelative, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
+        RIGHT_LIST_WIDGET(() -> -getListWidgetRight(), () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.width - getListWidgetRight() - 20, string -> MinecraftClient.getInstance().currentScreen == null ? 0 : Integer.parseInt(string) - getListWidgetRight(), OrganizablePlayScreensOptions::fromRightRelativeListWidget, (optionText, value) -> GameOptions.getGenericValueText(X, value)),
         TOP(0, () -> MinecraftClient.getInstance().currentScreen == null ? Integer.MAX_VALUE - 1 : MinecraftClient.getInstance().currentScreen.height - 20, (optionText, value) -> GameOptions.getGenericValueText(Y, value));
         public final IntSupplier minSupplier;
         public final IntSupplier maxSupplier;
         public final Function<String, Integer> displayValueParser;
-        public final Function<Integer, Integer> displayValueGetter;
+        public final UnaryOperator<Integer> displayValueGetter;
         public final SimpleOption.ValueTextGetter<Integer> displayValueTextGetter;
 
-        ScreenRelativeCallbacks(int minInclusive, IntSupplier maxSupplier, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
-            this(() -> minInclusive, maxSupplier, Integer::parseInt, Function.identity(), displayValueTextGetter);
+        ScreenRelativeCallbacks(int minInclusive, IntSupplier maxSupplier, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
+            this(() -> minInclusive, maxSupplier, Integer::parseInt, UnaryOperator.identity(), valueTextGetter);
         }
 
-        ScreenRelativeCallbacks(IntSupplier minSupplier, int maxInclusive, Function<String, Integer> displayValueParser, Function<Integer, Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
-            this(minSupplier, () -> maxInclusive, displayValueParser, displayValueGetter, displayValueTextGetter);
+        ScreenRelativeCallbacks(IntSupplier minSupplier, int maxInclusive, Function<String, Integer> displayValueParser, UnaryOperator<Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
+            this(minSupplier, () -> maxInclusive, displayValueParser, displayValueGetter, valueTextGetter);
         }
 
-        ScreenRelativeCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, Function<Integer, Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> displayValueTextGetter) {
+        ScreenRelativeCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, UnaryOperator<Integer> displayValueGetter, SimpleOption.ValueTextGetter<Integer> valueTextGetter) {
             this.minSupplier = minSupplier;
             this.maxSupplier = maxSupplier;
             this.displayValueParser = displayValueParser;
             this.displayValueGetter = displayValueGetter;
-            this.displayValueTextGetter = displayValueTextGetter;
+            this.displayValueTextGetter = (optionText, value) -> valueTextGetter.toString(optionText, displayValueGetter.apply(value));
         }
     }
 }
