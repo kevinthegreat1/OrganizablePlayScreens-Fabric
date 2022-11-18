@@ -20,9 +20,21 @@ import java.util.List;
  * The options screen for Organizable Play Screens.
  */
 public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
+    /**
+     * {@code 'X:'} text used in front of text field options.
+     */
     private static final Text X_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.X, Text.of(""));
+    /**
+     * {@code 'Y:'} text used in front of text field options.
+     */
     private static final Text Y_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.Y, Text.of(""));
+    /**
+     * The {@link OrganizablePlayScreensOptions} instance used for loading, storing, and saving the options.
+     */
     private final OrganizablePlayScreensOptions options;
+    /**
+     * The reset buttons ordered by row.
+     */
     private List<ButtonWidget> resetButtons;
 
     public OrganizablePlayScreensOptionsScreen(Screen parent) {
@@ -30,10 +42,24 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         options = OrganizablePlayScreens.getInstance().options;
     }
 
+    /**
+     * Gets the parent screen.
+     * Public for {@link OrganizablePlayScreensOptions} to access potential
+     * {@link net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen MultiplayerScreen} and
+     * {@link net.minecraft.client.gui.screen.world.SelectWorldScreen SelectWorldScreen} instances.
+     *
+     * @return the parent screen
+     */
     public Screen getParent() {
         return parent;
     }
 
+    /**
+     * Initializes the screen.
+     * Creates option buttons and reset buttons row by row.
+     * Adds the reset buttons to {@link #resetButtons}.
+     * Creates button type button and done button at the end.
+     */
     @Override
     protected void init() {
         super.init();
@@ -66,10 +92,25 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         options.updateResetButtons();
     }
 
+    /**
+     * Clears and re-initializes the screen.
+     * Used to replace buttons when option value is reset or when button type is changed.
+     * Overridden to make method public so {@link OrganizablePlayScreensOptions} can call this when changing button type.
+     */
+    @Override
     public void clearAndInit() {
         super.clearAndInit();
     }
 
+    /**
+     * Renders the screen.
+     * Draws the title and option titles. Then, draws the {@code 'X:'} and {@code 'Y:'} text if text fields are being used.
+     * Finally, draws the buttons with {@link Screen#render(MatrixStack, int, int, float) super.render(MatrixStack, int, int, float)}.
+     * @param matrices the matrix stack
+     * @param mouseX the x position of the mouse
+     * @param mouseY the y position of the mouse
+     * @param delta the time between ticks
+     */
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         renderBackground(matrices);
@@ -91,11 +132,20 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
+    /**
+     * Saves the options when closing the screen.
+     */
     @Override
     public void removed() {
         options.save();
     }
 
+    /**
+     * Updates the reset button at the given index with the given state.
+     *
+     * @param resetButtonIndex the index of the reset button to update
+     * @param active           whether the reset button should be active
+     */
     public void updateResetButton(int resetButtonIndex, boolean active) {
         resetButtons.get(resetButtonIndex).active = active;
     }
