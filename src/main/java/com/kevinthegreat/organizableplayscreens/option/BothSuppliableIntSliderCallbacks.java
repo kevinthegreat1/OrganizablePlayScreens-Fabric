@@ -65,7 +65,7 @@ public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSuppl
     @Override
     public Codec<Integer> codec() {
         Function<Integer, DataResult<Integer>> function = value -> {
-            int minInclusive = minSupplier.getAsInt() + 1;
+            int minInclusive = minSupplier.getAsInt();
             int maxInclusive = maxSupplier.getAsInt() + 1;
             if (value.compareTo(minInclusive) >= 0 && value.compareTo(maxInclusive) <= 0) {
                 return DataResult.success(value);
