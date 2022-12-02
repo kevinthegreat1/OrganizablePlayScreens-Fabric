@@ -4,11 +4,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.SimpleOptionAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.util.OrderableTooltip;
-import net.minecraft.text.OrderedText;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * A text field widget for use with {@link SimpleOption} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
@@ -16,7 +12,7 @@ import java.util.List;
  * @param <N> the type of number for the option
  */
 @SuppressWarnings("JavadocReference")
-public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFieldWidget implements OrderableTooltip {
+public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFieldWidget {
     protected final SimpleOption<N> option;
     protected final SimpleOption.SliderCallbacks<N> callbacks;
     protected final SimpleOption.TooltipFactory<N> tooltipFactory;
@@ -39,6 +35,7 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFi
             option.setValue(value);
             setText(getDisplayValueString());
             setMessage(((SimpleOptionAccessor) (Object) option).getTextGetter().apply(option.getValue()));
+            setTooltip(tooltipFactory.apply(option.getValue()));
         });
         setText(getDisplayValueString());
     }
@@ -48,9 +45,4 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFi
     public abstract boolean isValid(String value);
 
     public abstract @NotNull N parseValue(String value);
-
-    @Override
-    public List<OrderedText> getOrderedTooltip() {
-        return tooltipFactory.apply(option.getValue());
-    }
 }

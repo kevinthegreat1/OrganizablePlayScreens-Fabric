@@ -7,6 +7,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class OrganizablePlayScreens implements ModInitializer {
     public static final String MOD_ID = "organizableplayscreens";
@@ -27,36 +27,8 @@ public class OrganizablePlayScreens implements ModInitializer {
     private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
     private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
     public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier("organizableplayscreens:textures/gui/options_button.png");
-    public static final ButtonWidget.TooltipSupplier MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER = new ButtonWidget.TooltipSupplier() {
-        private static final Text MOVE_ENTRY_INTO_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveInto");
-
-        @Override
-        public void onTooltip(ButtonWidget button, MatrixStack matrices, int mouseX, int mouseY) {
-            if (button.isHovered()) {
-                client.currentScreen.renderOrderedTooltip(matrices, client.textRenderer.wrapLines(MOVE_ENTRY_INTO_TOOLTIP, client.currentScreen.width / 2), mouseX, mouseY);
-            }
-        }
-
-        @Override
-        public void supply(Consumer<Text> consumer) {
-            consumer.accept(MOVE_ENTRY_INTO_TOOLTIP);
-        }
-    };
-    public static final ButtonWidget.TooltipSupplier MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER = new ButtonWidget.TooltipSupplier() {
-        private static final Text MOVE_ENTRY_BACK_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveBack");
-
-        @Override
-        public void onTooltip(ButtonWidget button, MatrixStack matrices, int mouseX, int mouseY) {
-            if (button.isHovered()) {
-                client.currentScreen.renderOrderedTooltip(matrices, client.textRenderer.wrapLines(MOVE_ENTRY_BACK_TOOLTIP, client.currentScreen.width / 2), mouseX, mouseY);
-            }
-        }
-
-        @Override
-        public void supply(Consumer<Text> consumer) {
-            consumer.accept(MOVE_ENTRY_BACK_TOOLTIP);
-        }
-    };
+    public static final Tooltip MOVE_ENTRY_INTO_TOOLTIP = Tooltip.of(Text.translatable("organizableplayscreens:folder.moveInto"));
+    public static final Tooltip MOVE_ENTRY_BACK_TOOLTIP = Tooltip.of(Text.translatable("organizableplayscreens:folder.moveBack"));
     private static OrganizablePlayScreens instance;
     public final OrganizablePlayScreensOptions options;
 
@@ -96,7 +68,7 @@ public class OrganizablePlayScreens implements ModInitializer {
         if (client.options.getTouchscreen().getValue() || hovered) {
             RenderSystem.setShaderTexture(0, SERVER_SELECTION_TEXTURE);
             DrawableHelper.fill(matrices, x, y, x + 32, y + 32, 0xa0909090);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.setShaderColor(1, 1, 1, 1);
             int o = mouseX - x;
             int p = mouseY - y;
@@ -121,8 +93,7 @@ public class OrganizablePlayScreens implements ModInitializer {
             }
         }
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        buttonMoveInto.x = options.getValue(options.moveEntryIntoButtonX);
-        buttonMoveInto.y = y + options.moveEntryIntoButtonY.getValue();
+        buttonMoveInto.setPos(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
         buttonMoveInto.render(matrices, mouseX, mouseY, tickDelta);
     }
 }

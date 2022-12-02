@@ -205,7 +205,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtEntry = nbtList.getCompound(i);
             if (!nbtEntry.getBoolean("type")) {
-                int index = Collections.binarySearch(levels, new LevelSummary(null, SaveVersionInfoInvoker.create(0, nbtEntry.getLong("lastPlayed"), null, 0, null, false), nbtEntry.getString("name"), false, false, null));
+                int index = Collections.binarySearch(levels, new LevelSummary(null, SaveVersionInfoInvoker.create(0, nbtEntry.getLong("lastPlayed"), null, 0, null, false), nbtEntry.getString("name"), false, false, false, null));
                 if (index >= 0) {
                     WorldListWidget.WorldEntry worldEntry = ((WorldListWidget) (Object) this).new WorldEntry((WorldListWidget) (Object) this, levels.get(index));
                     organizableplayscreens_worlds.put(worldEntry, folder);

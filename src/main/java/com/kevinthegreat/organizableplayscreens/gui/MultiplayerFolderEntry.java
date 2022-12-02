@@ -53,7 +53,7 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         this.parent = parent;
         this.name = name;
         this.entries = entries;
-        buttonMoveInto = new ButtonWidget(0, 0, 20, 20, Text.of("+"), button -> {
+        buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {
             MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
             MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
             if (entry != null) {
@@ -64,7 +64,7 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
                 ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().remove(entry);
                 ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_updateAndSave();
             }
-        }, OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER);
+        }).width(20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP).build();
     }
 
     public @NotNull String getName() {

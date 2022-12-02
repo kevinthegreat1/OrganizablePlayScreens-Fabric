@@ -8,6 +8,7 @@ import net.minecraft.client.option.SimpleOption;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.UnaryOperator;
@@ -49,11 +50,11 @@ public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSuppl
     }
 
     @Override
-    public Function<SimpleOption<Integer>, ClickableWidget> getButtonCreator(SimpleOption.TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width) {
+    public Function<SimpleOption<Integer>, ClickableWidget> getButtonCreator(SimpleOption.TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
         if (buttonType.getValue()) {
             return option -> new OptionIntTextFieldWidgetImpl(x + 20, y, width - 20, 20, option, this, tooltipFactory);
         } else {
-            return SimpleOption.IntSliderCallbacks.super.getButtonCreator(tooltipFactory, gameOptions, x, y, width);
+            return SimpleOption.IntSliderCallbacks.super.getButtonCreator(tooltipFactory, gameOptions, x, y, width, changeCallback);
         }
     }
 

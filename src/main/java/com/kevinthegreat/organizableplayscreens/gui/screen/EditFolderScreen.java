@@ -40,15 +40,14 @@ public class EditFolderScreen extends Screen {
 
     @Override
     protected void init() {
-        client.keyboard.setRepeatEvents(true);
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, ENTER_FOLDER_NAME_TEXT);
         nameField.setMaxLength(128);
         nameField.setTextFieldFocused(true);
         nameField.setText(folderName.getValue());
         nameField.setChangedListener(this::updateDoneButton);
         addSelectableChild(nameField);
-        doneButton = addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 96 + 12, 200, 20, ScreenTexts.DONE, buttonWidget -> saveAndClose()));
-        addDrawableChild(new ButtonWidget(width / 2 - 100, height / 4 + 120 + 12, 200, 20, ScreenTexts.CANCEL, buttonWidget -> callback.accept(false)));
+        doneButton = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, buttonWidget -> callback.accept(false)).dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
         updateDoneButton(nameField.getText());
     }
 
@@ -90,11 +89,6 @@ public class EditFolderScreen extends Screen {
     private void saveAndClose() {
         folderName.setValue(nameField.getText());
         callback.accept(true);
-    }
-
-    @Override
-    public void removed() {
-        client.keyboard.setRepeatEvents(false);
     }
 
     /**

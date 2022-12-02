@@ -59,7 +59,7 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
         this.name = name;
         this.folderEntries = folderEntries;
         this.worldEntries = worldEntries;
-        buttonMoveInto = new ButtonWidget(0, 0, 20, 20, Text.of("+"), button -> {
+        buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {
             WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
             WorldListWidget.Entry entry = levelList.getSelectedOrNull();
             if (entry instanceof WorldListWidget.WorldEntry worldEntry) {
@@ -74,7 +74,7 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
             }
             levelList.setSelected(null);
             ((WorldListWidgetAccessor) levelList).organizableplayscreens_updateAndSave();
-        }, OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER);
+        }).width(20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP).build();
     }
 
     public @NotNull String getName() {

@@ -73,10 +73,10 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
                 addDrawableChild(namedOption.getRight().createButton(gameOptions, x, y, 125));
                 j++;
             }
-            ButtonWidget resetButton = new ButtonWidget(width / 2 - 155 + j * 135, y, 40, 20, Text.translatable("controls.reset"), (buttonWidget) -> {
+            ButtonWidget resetButton = ButtonWidget.builder(Text.translatable("controls.reset"), (buttonWidget) -> {
                 OrganizablePlayScreensOptions.reset(optionRow);
                 clearAndInit();
-            });
+            }).dimensions(width / 2 - 155 + j * 135, y, 40, 20).build();
             resetButtonsBuilder.add(resetButton);
             addDrawableChild(resetButton);
             if (i++ == 4) {
@@ -85,10 +85,10 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         }
         resetButtons = resetButtonsBuilder.build();
         addDrawableChild(options.buttonType.createButton(gameOptions, width / 2 - 155, height - 28, 150));
-        addDrawableChild(new ButtonWidget(width / 2 + 5, height - 28, 150, 20, ScreenTexts.DONE, (buttonWidget) -> {
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
             options.save();
             client.setScreen(parent);
-        }));
+        }).dimensions(width / 2 + 5, height - 28, 150, 20).build());
         options.updateResetButtons();
     }
 
@@ -106,10 +106,11 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
      * Renders the screen.
      * Draws the title and option titles. Then, draws the {@code 'X:'} and {@code 'Y:'} text if text fields are being used.
      * Finally, draws the buttons with {@link Screen#render(MatrixStack, int, int, float) super.render(MatrixStack, int, int, float)}.
+     *
      * @param matrices the matrix stack
-     * @param mouseX the x position of the mouse
-     * @param mouseY the y position of the mouse
-     * @param delta the time between ticks
+     * @param mouseX   the x position of the mouse
+     * @param mouseY   the y position of the mouse
+     * @param delta    the time between ticks
      */
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {

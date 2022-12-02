@@ -91,12 +91,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Z)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        organizableplayscreens_buttonBack = addDrawableChild(new ButtonWidget(options.backButtonX.getValue(), options.backButtonY.getValue(), 20, 20, Text.of("←"), buttonWidget -> {
+        organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
             if (!worldListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
             }
-        }));
-        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(new ButtonWidget(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20, Text.of("←+"), buttonWidget -> {
+        }).dimensions(options.backButtonX.getValue(), options.backButtonY.getValue(), 20, 20).build());
+        organizableplayscreens_buttonMoveEntryBack = addDrawableChild(ButtonWidget.builder(Text.of("←+"), buttonWidget -> {
             if (!worldListWidgetAccessor.organizableplayscreens_isRootFolder()) {
                 WorldListWidget.Entry entry = levelList.getSelectedOrNull();
                 SingleplayerFolderEntry parentFolder = worldListWidgetAccessor.organizableplayscreens_getCurrentFolder().getParent();
@@ -113,12 +113,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 levelList.setSelected(null);
                 worldListWidgetAccessor.organizableplayscreens_updateAndSave();
             }
-        }, OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP_SUPPLIER));
-        organizableplayscreens_buttonNewFolder = addDrawableChild(new ButtonWidget(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20, Text.of("+"), buttonWidget -> {
+        }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
+        organizableplayscreens_buttonNewFolder = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new SingleplayerFolderEntry((SelectWorldScreen) (Object) this, worldListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             levelList.setSelected(organizableplayscreens_newFolder);
-        }));
+        }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
         addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
@@ -263,7 +263,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
         }
         boolean notSearching = searchBox.getText().isEmpty();
         worldListWidgetAccessor.organizableplayscreens_updateCurrentPath();
-        searchBox.y = worldListWidgetAccessor.organizableplayscreens_getCurrentPath().isEmpty() ? 22 : 24;
+        searchBox.setY(worldListWidgetAccessor.organizableplayscreens_getCurrentPath().isEmpty() ? 22 : 24);
         organizableplayscreens_buttonBack.active = notSearching;
         organizableplayscreens_buttonMoveEntryBack.active = entry != null && !worldListWidgetAccessor.organizableplayscreens_isRootFolder() && notSearching;
         organizableplayscreens_buttonNewFolder.active = notSearching;
