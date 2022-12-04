@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -177,7 +178,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             NbtCompound nbtEntry = nbtList.getCompound(i);
             if (!nbtEntry.getBoolean("type")) {
                 if (!nbtEntry.getBoolean("hidden")) {
-                    int index = Collections.binarySearch(serversSorted, ((MultiplayerServerListWidget) (Object) this).new ServerEntry(screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
+                    int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
                     if (index >= 0) {
                         folder.getEntries().add(serversSorted.remove(index));
                     }
@@ -265,5 +266,14 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
         Collections.reverse(path);
         organizableplayscreens_currentPath = String.join(" > ", path);
+    }
+
+    @Mixin(MultiplayerServerListWidget.ServerEntry.class)
+    public interface ServerEntryInvoker {
+        @SuppressWarnings("unused")
+        @Invoker("<init>")
+        static MultiplayerServerListWidget.ServerEntry create(MultiplayerServerListWidget serverListWidget, MultiplayerScreen screen, ServerInfo server) {
+            throw new IllegalStateException("Mixin invoker failed to apply");
+        }
     }
 }

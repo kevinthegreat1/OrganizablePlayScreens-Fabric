@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
+import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ModInitializer;
@@ -24,7 +25,7 @@ public class OrganizablePlayScreens implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
-    private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/textures/server_selection.png");
+    private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
     public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier("organizableplayscreens:textures/gui/options_button.png");
     public static final ButtonWidget.TooltipSupplier MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER = new ButtonWidget.TooltipSupplier() {
         private static final Text MOVE_ENTRY_INTO_TOOLTIP = Text.translatable("organizableplayscreens:folder.moveInto");
@@ -79,7 +80,7 @@ public class OrganizablePlayScreens implements ModInitializer {
      * @param worldEntries The list of {@link WorldListWidget.WorldEntry} to sort.
      */
     public static void sortWorldEntries(List<WorldListWidget.WorldEntry> worldEntries) {
-        worldEntries.sort(Comparator.comparing(worldEntry -> worldEntry.level));
+        worldEntries.sort(Comparator.comparing(worldEntry -> ((WorldListWidgetMixin.WorldEntryAccessor) worldEntry).getLevel()));
     }
 
     /**

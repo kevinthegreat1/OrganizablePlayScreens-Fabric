@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
+import com.kevinthegreat.organizableplayscreens.mixin.SimpleOptionAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.SimpleOption;
@@ -11,6 +12,7 @@ import java.util.List;
 
 /**
  * A text field widget for use with {@link SimpleOption} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
+ *
  * @param <N> the type of number for the option
  */
 @SuppressWarnings("JavadocReference")
@@ -20,7 +22,7 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFi
     protected final SimpleOption.TooltipFactory<N> tooltipFactory;
 
     public OptionTextFieldWidgetImpl(int x, int y, int width, int height, SimpleOption<N> option, SimpleOption.SliderCallbacks<N> callbacks, SimpleOption.TooltipFactory<N> tooltipFactory) {
-        super(MinecraftClient.getInstance().textRenderer, x, y, width, height, option.textGetter.apply(option.getValue()));
+        super(MinecraftClient.getInstance().textRenderer, x, y, width, height, ((SimpleOptionAccessor) (Object) option).getTextGetter().apply(option.getValue()));
         this.option = option;
         this.callbacks = callbacks;
         this.tooltipFactory = tooltipFactory;
@@ -36,7 +38,7 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFi
             }
             option.setValue(value);
             setText(getDisplayValueString());
-            setMessage(option.textGetter.apply(option.getValue()));
+            setMessage(((SimpleOptionAccessor) (Object) option).getTextGetter().apply(option.getValue()));
         });
         setText(getDisplayValueString());
     }

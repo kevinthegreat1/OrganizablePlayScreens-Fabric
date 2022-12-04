@@ -1,6 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.mixin.EntryListWidgetInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.MultiplayerScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -52,14 +54,15 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         this.name = name;
         this.entries = entries;
         buttonMoveInto = new ButtonWidget(0, 0, 20, 20, Text.of("+"), button -> {
-            MultiplayerServerListWidget.Entry entry = screen.serverListWidget.getSelectedOrNull();
+            MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
+            MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
             if (entry != null) {
                 if (entry instanceof MultiplayerFolderEntry folderEntry) {
                     folderEntry.parent = this;
                 }
                 entries.add(entry);
-                ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().remove(entry);
-                ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_updateAndSave();
+                ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().remove(entry);
+                ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_updateAndSave();
             }
         }, OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER);
     }
@@ -92,7 +95,7 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size(), buttonMoveInto);
+        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) ((MultiplayerScreenAccessor) screen).getServerListWidget()).organizableplayscreens_getCurrentEntries().size(), buttonMoveInto);
     }
 
     /**
@@ -106,11 +109,12 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (Screen.hasShiftDown()) {
-            int i = ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().indexOf(this);
+            MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
+            int i = ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().indexOf(this);
             if (i == -1) {
                 return true;
             }
-            if (keyCode == GLFW.GLFW_KEY_DOWN && i < ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0) {
+            if (keyCode == GLFW.GLFW_KEY_DOWN && i < ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0) {
                 swapEntries(i, keyCode == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
                 return true;
             }
@@ -130,9 +134,10 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
         if (buttonMoveInto.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        int i = ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().indexOf(this);
-        double d = mouseX - (double) screen.serverListWidget.getRowLeft();
-        double e = mouseY - (double) screen.serverListWidget.getRowTop(i);
+        MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
+        int i = ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().indexOf(this);
+        double d = mouseX - (double) serverListWidget.getRowLeft();
+        double e = mouseY - (double) ((EntryListWidgetInvoker) serverListWidget).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
                 screen.select(this);
@@ -143,7 +148,7 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
                 swapEntries(i, i - 1);
                 return true;
             }
-            if (d < 16 && e > 16 && i < ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_getCurrentEntries().size() - 1) {
+            if (d < 16 && e > 16 && i < ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().size() - 1) {
                 swapEntries(i, i + 1);
                 return true;
             }
@@ -165,14 +170,14 @@ public class MultiplayerFolderEntry extends MultiplayerServerListWidget.Entry im
      * @see MultiplayerServerListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
      */
     private void swapEntries(int i, int j) {
-        ((MultiplayerServerListWidgetAccessor) screen.serverListWidget).organizableplayscreens_swapEntries(i, j);
+        ((MultiplayerServerListWidgetAccessor) ((MultiplayerScreenAccessor) screen).getServerListWidget()).organizableplayscreens_swapEntries(i, j);
     }
 
     /**
      * Updates the activation state of {@link #buttonMoveInto}.
      */
     public void updateButtonStates() {
-        MultiplayerServerListWidget.Entry entry = screen.serverListWidget.getSelectedOrNull();
+        MultiplayerServerListWidget.Entry entry = ((MultiplayerScreenAccessor) screen).getServerListWidget().getSelectedOrNull();
         buttonMoveInto.active = entry != null && entry != this;
     }
 

@@ -38,7 +38,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Final
     private Screen parent;
     @Shadow
-    public MultiplayerServerListWidget serverListWidget;
+    protected MultiplayerServerListWidget serverListWidget;
     @Shadow
     private ButtonWidget buttonJoin;
     @Shadow
@@ -194,7 +194,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "addEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_addServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(serverListWidget.new ServerEntry((MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
         serverListWidgetAccessor.organizableplayscreens_updateAndSave();
     }
 
@@ -203,7 +203,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "editEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_editServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().set(serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), serverListWidget.new ServerEntry((MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().set(serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
         serverListWidgetAccessor.organizableplayscreens_updateAndSave();
     }
 

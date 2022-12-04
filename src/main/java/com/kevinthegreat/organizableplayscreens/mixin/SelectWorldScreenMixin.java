@@ -42,7 +42,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Shadow
     protected TextFieldWidget searchBox;
     @Shadow
-    public WorldListWidget levelList;
+    private WorldListWidget levelList;
     /**
      * An accessor to access methods in {@link WorldListWidgetMixin}
      */

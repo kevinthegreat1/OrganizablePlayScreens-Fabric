@@ -3,6 +3,9 @@ package com.kevinthegreat.organizableplayscreens.option;
 import com.google.gson.*;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
+import com.kevinthegreat.organizableplayscreens.mixin.MultiplayerScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.SelectWorldScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.SimpleOptionAccessor;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
@@ -88,10 +91,10 @@ public class OrganizablePlayScreensOptions {
             screen = optionsScreen.getParent();
         }
         if (screen instanceof MultiplayerScreen multiplayerScreen) {
-            return multiplayerScreen.serverListWidget.getRowRight();
+            return ((MultiplayerScreenAccessor) multiplayerScreen).getServerListWidget().getRowRight();
         }
         if (screen instanceof SelectWorldScreen selectWorldScreen) {
-            return selectWorldScreen.levelList.getRowRight();
+            return ((SelectWorldScreenAccessor) selectWorldScreen).getLevelList().getRowRight();
         }
         return screen == null ? Integer.MAX_VALUE - 1 : screen.width * 5 / 6;
     }
@@ -202,9 +205,18 @@ public class OrganizablePlayScreensOptions {
      */
     public void updateResetButton(int row) {
         if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
-            List<Pair<String, SimpleOption<?>>> optionRow = optionsArray.get(row);
-            optionsScreen.updateResetButton(row, optionRow.stream().map(Pair::getRight).anyMatch(option -> option.getValue() != option.defaultValue));
+            optionsScreen.updateResetButton(row, optionsArray.get(row).stream().map(Pair::getRight).anyMatch(OrganizablePlayScreensOptions::notDefault));
         }
+    }
+
+    /**
+     * Checks if an option is not its default value.
+     *
+     * @param option the option to check
+     * @return true if the option is not its default value
+     */
+    public static <T> boolean notDefault(SimpleOption<T> option) {
+        return option.getValue() != ((SimpleOptionAccessor) (Object) option).getDefaultValue();
     }
 
     /**
@@ -212,7 +224,7 @@ public class OrganizablePlayScreensOptions {
      *
      * @param options the options to reset
      */
-    public void reset(List<Pair<String, SimpleOption<?>>> options) {
+    public static void reset(List<Pair<String, SimpleOption<?>>> options) {
         for (Pair<String, SimpleOption<?>> option : options) {
             reset(option.getRight());
         }
@@ -223,8 +235,8 @@ public class OrganizablePlayScreensOptions {
      *
      * @param option the option to reset
      */
-    public <T> void reset(SimpleOption<T> option) {
-        option.setValue(option.defaultValue);
+    public static <T> void reset(SimpleOption<T> option) {
+        option.setValue(((SimpleOptionAccessor) (Object) option).getDefaultValue());
     }
 
     /**

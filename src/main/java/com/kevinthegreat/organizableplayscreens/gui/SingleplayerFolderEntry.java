@@ -1,6 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.mixin.EntryListWidgetInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.SelectWorldScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
@@ -58,19 +60,20 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
         this.folderEntries = folderEntries;
         this.worldEntries = worldEntries;
         buttonMoveInto = new ButtonWidget(0, 0, 20, 20, Text.of("+"), button -> {
-            WorldListWidget.Entry entry = screen.levelList.getSelectedOrNull();
+            WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
+            WorldListWidget.Entry entry = levelList.getSelectedOrNull();
             if (entry instanceof WorldListWidget.WorldEntry worldEntry) {
-                ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getWorlds().put(worldEntry, this);
+                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getWorlds().put(worldEntry, this);
                 worldEntries.add(worldEntry);
                 OrganizablePlayScreens.sortWorldEntries(worldEntries);
-                ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentWorldEntries().remove(worldEntry);
+                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentWorldEntries().remove(worldEntry);
             } else if (entry instanceof SingleplayerFolderEntry folderEntry) {
                 folderEntry.parent = this;
                 folderEntries.add(folderEntry);
-                ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().remove(folderEntry);
+                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentFolderEntries().remove(folderEntry);
             }
-            screen.levelList.setSelected(null);
-            ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_updateAndSave();
+            levelList.setSelected(null);
+            ((WorldListWidgetAccessor) levelList).organizableplayscreens_updateAndSave();
         }, OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP_SUPPLIER);
     }
 
@@ -106,7 +109,7 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
 
     @Override
     public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size(), buttonMoveInto);
+        OrganizablePlayScreens.renderFolderEntry(matrices, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_getCurrentFolderEntries().size(), buttonMoveInto);
     }
 
     /**
@@ -119,13 +122,14 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
      */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            screen.levelList.setSelected(this);
-            ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_setCurrentFolder(this);
+            levelList.setSelected(this);
+            ((WorldListWidgetAccessor) levelList).organizableplayscreens_setCurrentFolder(this);
             return true;
         } else if (Screen.hasShiftDown()) {
-            int i = ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().indexOf(this);
-            if (i != -1 && (keyCode == GLFW.GLFW_KEY_DOWN && i < ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0)) {
+            int i = ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentFolderEntries().indexOf(this);
+            if (i != -1 && (keyCode == GLFW.GLFW_KEY_DOWN && i < ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentFolderEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0)) {
                 swapEntries(i, keyCode == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
             }
             return true;
@@ -142,31 +146,32 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
      */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
         if (buttonMoveInto.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        int i = ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().indexOf(this);
-        double d = mouseX - (double) screen.levelList.getRowLeft();
-        double e = mouseY - (double) screen.levelList.getRowTop(i);
+        int i = ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentFolderEntries().indexOf(this);
+        double d = mouseX - (double) levelList.getRowLeft();
+        double e = mouseY - (double) ((EntryListWidgetInvoker) levelList).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
-                screen.levelList.setSelected(this);
-                ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_setCurrentFolder(this);
+                levelList.setSelected(this);
+                ((WorldListWidgetAccessor) levelList).organizableplayscreens_setCurrentFolder(this);
                 return true;
             }
             if (d < 16 && e < 16 && i > 0) {
                 swapEntries(i, i - 1);
                 return true;
             }
-            if (d < 16 && e > 16 && i < ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_getCurrentFolderEntries().size() - 1) {
+            if (d < 16 && e > 16 && i < ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentFolderEntries().size() - 1) {
                 swapEntries(i, i + 1);
                 return true;
             }
         }
 
-        screen.levelList.setSelected(this);
+        levelList.setSelected(this);
         if (Util.getMeasuringTimeMs() - time < 250) {
-            ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_setCurrentFolder(this);
+            ((WorldListWidgetAccessor) levelList).organizableplayscreens_setCurrentFolder(this);
         }
         time = Util.getMeasuringTimeMs();
         return false;
@@ -180,14 +185,14 @@ public class SingleplayerFolderEntry extends WorldListWidget.Entry implements Mu
      * @see WorldListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
      */
     private void swapEntries(int i, int j) {
-        ((WorldListWidgetAccessor) screen.levelList).organizableplayscreens_swapEntries(i, j);
+        ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_swapEntries(i, j);
     }
 
     /**
      * Updates the activation state of {@link #buttonMoveInto}.
      */
     public void updateButtonStates() {
-        WorldListWidget.Entry entry = screen.levelList.getSelectedOrNull();
+        WorldListWidget.Entry entry = ((SelectWorldScreenAccessor) screen).getLevelList().getSelectedOrNull();
         buttonMoveInto.active = entry != null && entry != this;
     }
 

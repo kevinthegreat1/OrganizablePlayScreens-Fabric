@@ -74,7 +74,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
                 j++;
             }
             ButtonWidget resetButton = new ButtonWidget(width / 2 - 155 + j * 135, y, 40, 20, Text.translatable("controls.reset"), (buttonWidget) -> {
-                options.reset(optionRow);
+                OrganizablePlayScreensOptions.reset(optionRow);
                 clearAndInit();
             });
             resetButtonsBuilder.add(resetButton);

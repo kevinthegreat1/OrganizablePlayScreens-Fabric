@@ -12,13 +12,13 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.storage.LevelSummary;
-import net.minecraft.world.level.storage.SaveVersionInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -65,7 +65,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     /**
      * A sorted map of {@link net.minecraft.client.gui.screen.world.WorldListWidget.WorldEntry} to {@link SingleplayerFolderEntry} used for searching worlds and quickly determining which folder a world is in.
      */
-    private final SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_worlds = new TreeMap<>(Comparator.comparing(worldEntry -> worldEntry.level));
+    private final SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_worlds = new TreeMap<>(Comparator.comparing(worldEntry -> ((WorldEntryAccessor) worldEntry).getLevel()));
     /**
      * The path of {@link #organizableplayscreens_currentFolder currentFolder}.
      * <p>
@@ -205,7 +205,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtEntry = nbtList.getCompound(i);
             if (!nbtEntry.getBoolean("type")) {
-                int index = Collections.binarySearch(levels, new LevelSummary(null, new SaveVersionInfo(0, nbtEntry.getLong("lastPlayed"), null, 0, null, false), nbtEntry.getString("name"), false, false, null));
+                int index = Collections.binarySearch(levels, new LevelSummary(null, SaveVersionInfoInvoker.create(0, nbtEntry.getLong("lastPlayed"), null, 0, null, false), nbtEntry.getString("name"), false, false, null));
                 if (index >= 0) {
                     WorldListWidget.WorldEntry worldEntry = ((WorldListWidget) (Object) this).new WorldEntry((WorldListWidget) (Object) this, levels.get(index));
                     organizableplayscreens_worlds.put(worldEntry, folder);
@@ -234,7 +234,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         newFolder.getWorldEntries().clear();
         newFolder.getFolderEntries().clear();
         for (WorldListWidget.WorldEntry oldWorldEntry : oldFolder.getWorldEntries()) {
-            WorldListWidget.WorldEntry newWorldEntry = ((WorldListWidget) (Object) this).new WorldEntry((WorldListWidget) (Object) this, oldWorldEntry.level);
+            WorldListWidget.WorldEntry newWorldEntry = ((WorldListWidget) (Object) this).new WorldEntry((WorldListWidget) (Object) this, ((WorldEntryAccessor) oldWorldEntry).getLevel());
             organizableplayscreens_worlds.put(newWorldEntry, newFolder);
             newFolder.getWorldEntries().add(newWorldEntry);
         }
@@ -293,8 +293,9 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
         for (WorldListWidget.WorldEntry worldEntry : folder.getWorldEntries()) {
             NbtCompound nbtEntry = new NbtCompound();
-            nbtEntry.putString("name", worldEntry.level.getName());
-            nbtEntry.putLong("lastPlayed", worldEntry.level.getLastPlayed());
+            LevelSummary level = ((WorldEntryAccessor) worldEntry).getLevel();
+            nbtEntry.putString("name", level.getName());
+            nbtEntry.putLong("lastPlayed", level.getLastPlayed());
             nbtList.add(nbtEntry);
         }
         NbtCompound nbtCompound = new NbtCompound();
@@ -359,7 +360,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         } else {
             search = search.toLowerCase(Locale.ROOT);
             for (WorldListWidget.WorldEntry entry : organizableplayscreens_worlds.keySet()) {
-                if (shouldShow(search, entry.level)) {
+                if (shouldShow(search, ((WorldEntryAccessor) entry).getLevel())) {
                     addEntry(entry);
                 }
             }
@@ -391,5 +392,11 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
         Collections.reverse(path);
         organizableplayscreens_currentPath = String.join(" > ", path);
+    }
+
+    @Mixin(WorldListWidget.WorldEntry.class)
+    public interface WorldEntryAccessor {
+        @Accessor
+        LevelSummary getLevel();
     }
 }
