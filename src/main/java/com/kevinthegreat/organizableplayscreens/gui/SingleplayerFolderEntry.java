@@ -1,8 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.mixin.EntryListWidgetInvoker;
-import com.kevinthegreat.organizableplayscreens.mixin.SelectWorldScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;

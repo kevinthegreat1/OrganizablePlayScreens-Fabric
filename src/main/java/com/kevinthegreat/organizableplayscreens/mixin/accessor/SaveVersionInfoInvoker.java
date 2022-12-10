@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens.mixin;
+package com.kevinthegreat.organizableplayscreens.mixin.accessor;
 
 import net.minecraft.world.level.storage.SaveVersionInfo;
 import org.spongepowered.asm.mixin.Mixin;

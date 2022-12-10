@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens.mixin;
+package com.kevinthegreat.organizableplayscreens.mixin.accessor;
 
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;

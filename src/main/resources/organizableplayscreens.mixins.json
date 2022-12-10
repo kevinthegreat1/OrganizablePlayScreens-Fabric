@@ -4,18 +4,18 @@
     "package": "com.kevinthegreat.organizableplayscreens.mixin",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
-        "SaveVersionInfoInvoker"
+        "accessor.SaveVersionInfoInvoker"
     ],
     "client": [
-        "EntryListWidgetInvoker",
-        "MultiplayerScreenAccessor",
+        "accessor.EntryListWidgetInvoker",
+        "accessor.MultiplayerScreenAccessor",
         "MultiplayerScreenMixin",
         "MultiplayerServerListWidgetMixin",
         "MultiplayerServerListWidgetMixin$ServerEntryInvoker",
-        "SelectWorldScreenAccessor",
+        "accessor.SelectWorldScreenAccessor",
         "SelectWorldScreenMixin",
         "ServerEntryMixin",
-        "SimpleOptionAccessor",
+        "accessor.SimpleOptionAccessor",
         "WorldListWidgetMixin",
         "WorldListWidgetMixin$WorldEntryAccessor"
     ],

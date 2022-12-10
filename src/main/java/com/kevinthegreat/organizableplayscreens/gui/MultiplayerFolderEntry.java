@@ -1,8 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.mixin.EntryListWidgetInvoker;
-import com.kevinthegreat.organizableplayscreens.mixin.MultiplayerScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;

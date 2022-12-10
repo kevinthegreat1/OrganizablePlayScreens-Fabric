@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
-import com.kevinthegreat.organizableplayscreens.mixin.SimpleOptionAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.SimpleOptionAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.SimpleOption;

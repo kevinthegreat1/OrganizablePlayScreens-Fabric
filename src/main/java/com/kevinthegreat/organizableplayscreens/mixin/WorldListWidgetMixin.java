@@ -3,6 +3,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.SaveVersionInfoInvoker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;

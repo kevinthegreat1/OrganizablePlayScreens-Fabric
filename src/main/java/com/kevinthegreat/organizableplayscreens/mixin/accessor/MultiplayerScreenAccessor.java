@@ -1,4 +1,4 @@
-package com.kevinthegreat.organizableplayscreens.mixin;
+package com.kevinthegreat.organizableplayscreens.mixin.accessor;
 
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
