@@ -1,12 +1,13 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-archivesBaseName = project.archives_base_name
+// Add minecraft version to the build jar name
+archivesBaseName = project.archives_base_name + '-' + project.minecraft_version
 version = project.mod_version
 group = project.maven_group
 
@@ -39,8 +40,8 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	modApi "com.terraformersmc:modmenu:4.1.0"
-	modImplementation "gg.essential:essential-1.19.2-fabric:5155+gf6c1d3696"
+	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+	modImplementation "gg.essential:essential-${project.minecraft_version}-fabric:${project.essential_version}"
 }
 
 processResources {

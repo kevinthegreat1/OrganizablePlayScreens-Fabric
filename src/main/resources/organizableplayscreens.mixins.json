@@ -7,17 +7,17 @@
         "accessor.SaveVersionInfoInvoker"
     ],
     "client": [
-        "accessor.EntryListWidgetInvoker",
-        "accessor.MultiplayerScreenAccessor",
         "MultiplayerScreenMixin",
         "MultiplayerServerListWidgetMixin",
         "MultiplayerServerListWidgetMixin$ServerEntryInvoker",
-        "accessor.SelectWorldScreenAccessor",
         "SelectWorldScreenMixin",
         "ServerEntryMixin",
-        "accessor.SimpleOptionAccessor",
         "WorldListWidgetMixin",
-        "WorldListWidgetMixin$WorldEntryAccessor"
+        "WorldListWidgetMixin$WorldEntryAccessor",
+        "accessor.EntryListWidgetInvoker",
+        "accessor.MultiplayerScreenAccessor",
+        "accessor.SelectWorldScreenAccessor",
+        "accessor.SimpleOptionAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

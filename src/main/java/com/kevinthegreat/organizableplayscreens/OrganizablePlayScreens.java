@@ -24,11 +24,11 @@ public class OrganizablePlayScreens implements ModInitializer {
     public static final String MOD_NAME = "Organizable Play Screens";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Text FOLDER_TEXT = Text.translatable("organizableplayscreens:folder.folder");
+    private static final Text FOLDER_TEXT = Text.translatable(MOD_ID, "folder.folder");
     private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
-    public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier("organizableplayscreens:textures/gui/options_button.png");
-    public static final Tooltip MOVE_ENTRY_INTO_TOOLTIP = Tooltip.of(Text.translatable("organizableplayscreens:folder.moveInto"));
-    public static final Tooltip MOVE_ENTRY_BACK_TOOLTIP = Tooltip.of(Text.translatable("organizableplayscreens:folder.moveBack"));
+    public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier(MOD_ID, "textures/gui/options_button.png");
+    public static final Tooltip MOVE_ENTRY_INTO_TOOLTIP = Tooltip.of(Text.translatable(MOD_ID, "folder.moveInto"));
+    public static final Tooltip MOVE_ENTRY_BACK_TOOLTIP = Tooltip.of(Text.translatable(MOD_ID, "folder.moveBack"));
     private static OrganizablePlayScreens instance;
     public final OrganizablePlayScreensOptions options;
 
