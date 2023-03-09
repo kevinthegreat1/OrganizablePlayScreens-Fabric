@@ -1,0 +1,26 @@
+{
+    "organizableplayscreens:folder.folder": "Папка",
+    "organizableplayscreens:folder.newFolder": "Новая папка",
+    "organizableplayscreens:folder.openFolder": "Открыть папку",
+    "organizableplayscreens:folder.edit": "Изменение папки",
+    "organizableplayscreens:folder.enterName": "Имя папки",
+    "organizableplayscreens:folder.moveBack": "Переместить выбранное в предыдущую папку.",
+    "organizableplayscreens:folder.moveInto": "Переместить выбранное в эту папку.",
+    "organizableplayscreens:folder.deleteFolderQuestion": "Вы действительно хотите безврзвратно удалить эту папку?",
+    "organizableplayscreens:folder.deleteMultiplayerFolderWarning": "«%s» и всё её содержимое будет потеряно навсегда! (это довольно долго)",
+    "organizableplayscreens:folder.deleteSingleplayerFolderWarning": "Папка «%s» будет потеряна навсегда! (это довольно долго)\nСодержимое будет помещено в текущую папку.",
+    "organizableplayscreens:options.title": "Настройки Organizable Play Screens",
+    "organizableplayscreens:options.x": "X",
+    "organizableplayscreens:options.y": "Y",
+    "organizableplayscreens:options.backButton": "Кнопка возврата",
+    "organizableplayscreens:options.moveEntryBackButton": "Кнопка перемещения из папки",
+    "organizableplayscreens:options.newFolderButton": "Кнопка создания папки",
+    "organizableplayscreens:options.optionsButton": "Кнопка настроек",
+    "organizableplayscreens:options.moveEntryIntoButton": "Кнопка перемещения в папку",
+    "organizableplayscreens:options.buttonType": "Тип настроек",
+    "organizableplayscreens:options.textField": "Текстовое поле",
+    "organizableplayscreens:options.slider": "Ползунок",
+
+    "modmenu.summaryTranslation.organizableplayscreens": "Организуйте списки миров и серверов при помощи папок.",
+    "modmenu.descriptionTranslation.organizableplayscreens": "Наведите порядок в ваших мирах и серверах, рассортировав их по разным папкам."
+}
