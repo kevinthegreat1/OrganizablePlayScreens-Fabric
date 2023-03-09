@@ -22,11 +22,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 @Mixin(WorldListWidget.class)
 public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldListWidget.Entry> implements WorldListWidgetAccessor {
@@ -314,6 +316,14 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         WorldListWidget.Entry entry = getSelectedOrNull();
         return entry != null && entry.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    /**
+     * Allows moving selection to unavailable worlds to move them across folders.
+     */
+    @ModifyArg(method = "moveSelection", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;moveSelectionIf(Lnet/minecraft/client/gui/widget/EntryListWidget$MoveDirection;Ljava/util/function/Predicate;)Z"))
+    protected Predicate<WorldListWidget.Entry> organizableplayscreens_allowMoveSelectionToWorldEntry(Predicate<WorldListWidget.Entry> predicate) {
+        return predicate.or(WorldListWidget.WorldEntry.class::isInstance);
     }
 
     /**
