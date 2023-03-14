@@ -232,7 +232,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         Collections.swap(organizableplayscreens_currentFolder.getEntries(), i, j);
         organizableplayscreens_updateAndSave();
         setSelected(children().get(j));
-        ensureSelectedEntryVisible();
+        ensureVisible(getSelectedOrNull());
     }
 
     /**

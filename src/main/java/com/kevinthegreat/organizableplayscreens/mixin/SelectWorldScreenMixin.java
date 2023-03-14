@@ -88,7 +88,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newFolder newFolder}.
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Z)V"))
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(ZZ)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
@@ -244,16 +244,16 @@ public abstract class SelectWorldScreenMixin extends Screen {
      *
      * @see WorldListWidgetMixin#organizableplayscreens_currentPath currentPath
      */
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;drawCenteredText(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;drawCenteredTextWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_renderPath(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        drawCenteredText(matrices, textRenderer, worldListWidgetAccessor.organizableplayscreens_getCurrentPath(), width / 2, 2, 0xa0a0a0);
+        drawCenteredTextWithShadow(matrices, textRenderer, worldListWidgetAccessor.organizableplayscreens_getCurrentPath(), width / 2, 2, 0xa0a0a0);
     }
 
     /**
      * Updates the activation states of buttons. Called at the end of {@link #init()} and every time an entry is selected.
      */
     @Inject(method = "worldSelected", at = @At("RETURN"))
-    private void organizableplayscreens_updateButtonStates(boolean active, CallbackInfo ci) {
+    private void organizableplayscreens_updateButtonStates(boolean buttonsActive, boolean deleteButtonActive, CallbackInfo ci) {
         WorldListWidget.Entry entry = levelList.getSelectedOrNull();
         if (entry instanceof WorldListWidget.WorldEntry) {
             selectButton.setMessage(Text.translatable("selectWorld.select"));

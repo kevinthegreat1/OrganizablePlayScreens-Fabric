@@ -42,7 +42,7 @@ public class EditFolderScreen extends Screen {
     protected void init() {
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, ENTER_FOLDER_NAME_TEXT);
         nameField.setMaxLength(128);
-        nameField.setTextFieldFocused(true);
+        nameField.setFocused(true);
         nameField.setText(folderName.getValue());
         nameField.setChangedListener(this::updateDoneButton);
         addSelectableChild(nameField);
@@ -103,7 +103,7 @@ public class EditFolderScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         renderBackground(matrices);
-        drawCenteredText(matrices, textRenderer, title, width / 2, 20, 0xffffff);
+        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 20, 0xffffff);
         drawTextWithShadow(matrices, textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 80, 0xa0a0a0);
         nameField.render(matrices, mouseX, mouseY, delta);
         super.render(matrices, mouseX, mouseY, delta);

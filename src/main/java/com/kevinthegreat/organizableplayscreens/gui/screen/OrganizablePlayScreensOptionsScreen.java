@@ -70,7 +70,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
             int y = height / 6 - 1 + i * 36;
             for (Pair<String, SimpleOption<?>> namedOption : optionRow) {
                 int x = width / 2 - 155 + j * 135;
-                addDrawableChild(namedOption.getRight().createButton(gameOptions, x, y, 125));
+                addDrawableChild(namedOption.getRight().createWidget(gameOptions, x, y, 125));
                 j++;
             }
             ButtonWidget resetButton = ButtonWidget.builder(Text.translatable("controls.reset"), (buttonWidget) -> {
@@ -84,7 +84,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
             }
         }
         resetButtons = resetButtonsBuilder.build();
-        addDrawableChild(options.buttonType.createButton(gameOptions, width / 2 - 155, height - 28, 150));
+        addDrawableChild(options.buttonType.createWidget(gameOptions, width / 2 - 155, height - 28, 150));
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
             options.save();
             client.setScreen(parent);
@@ -115,10 +115,10 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         renderBackground(matrices);
-        drawCenteredText(matrices, textRenderer, title, width / 2, 12, 0xFFFFFF);
+        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 12, 0xFFFFFF);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            drawCenteredText(matrices, textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
+            drawCenteredTextWithShadow(matrices, textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
             i += 36;
         }
         if (options.buttonType.getValue()) {

@@ -22,13 +22,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
 
 @Mixin(WorldListWidget.class)
 public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldListWidget.Entry> implements WorldListWidgetAccessor {
@@ -319,14 +317,6 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     /**
-     * Allows moving selection to unavailable worlds to move them across folders.
-     */
-    @ModifyArg(method = "moveSelection", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;moveSelectionIf(Lnet/minecraft/client/gui/widget/EntryListWidget$MoveDirection;Ljava/util/function/Predicate;)Z"))
-    protected Predicate<WorldListWidget.Entry> organizableplayscreens_allowMoveSelectionToWorldEntry(Predicate<WorldListWidget.Entry> predicate) {
-        return predicate.or(WorldListWidget.WorldEntry.class::isInstance);
-    }
-
-    /**
      * Updates the displayed entries with specified search string.
      */
     @Inject(method = "showSummaries", at = @At("HEAD"), cancellable = true)
@@ -343,7 +333,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         Collections.swap(organizableplayscreens_currentFolder.getFolderEntries(), i, j);
         organizableplayscreens_updateAndSave();
         setSelected(children().get(j));
-        ensureSelectedEntryVisible();
+        ensureVisible(getSelectedOrNull());
     }
 
     /**
@@ -363,7 +353,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 SingleplayerFolderEntry folderEntry = organizableplayscreens_worlds.get(worldEntry);
                 if (folderEntry != null) {
                     organizableplayscreens_currentFolder = folderEntry;
-                    parent.worldSelected(true);
+                    parent.worldSelected(true, true);
                 }
             }
             children().addAll(organizableplayscreens_currentFolder.getFolderEntries());
@@ -376,10 +366,12 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 }
             }
         }
-        if (getSelectedOrNull() == null) {
+        WorldListWidget.Entry selected = getSelectedOrNull();
+        if (selected == null) {
             setScrollAmount(0);
+        } else {
+            ensureVisible(selected);
         }
-        ensureSelectedEntryVisible();
         narrateScreenIfNarrationEnabled();
     }
 

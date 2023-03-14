@@ -1,7 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
@@ -50,11 +49,11 @@ public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSuppl
     }
 
     @Override
-    public Function<SimpleOption<Integer>, ClickableWidget> getButtonCreator(SimpleOption.TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
+    public Function<SimpleOption<Integer>, ClickableWidget> getWidgetCreator(SimpleOption.TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
         if (buttonType.getValue()) {
             return option -> new OptionIntTextFieldWidgetImpl(x + 20, y, width - 20, 20, option, this, tooltipFactory);
         } else {
-            return SimpleOption.IntSliderCallbacks.super.getButtonCreator(tooltipFactory, gameOptions, x, y, width, changeCallback);
+            return SimpleOption.IntSliderCallbacks.super.getWidgetCreator(tooltipFactory, gameOptions, x, y, width, changeCallback);
         }
     }
 
@@ -65,14 +64,6 @@ public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSuppl
 
     @Override
     public Codec<Integer> codec() {
-        Function<Integer, DataResult<Integer>> function = value -> {
-            int minInclusive = minSupplier.getAsInt();
-            int maxInclusive = maxSupplier.getAsInt() + 1;
-            if (value.compareTo(minInclusive) >= 0 && value.compareTo(maxInclusive) <= 0) {
-                return DataResult.success(value);
-            }
-            return DataResult.error("Value " + value + " outside of range [" + minInclusive + ":" + maxInclusive + "]", value);
-        };
-        return Codec.INT.flatXmap(function, function);
+        return Codec.intRange(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 }
