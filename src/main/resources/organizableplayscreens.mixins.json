@@ -12,7 +12,6 @@
         "MultiplayerServerListWidgetMixin$ServerEntryInvoker",
         "SelectWorldScreenMixin",
         "ServerEntryMixin",
-        "WorldEntryMixin",
         "WorldListWidgetMixin",
         "WorldListWidgetMixin$WorldEntryAccessor",
         "accessor.EntryListWidgetInvoker",
