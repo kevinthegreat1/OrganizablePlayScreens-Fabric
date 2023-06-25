@@ -2,6 +2,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -176,20 +177,24 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         folder.getEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtEntry = nbtList.getCompound(i);
-            if (!nbtEntry.getBoolean("type")) {
-                if (!nbtEntry.getBoolean("hidden")) {
-                    int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
-                    if (index >= 0) {
-                        folder.getEntries().add(serversSorted.remove(index));
+            OrganizablePlayScreens.updateEntryNbt(nbtEntry);
+            switch (nbtEntry.getString("type")) {
+                default -> {
+                    if (!nbtEntry.getBoolean("hidden")) {
+                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
+                        if (index >= 0) {
+                            folder.getEntries().add(serversSorted.remove(index));
+                        }
                     }
                 }
-            } else {
-                MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
-                if (nbtEntry.getBoolean("current")) {
-                    organizableplayscreens_currentFolder = folderEntry;
+                case "folder" -> {
+                    MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
+                    if (nbtEntry.getBoolean("current")) {
+                        organizableplayscreens_currentFolder = folderEntry;
+                    }
+                    organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
+                    folder.getEntries().add(folderEntry);
                 }
-                organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
-                folder.getEntries().add(folderEntry);
             }
         }
     }
@@ -209,13 +214,16 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                 nbtEntry.putString("name", serverEntry.getServer().name);
                 nbtEntry.putBoolean("hidden", false);
                 nbtList.add(nbtEntry);
-            } else if (entry instanceof MultiplayerFolderEntry folderEntry) {
-                NbtCompound nbtEntry = organizableplayscreens_toNbt(folderEntry);
-                nbtEntry.putBoolean("type", true);
-                if (folderEntry == organizableplayscreens_currentFolder) {
-                    nbtEntry.putBoolean("current", true);
+            } else if (entry instanceof AbstractMultiplayerEntry nonServerEntry) {
+                NbtCompound nbtEntry = new NbtCompound();
+                if (nonServerEntry instanceof MultiplayerFolderEntry folderEntry) {
+                    nbtEntry = organizableplayscreens_toNbt(folderEntry);
+                    nbtEntry.putString("type", "folder");
+                    if (folderEntry == organizableplayscreens_currentFolder) {
+                        nbtEntry.putBoolean("current", true);
+                    }
                 }
-                nbtEntry.putString("name", folderEntry.getName());
+                nbtEntry.putString("name", nonServerEntry.getName());
                 nbtList.add(nbtEntry);
             }
         }

@@ -9,9 +9,12 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.mutable.Mutable;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public class EditFolderScreen extends Screen {
+import java.util.function.Function;
+
+public class EditEntryScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
     private final Screen parent;
 
@@ -22,23 +25,34 @@ public class EditFolderScreen extends Screen {
      * Calling this with false will not change anything.
      */
     private final BooleanConsumer callback;
+    @Nullable
+    private final Function<Type, Mutable<String>> factory;
     /**
      * The name string to be edited.
      */
-    private final Mutable<String> folderName;
+    private final Mutable<String> entryName;
     /**
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
-    private final boolean newFolder;
+    private final boolean newEntry;
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
 
-    public EditFolderScreen(Screen parent, BooleanConsumer callback, Mutable<String> folderName, boolean newFolder) {
-        super(Text.translatable(newFolder ? "organizableplayscreens:folder.newFolder" : "organizableplayscreens:folder.edit"));
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<Type, Mutable<String>> factory) {
+        this(parent, callback, factory, factory.apply(Type.FOLDER), true);
+    }
+
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, Mutable<String> entryName) {
+        this(parent, callback, null, entryName, false);
+    }
+
+    private EditEntryScreen(Screen parent, BooleanConsumer callback, @Nullable Function<Type, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
+        super(Text.translatable(newEntry ? "organizableplayscreens:folder.newFolder" : "organizableplayscreens:folder.edit"));
         this.parent = parent;
         this.callback = callback;
-        this.folderName = folderName;
-        this.newFolder = newFolder;
+        this.factory = factory;
+        this.entryName = entryName;
+        this.newEntry = newEntry;
     }
 
     @Override
@@ -46,7 +60,7 @@ public class EditFolderScreen extends Screen {
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, ENTER_FOLDER_NAME_TEXT);
         nameField.setMaxLength(128);
         nameField.setFocused(true);
-        nameField.setText(folderName.getValue());
+        nameField.setText(entryName.getValue());
         nameField.setChangedListener(this::updateDoneButton);
         addSelectableChild(nameField);
         doneButton = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
@@ -95,7 +109,7 @@ public class EditFolderScreen extends Screen {
      * Sets the name to the folder and calls the callback with true.
      */
     private void saveAndClose() {
-        folderName.setValue(nameField.getText());
+        entryName.setValue(nameField.getText());
         callback.accept(true);
     }
 
@@ -105,7 +119,7 @@ public class EditFolderScreen extends Screen {
      * @param text the text to check for changes
      */
     private void updateDoneButton(String text) {
-        doneButton.active = newFolder || !folderName.getValue().equals(text);
+        doneButton.active = newEntry || !entryName.getValue().equals(text);
     }
 
     @Override
@@ -115,5 +129,9 @@ public class EditFolderScreen extends Screen {
         context.drawTextWithShadow(textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 80, 0xa0a0a0);
         nameField.render(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    public enum Type {
+        FOLDER
     }
 }

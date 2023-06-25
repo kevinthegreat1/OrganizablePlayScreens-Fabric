@@ -2,9 +2,10 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
-import com.kevinthegreat.organizableplayscreens.gui.screen.EditFolderScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.gui.DrawContext;
@@ -67,7 +68,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      * A folder entry to store the folder that is currently being created.
      */
     @Nullable
-    private MultiplayerFolderEntry organizableplayscreens_newFolder;
+    private AbstractMultiplayerEntry organizableplayscreens_newEntry;
 
     protected MultiplayerScreenMixin(Text title) {
         super(title);
@@ -87,7 +88,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      * <p>
      * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
-     * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newFolder newFolder}.
+     * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;updateButtonActivationStates()V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
@@ -112,9 +113,10 @@ public abstract class MultiplayerScreenMixin extends Screen {
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
-            organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
-            client.setScreen(new EditFolderScreen(this, this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
-            select(organizableplayscreens_newFolder);
+            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_addEntry, type -> organizableplayscreens_newEntry = switch (type) {
+                case FOLDER -> new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
+            }));
+            select(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
         addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
@@ -124,8 +126,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "method_19915", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
-        if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
-            client.setScreen(new EditFolderScreen(this, this::organizableplayscreens_editFolder, folderEntry, false));
+        if (serverListWidget.getSelectedOrNull() instanceof AbstractMultiplayerEntry entry) {
+            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
         }
     }
 
@@ -135,7 +137,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "method_19914", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
-            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteFolder, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteMultiplayerFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
+            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteMultiplayerFolderWarning", folderEntry.getName()), Text.translatable("selectServer.deleteButton"), ScreenTexts.CANCEL));
         }
     }
 
@@ -159,28 +161,28 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Adds the folder stored in {@link #organizableplayscreens_newFolder newFolder} to {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
+     * Adds the non-server entry stored in {@link #organizableplayscreens_newEntry newEntry} to {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
      */
-    private void organizableplayscreens_addFolder(boolean confirmedAction) {
+    private void organizableplayscreens_addEntry(boolean confirmedAction) {
         if (confirmedAction) {
-            serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newFolder);
+            serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newEntry);
             serverListWidgetAccessor.organizableplayscreens_updateAndSave();
-            organizableplayscreens_newFolder = null;
+            organizableplayscreens_newEntry = null;
         }
         client.setScreen(this);
     }
 
     /**
-     * Sets the screen back to this after finishing editing the selected folder.
+     * Sets the screen back to this after finishing editing the selected non-server entry.
      */
-    private void organizableplayscreens_editFolder(boolean confirmedAction) {
+    private void organizableplayscreens_editEntry(boolean confirmedAction) {
         client.setScreen(this);
     }
 
     /**
-     * Deletes the selected folder, updates the displayed entries, and sets the screen back to this.
+     * Deletes the selected non-server entry, updates the displayed entries, and sets the screen back to this.
      */
-    private void organizableplayscreens_deleteFolder(boolean confirmedAction) {
+    private void organizableplayscreens_deleteEntry(boolean confirmedAction) {
         if (confirmedAction) {
             serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
             select(null);

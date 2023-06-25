@@ -8,6 +8,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -89,5 +91,16 @@ public class OrganizablePlayScreens implements ModInitializer {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
         buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
+    }
+
+    public static void updateEntryNbt(NbtCompound nbtEntry) {
+        if (nbtEntry.contains("type", NbtElement.NUMBER_TYPE)) {
+            if (nbtEntry.getBoolean("type")) {
+                nbtEntry.remove("type");
+                nbtEntry.putString("type", "folder");
+            } else {
+                nbtEntry.remove("type");
+            }
+        }
     }
 }

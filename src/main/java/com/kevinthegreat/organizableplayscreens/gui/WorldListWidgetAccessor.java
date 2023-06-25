@@ -22,7 +22,7 @@ public interface WorldListWidgetAccessor {
 
     SingleplayerFolderEntry organizableplayscreens_getCurrentFolder();
 
-    List<SingleplayerFolderEntry> organizableplayscreens_getCurrentFolderEntries();
+    List<AbstractSingleplayerEntry> organizableplayscreens_getCurrentNonWorldEntries();
 
     List<WorldListWidget.WorldEntry> organizableplayscreens_getCurrentWorldEntries();
 
