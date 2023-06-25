@@ -2,15 +2,12 @@ package com.kevinthegreat.organizableplayscreens;
 
 import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -62,38 +59,35 @@ public class OrganizablePlayScreens implements ModInitializer {
      * @param listSize       The size of the entry list that the folder is in.
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
-    public static void renderFolderEntry(MatrixStack matrices, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
-        client.textRenderer.draw(matrices, name, x + 32 + 3, y + 1, 0xffffff);
-        client.textRenderer.draw(matrices, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
+    public static void renderFolderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xffffff);
+        context.drawTextWithShadow(client.textRenderer, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
         if (client.options.getTouchscreen().getValue() || hovered) {
-            RenderSystem.setShaderTexture(0, SERVER_SELECTION_TEXTURE);
-            DrawableHelper.fill(matrices, x, y, x + 32, y + 32, 0xa0909090);
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            RenderSystem.setShaderColor(1, 1, 1, 1);
+            context.fill(x, y, x + 32, y + 32, 0xa0909090);
             int o = mouseX - x;
             int p = mouseY - y;
             if (o < 32 && o > 16) {
-                DrawableHelper.drawTexture(matrices, x, y, 0, 32, 32, 32, 256, 256);
+                context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 32, 32, 32, 256, 256);
             } else {
-                DrawableHelper.drawTexture(matrices, x, y, 0, 0, 32, 32, 256, 256);
+                context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 0, 32, 32, 256, 256);
             }
             if (index > 0) {
                 if (o < 16 && p < 16) {
-                    DrawableHelper.drawTexture(matrices, x, y, 96, 32, 32, 32, 256, 256);
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 96, 32, 32, 32, 256, 256);
                 } else {
-                    DrawableHelper.drawTexture(matrices, x, y, 96, 0, 32, 32, 256, 256);
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 96, 0, 32, 32, 256, 256);
                 }
             }
             if (index < listSize - 1) {
                 if (o < 16 && p > 16) {
-                    DrawableHelper.drawTexture(matrices, x, y, 64, 32, 32, 32, 256, 256);
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 64, 32, 32, 32, 256, 256);
                 } else {
-                    DrawableHelper.drawTexture(matrices, x, y, 64, 0, 32, 32, 256, 256);
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 64, 0, 32, 32, 256, 256);
                 }
             }
         }
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
-        buttonMoveInto.render(matrices, mouseX, mouseY, tickDelta);
+        buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
     }
 }

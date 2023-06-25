@@ -2,10 +2,10 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -101,11 +101,11 @@ public class EditFolderScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 20, 0xffffff);
-        drawTextWithShadow(matrices, textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 80, 0xa0a0a0);
-        nameField.render(matrices, mouseX, mouseY, delta);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context);
+        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 20, 0xffffff);
+        context.drawTextWithShadow(textRenderer, ENTER_FOLDER_NAME_TEXT, width / 2 - 100, 80, 0xa0a0a0);
+        nameField.render(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 }

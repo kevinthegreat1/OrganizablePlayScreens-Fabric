@@ -34,7 +34,6 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     @Final
     private SelectWorldScreen parent;
     @Shadow
-    @Nullable
     private CompletableFuture<List<LevelSummary>> levelsFuture;
     @Shadow
     private String search;
@@ -347,7 +346,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      * Clears the displayed entries, sets {@link #organizableplayscreens_currentFolder currentFolder} to the folder that the selected entry is in if {@code search} is empty and the selected entry is a world entry, and displays all entries in {@link #organizableplayscreens_currentFolder currentFolder} or all entries in {@link #organizableplayscreens_worlds worlds} with the search filter applied if it is not empty.
      */
     private void organizableplayscreens_updateEntries(String search) {
-        clearEntries();
+        super.clearEntries();
         if (search.isEmpty()) {
             if (getSelectedOrNull() instanceof WorldListWidget.WorldEntry worldEntry) {
                 SingleplayerFolderEntry folderEntry = organizableplayscreens_worlds.get(worldEntry);

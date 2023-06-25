@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
@@ -105,32 +105,32 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     /**
      * Renders the screen.
      * Draws the title and option titles. Then, draws the {@code 'X:'} and {@code 'Y:'} text if text fields are being used.
-     * Finally, draws the buttons with {@link Screen#render(MatrixStack, int, int, float) super.render(MatrixStack, int, int, float)}.
+     * Finally, draws the buttons with {@link Screen#render(DrawContext, int, int, float) super.render(MatrixStack, int, int, float)}.
      *
-     * @param matrices the matrix stack
-     * @param mouseX   the x position of the mouse
-     * @param mouseY   the y position of the mouse
-     * @param delta    the time between ticks
+     * @param context the draw context
+     * @param mouseX  the x position of the mouse
+     * @param mouseY  the y position of the mouse
+     * @param delta   the time between ticks
      */
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 12, 0xFFFFFF);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context);
+        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 12, 0xFFFFFF);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            drawCenteredTextWithShadow(matrices, textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
+            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
             i += 36;
         }
         if (options.buttonType.getValue()) {
             for (i = 0; i < 5; i++) {
                 int y = height / 6 - 1 + i * 36;
                 int x = width / 2 - 155;
-                drawTextWithShadow(matrices, textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFF);
+                context.drawTextWithShadow(textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFF);
                 x = width / 2 - 155 + 135;
-                drawTextWithShadow(matrices, textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFF);
+                context.drawTextWithShadow(textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFF);
             }
         }
-        super.render(matrices, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     /**
