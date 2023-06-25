@@ -13,6 +13,8 @@ import org.lwjgl.glfw.GLFW;
 
 public class EditFolderScreen extends Screen {
     private static final Text ENTER_FOLDER_NAME_TEXT = Text.translatable("organizableplayscreens:folder.enterName");
+    private final Screen parent;
+
     /**
      * This is called when this screen should be closed.
      * <p>
@@ -31,8 +33,9 @@ public class EditFolderScreen extends Screen {
     private TextFieldWidget nameField;
     private ButtonWidget doneButton;
 
-    public EditFolderScreen(BooleanConsumer callback, Mutable<String> folderName, boolean newFolder) {
-        super(Text.translatable("organizableplayscreens:folder.edit"));
+    public EditFolderScreen(Screen parent, BooleanConsumer callback, Mutable<String> folderName, boolean newFolder) {
+        super(Text.translatable(newFolder ? "organizableplayscreens:folder.newFolder" : "organizableplayscreens:folder.edit"));
+        this.parent = parent;
         this.callback = callback;
         this.folderName = folderName;
         this.newFolder = newFolder;
@@ -81,6 +84,11 @@ public class EditFolderScreen extends Screen {
         String folderName = nameField.getText();
         init(client, width, height);
         nameField.setText(folderName);
+    }
+
+    @Override
+    public void close() {
+        client.setScreen(parent);
     }
 
     /**

@@ -113,7 +113,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             organizableplayscreens_newFolder = new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
-            client.setScreen(new EditFolderScreen(this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
+            client.setScreen(new EditFolderScreen(this, this::organizableplayscreens_addFolder, organizableplayscreens_newFolder, true));
             select(organizableplayscreens_newFolder);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
         addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
@@ -125,7 +125,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "method_19915", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
-            client.setScreen(new EditFolderScreen(this::organizableplayscreens_editFolder, folderEntry, false));
+            client.setScreen(new EditFolderScreen(this, this::organizableplayscreens_editFolder, folderEntry, false));
         }
     }
 
