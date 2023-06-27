@@ -9,6 +9,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +25,16 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
-    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent) {
+    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
         this(screen, parent, I18n.translate("organizableplayscreens:folder.newFolder"), new ArrayList<>());
     }
 
-    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent, @NotNull String name) {
+    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         this(screen, parent, name, new ArrayList<>());
     }
 
-    public MultiplayerFolderEntry(MultiplayerScreen screen, MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
-        super(screen, name, parent);
+    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
+        super(screen, parent, name);
         this.entries = entries;
         buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {
             MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();

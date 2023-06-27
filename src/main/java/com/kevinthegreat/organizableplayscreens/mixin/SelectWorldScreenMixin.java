@@ -1,9 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
-import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.*;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
@@ -68,7 +66,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * A folder entry to store the folder that is currently being created.
      */
     @Nullable
-    private SingleplayerFolderEntry organizableplayscreens_newEntry;
+    private AbstractSingleplayerEntry organizableplayscreens_newEntry;
 
     protected SelectWorldScreenMixin(Text title) {
         super(title);
@@ -118,6 +116,8 @@ public abstract class SelectWorldScreenMixin extends Screen {
         organizableplayscreens_buttonNewFolder = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_addEntry, type -> organizableplayscreens_newEntry = switch (type) {
                 case FOLDER -> new SingleplayerFolderEntry((SelectWorldScreen) (Object) this, worldListWidgetAccessor.organizableplayscreens_getCurrentFolder());
+                case SECTION -> new SingleplayerSectionEntry((SelectWorldScreen) (Object) this, worldListWidgetAccessor.organizableplayscreens_getCurrentFolder());
+                case SEPARATOR -> new SingleplayerSeparatorEntry((SelectWorldScreen) (Object) this, worldListWidgetAccessor.organizableplayscreens_getCurrentFolder());
             }));
             levelList.setSelected(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());

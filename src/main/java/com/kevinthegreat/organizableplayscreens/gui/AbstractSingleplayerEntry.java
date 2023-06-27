@@ -9,24 +9,35 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements Mutable<String> {
-    protected final SelectWorldScreen screen;
     @NotNull
-    protected String name;
+    protected final SelectWorldScreen screen;
     /**
      * The parent of this folder.
      */
+    @Nullable
     protected SingleplayerFolderEntry parent;
+    @NotNull
+    protected String name;
     /**
      * Used to detect double-clicking.
      */
     private long time;
 
-    public AbstractSingleplayerEntry(SelectWorldScreen screen, @NotNull String name, SingleplayerFolderEntry parent) {
+    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
         this.screen = screen;
+        this.parent = parent;
         this.name = name;
+    }
+
+    public @Nullable SingleplayerFolderEntry getParent() {
+        return parent;
+    }
+
+    public void setParent(@Nullable SingleplayerFolderEntry parent) {
         this.parent = parent;
     }
 
@@ -42,14 +53,6 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     @Override
     public void setValue(@NotNull String name) {
         this.name = name;
-    }
-
-    public SingleplayerFolderEntry getParent() {
-        return parent;
-    }
-
-    public void setParent(SingleplayerFolderEntry parent) {
-        this.parent = parent;
     }
 
     protected void entrySelected(WorldListWidgetAccessor levelList) {

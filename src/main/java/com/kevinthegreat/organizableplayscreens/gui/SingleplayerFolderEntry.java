@@ -9,6 +9,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +30,16 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
-    public SingleplayerFolderEntry(SelectWorldScreen screen, SingleplayerFolderEntry parent) {
+    public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
         this(screen, parent, I18n.translate("organizableplayscreens:folder.newFolder"), new ArrayList<>(), new ArrayList<>());
     }
 
-    public SingleplayerFolderEntry(SelectWorldScreen screen, SingleplayerFolderEntry parent, @NotNull String name) {
+    public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
         this(screen, parent, name, new ArrayList<>(), new ArrayList<>());
     }
 
-    public SingleplayerFolderEntry(SelectWorldScreen screen, SingleplayerFolderEntry parent, @NotNull String name, @NotNull List<AbstractSingleplayerEntry> nonWorldEntries, @NotNull List<WorldListWidget.WorldEntry> worldEntries) {
-        super(screen, name, parent);
+    public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name, @NotNull List<AbstractSingleplayerEntry> nonWorldEntries, @NotNull List<WorldListWidget.WorldEntry> worldEntries) {
+        super(screen, parent, name);
         this.nonWorldEntries = nonWorldEntries;
         this.worldEntries = worldEntries;
         buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {

@@ -2,9 +2,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
-import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
-import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -195,6 +193,14 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
+                case "section" -> {
+                    MultiplayerSectionEntry sectionEntry = new MultiplayerSectionEntry(screen, folder, nbtEntry.getString("name"));
+                    folder.getEntries().add(sectionEntry);
+                }
+                case "separator" -> {
+                    MultiplayerSeparatorEntry separatorEntry = new MultiplayerSeparatorEntry(screen, folder, nbtEntry.getString("name"));
+                    folder.getEntries().add(separatorEntry);
+                }
             }
         }
     }
@@ -222,6 +228,10 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     if (folderEntry == organizableplayscreens_currentFolder) {
                         nbtEntry.putBoolean("current", true);
                     }
+                } else if (nonServerEntry instanceof MultiplayerSectionEntry) {
+                    nbtEntry.putString("type", "section");
+                } else if (nonServerEntry instanceof MultiplayerSeparatorEntry) {
+                    nbtEntry.putString("type", "separator");
                 }
                 nbtEntry.putString("name", nonServerEntry.getName());
                 nbtList.add(nbtEntry);

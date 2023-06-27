@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
+import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.mutable.Mutable;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
@@ -25,12 +25,11 @@ public class EditEntryScreen extends Screen {
      * Calling this with false will not change anything.
      */
     private final BooleanConsumer callback;
-    @Nullable
     private final Function<Type, Mutable<String>> factory;
     /**
      * The name string to be edited.
      */
-    private final Mutable<String> entryName;
+    private Mutable<String> entryName;
     /**
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
@@ -43,10 +42,10 @@ public class EditEntryScreen extends Screen {
     }
 
     public EditEntryScreen(Screen parent, BooleanConsumer callback, Mutable<String> entryName) {
-        this(parent, callback, null, entryName, false);
+        this(parent, callback, type -> entryName, entryName, false);
     }
 
-    private EditEntryScreen(Screen parent, BooleanConsumer callback, @Nullable Function<Type, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
+    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<Type, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:folder.newFolder" : "organizableplayscreens:folder.edit"));
         this.parent = parent;
         this.callback = callback;
@@ -57,6 +56,20 @@ public class EditEntryScreen extends Screen {
 
     @Override
     protected void init() {
+        if (newEntry) {
+            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), buttonWidget -> {
+                entryName = factory.apply(Type.FOLDER);
+                nameField.setText(entryName.getValue());
+            }).dimensions(width / 2 - 75, 40, 50, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), buttonWidget -> {
+                entryName = factory.apply(Type.SECTION);
+                nameField.setText(entryName.getValue());
+            }).dimensions(width / 2 - 25, 40, 50, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), buttonWidget -> {
+                entryName = factory.apply(Type.SEPARATOR);
+                nameField.setText(entryName.getValue());
+            }).dimensions(width / 2 - 25, 40, 50, 20).build());
+        }
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, ENTER_FOLDER_NAME_TEXT);
         nameField.setMaxLength(128);
         nameField.setFocused(true);
@@ -132,6 +145,6 @@ public class EditEntryScreen extends Screen {
     }
 
     public enum Type {
-        FOLDER
+        FOLDER, SECTION, SEPARATOR
     }
 }

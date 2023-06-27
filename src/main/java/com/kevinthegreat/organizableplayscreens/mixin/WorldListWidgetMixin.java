@@ -1,9 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
-import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.gui.*;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SaveVersionInfoInvoker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
@@ -224,6 +222,14 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
+                case "section" -> {
+                    SingleplayerSectionEntry sectionEntry = new SingleplayerSectionEntry(parent, folder, nbtEntry.getString("name"));
+                    folder.getNonWorldEntries().add(sectionEntry);
+                }
+                case "separator" -> {
+                    SingleplayerSeparatorEntry separatorEntry = new SingleplayerSeparatorEntry(parent, folder, nbtEntry.getString("name"));
+                    folder.getNonWorldEntries().add(separatorEntry);
+                }
             }
         }
     }
@@ -248,6 +254,12 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 SingleplayerFolderEntry newFolderEntry = new SingleplayerFolderEntry(parent, newFolder, oldFolderEntry.getName());
                 organizableplayscreens_fromFolder(newFolderEntry, oldFolderEntry, oldCurrentFolder);
                 newFolder.getNonWorldEntries().add(newFolderEntry);
+            } else if (oldNonWorldEntry instanceof SingleplayerSectionEntry oldSectionEntry) {
+                SingleplayerSectionEntry newSectionEntry = new SingleplayerSectionEntry(parent, newFolder, oldSectionEntry.getName());
+                newFolder.getNonWorldEntries().add(newSectionEntry);
+            } else if (oldNonWorldEntry instanceof SingleplayerSeparatorEntry oldSeparatorEntry) {
+                SingleplayerSeparatorEntry newSeparatorEntry = new SingleplayerSeparatorEntry(parent, newFolder, oldSeparatorEntry.getName());
+                newFolder.getNonWorldEntries().add(newSeparatorEntry);
             }
         }
         if (oldCurrentFolder == oldFolder) {
@@ -297,6 +309,10 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 if (nonWorldEntry == organizableplayscreens_currentFolder) {
                     nbtEntry.putBoolean("current", true);
                 }
+            } else if (nonWorldEntry instanceof SingleplayerSectionEntry) {
+                nbtEntry.putString("type", "section");
+            } else if (nonWorldEntry instanceof SingleplayerSeparatorEntry) {
+                nbtEntry.putString("type", "separator");
             }
             nbtEntry.putString("name", nonWorldEntry.getName());
             nbtList.add(nbtEntry);

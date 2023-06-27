@@ -9,24 +9,35 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements Mutable<String> {
-    protected final MultiplayerScreen screen;
     @NotNull
-    protected String name;
+    protected final MultiplayerScreen screen;
     /**
      * The parent of this folder.
      */
+    @Nullable
     protected MultiplayerFolderEntry parent;
+    @NotNull
+    protected String name;
     /**
      * Used to detect double-clicking.
      */
     private long time;
 
-    public AbstractMultiplayerEntry(MultiplayerScreen screen, @NotNull String name, MultiplayerFolderEntry parent) {
+    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         this.screen = screen;
+        this.parent = parent;
         this.name = name;
+    }
+
+    public @Nullable MultiplayerFolderEntry getParent() {
+        return parent;
+    }
+
+    public void setParent(@Nullable MultiplayerFolderEntry parent) {
         this.parent = parent;
     }
 
@@ -42,14 +53,6 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     @Override
     public void setValue(@NotNull String name) {
         this.name = name;
-    }
-
-    public MultiplayerFolderEntry getParent() {
-        return parent;
-    }
-
-    public void setParent(MultiplayerFolderEntry parent) {
-        this.parent = parent;
     }
 
     /**

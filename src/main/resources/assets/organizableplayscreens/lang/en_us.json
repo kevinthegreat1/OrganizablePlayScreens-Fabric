@@ -1,4 +1,8 @@
 {
+    "organizableplayscreens:entry.section": "Section",
+    "organizableplayscreens:entry.newSection": "New Section",
+    "organizableplayscreens:entry.separator": "Separator",
+    "organizableplayscreens:entry.newSeparator": "New Separator",
     "organizableplayscreens:folder.folder": "Folder",
     "organizableplayscreens:folder.newFolder": "New Folder",
     "organizableplayscreens:folder.openFolder": "Open Folder",
