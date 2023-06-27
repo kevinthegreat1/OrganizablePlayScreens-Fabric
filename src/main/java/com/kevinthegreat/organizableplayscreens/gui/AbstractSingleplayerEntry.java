@@ -1,5 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
@@ -12,7 +15,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Map;
+
 public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements Mutable<String> {
+    public static final BiMap<String, Class<? extends AbstractSingleplayerEntry>> SINGLEPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
+            OrganizablePlayScreens.MOD_ID + ":folder", SingleplayerFolderEntry.class,
+            OrganizablePlayScreens.MOD_ID + ":section", SingleplayerSectionEntry.class,
+            OrganizablePlayScreens.MOD_ID + ":separator", SingleplayerSeparatorEntry.class
+    ));
     @NotNull
     protected final SelectWorldScreen screen;
     /**

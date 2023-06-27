@@ -2,7 +2,9 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
-import com.kevinthegreat.organizableplayscreens.gui.*;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -175,9 +178,10 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         folder.getEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbtEntry = nbtList.getCompound(i);
-            OrganizablePlayScreens.updateEntryNbt(nbtEntry);
-            switch (nbtEntry.getString("type")) {
-                default -> {
+            OrganizablePlayScreens.updateEntryNbt(nbtEntry, true);
+            String type = nbtEntry.getString("type");
+            switch (type) {
+                case "minecraft:server" -> {
                     if (!nbtEntry.getBoolean("hidden")) {
                         int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
                         if (index >= 0) {
@@ -185,7 +189,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                         }
                     }
                 }
-                case "folder" -> {
+                case OrganizablePlayScreens.MOD_ID + ":folder" -> {
                     MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
                     if (nbtEntry.getBoolean("current")) {
                         organizableplayscreens_currentFolder = folderEntry;
@@ -193,13 +197,12 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                case "section" -> {
-                    MultiplayerSectionEntry sectionEntry = new MultiplayerSectionEntry(screen, folder, nbtEntry.getString("name"));
-                    folder.getEntries().add(sectionEntry);
-                }
-                case "separator" -> {
-                    MultiplayerSeparatorEntry separatorEntry = new MultiplayerSeparatorEntry(screen, folder, nbtEntry.getString("name"));
-                    folder.getEntries().add(separatorEntry);
+                default -> {
+                    try {
+                        folder.getEntries().add(AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class, String.class).newInstance(screen, folder, nbtEntry.getString("name")));
+                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                        OrganizablePlayScreens.LOGGER.error("Failed to instantiate an instance of " + AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.get(type), e);
+                    }
                 }
             }
         }
@@ -216,6 +219,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         for (MultiplayerServerListWidget.Entry entry : folder.getEntries()) {
             if (entry instanceof MultiplayerServerListWidget.ServerEntry serverEntry) {
                 NbtCompound nbtEntry = new NbtCompound();
+                nbtEntry.putString("type", "minecraft:server");
                 nbtEntry.putString("ip", serverEntry.getServer().address);
                 nbtEntry.putString("name", serverEntry.getServer().name);
                 nbtEntry.putBoolean("hidden", false);
@@ -224,15 +228,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                 NbtCompound nbtEntry = new NbtCompound();
                 if (nonServerEntry instanceof MultiplayerFolderEntry folderEntry) {
                     nbtEntry = organizableplayscreens_toNbt(folderEntry);
-                    nbtEntry.putString("type", "folder");
                     if (folderEntry == organizableplayscreens_currentFolder) {
                         nbtEntry.putBoolean("current", true);
                     }
-                } else if (nonServerEntry instanceof MultiplayerSectionEntry) {
-                    nbtEntry.putString("type", "section");
-                } else if (nonServerEntry instanceof MultiplayerSeparatorEntry) {
-                    nbtEntry.putString("type", "separator");
                 }
+                nbtEntry.putString("type", AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.inverse().get(nonServerEntry.getClass()));
                 nbtEntry.putString("name", nonServerEntry.getName());
                 nbtList.add(nbtEntry);
             }

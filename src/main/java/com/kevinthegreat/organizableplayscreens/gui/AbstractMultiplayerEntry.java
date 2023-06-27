@@ -1,5 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import net.minecraft.client.gui.screen.Screen;
@@ -12,7 +15,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Map;
+
 public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements Mutable<String> {
+    public static final BiMap<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
+            OrganizablePlayScreens.MOD_ID + ":folder", MultiplayerFolderEntry.class,
+            OrganizablePlayScreens.MOD_ID + ":section", MultiplayerSectionEntry.class,
+            OrganizablePlayScreens.MOD_ID + ":separator", MultiplayerSeparatorEntry.class
+    ));
     @NotNull
     protected final MultiplayerScreen screen;
     /**

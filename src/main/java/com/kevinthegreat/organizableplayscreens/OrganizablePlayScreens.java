@@ -93,14 +93,13 @@ public class OrganizablePlayScreens implements ModInitializer {
         buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
     }
 
-    public static void updateEntryNbt(NbtCompound nbtEntry) {
-        if (nbtEntry.contains("type", NbtElement.NUMBER_TYPE)) {
-            if (nbtEntry.getBoolean("type")) {
-                nbtEntry.remove("type");
-                nbtEntry.putString("type", "folder");
-            } else {
-                nbtEntry.remove("type");
-            }
+    public static void updateEntryNbt(NbtCompound nbtEntry, boolean multiplayer) {
+        if (nbtEntry.contains("type", NbtElement.NUMBER_TYPE) && nbtEntry.getBoolean("type")) {
+            nbtEntry.remove("type");
+            nbtEntry.putString("type", OrganizablePlayScreens.MOD_ID + ":folder");
+        } else {
+            nbtEntry.remove("type");
+            nbtEntry.putString("type", multiplayer ? "minecraft:server" : "minecraft:world");
         }
     }
 }
