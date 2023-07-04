@@ -8,6 +8,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreen
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -37,10 +38,10 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      */
     private long time;
 
-    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
+    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String type) {
         this.screen = screen;
         this.parent = parent;
-        this.name = name;
+        this.name = I18n.translate("organizableplayscreens:entry.new", type);
     }
 
     public @Nullable SingleplayerFolderEntry getParent() {

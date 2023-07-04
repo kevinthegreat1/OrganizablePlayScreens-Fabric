@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SingleplayerSectionEntry extends AbstractSingleplayerEntry {
     public SingleplayerSectionEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.newSection"));
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.section"));
     }
 
     public SingleplayerSectionEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {

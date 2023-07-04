@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SingleplayerSeparatorEntry extends AbstractSingleplayerEntry {
     public SingleplayerSeparatorEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.newSeparator"));
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.separator"));
     }
 
     public SingleplayerSeparatorEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {

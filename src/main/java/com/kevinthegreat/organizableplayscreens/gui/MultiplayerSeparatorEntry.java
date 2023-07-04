@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MultiplayerSeparatorEntry extends AbstractMultiplayerEntry {
     public MultiplayerSeparatorEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.newSeparator"));
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.separator"));
     }
 
     public MultiplayerSeparatorEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {

@@ -26,7 +26,7 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
     private final ButtonWidget buttonMoveInto;
 
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:folder.newFolder"), new ArrayList<>());
+        this(screen, parent, I18n.translate("organizableplayscreens:folder.folder"), new ArrayList<>());
     }
 
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {

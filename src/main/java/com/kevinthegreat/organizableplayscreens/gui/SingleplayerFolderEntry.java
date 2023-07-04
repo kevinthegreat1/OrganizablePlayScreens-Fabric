@@ -31,7 +31,7 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
     private final ButtonWidget buttonMoveInto;
 
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:folder.newFolder"), new ArrayList<>(), new ArrayList<>());
+        this(screen, parent, I18n.translate("organizableplayscreens:folder.folder"), new ArrayList<>(), new ArrayList<>());
     }
 
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {

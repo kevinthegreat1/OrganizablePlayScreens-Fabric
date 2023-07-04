@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MultiplayerSectionEntry extends AbstractMultiplayerEntry {
     public MultiplayerSectionEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.newSection"));
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.section"));
     }
 
     public MultiplayerSectionEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
