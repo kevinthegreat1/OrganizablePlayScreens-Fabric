@@ -13,14 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Map;
-
 public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry {
-    public static final Map<String, Class<? extends AbstractSingleplayerEntry>> SINGLEPLAYER_ENTRY_TYPE_MAP = Map.of(
-            EntryType.FOLDER.id(), SingleplayerFolderEntry.class,
-            EntryType.SECTION.id(), SingleplayerSectionEntry.class,
-            EntryType.SEPARATOR.id(), SingleplayerSeparatorEntry.class
-    );
     @NotNull
     protected final SelectWorldScreen screen;
     /**
@@ -46,26 +39,6 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
         this.parent = parent;
         this.type = type;
         this.name = name;
-    }
-
-    public static AbstractSingleplayerEntry of(EntryType entryType, SelectWorldScreen screen, SingleplayerFolderEntry folder) {
-        try {
-            return SINGLEPLAYER_ENTRY_TYPE_MAP.get(entryType.id()).getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class).newInstance(screen, folder);
-        } catch (ReflectiveOperationException e) {
-            throw createException(e, entryType.id());
-        }
-    }
-
-    public static AbstractSingleplayerEntry of(String type, SelectWorldScreen screen, SingleplayerFolderEntry folder, String name) {
-        try {
-            return SINGLEPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class, String.class).newInstance(screen, folder, name);
-        } catch (ReflectiveOperationException e) {
-            throw createException(e, type);
-        }
-    }
-
-    private static RuntimeException createException(ReflectiveOperationException e, String type) {
-        return new RuntimeException("Failed to instantiate an instance of " + SINGLEPLAYER_ENTRY_TYPE_MAP.get(type), e);
     }
 
     public @Nullable SingleplayerFolderEntry getParent() {

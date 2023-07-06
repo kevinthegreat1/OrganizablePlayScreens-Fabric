@@ -7,12 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SingleplayerSeparatorEntry extends AbstractSingleplayerEntry {
-    @SuppressWarnings("unused") // Used via reflection
     public SingleplayerSeparatorEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
         super(screen, parent, EntryType.SEPARATOR);
     }
 
-    @SuppressWarnings("unused") // Used via reflection
     public SingleplayerSeparatorEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
         super(screen, parent, EntryType.SEPARATOR, name);
     }

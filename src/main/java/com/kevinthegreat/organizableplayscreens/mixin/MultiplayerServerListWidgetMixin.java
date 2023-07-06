@@ -3,6 +3,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
+import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -202,7 +203,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                default -> folder.getEntries().add(AbstractMultiplayerEntry.of(type, screen, folder, nbtEntry.getString("name")));
+                default -> folder.getEntries().add(EntryType.ENTRY_TYPE_MAP.get(type).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
             }
         }
     }

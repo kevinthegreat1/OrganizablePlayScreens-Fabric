@@ -7,12 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MultiplayerSeparatorEntry extends AbstractMultiplayerEntry {
-    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerSeparatorEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
         super(screen, parent, EntryType.SEPARATOR);
     }
 
-    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerSeparatorEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         super(screen, parent, EntryType.SEPARATOR, name);
     }

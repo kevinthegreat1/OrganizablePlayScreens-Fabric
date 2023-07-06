@@ -25,7 +25,6 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
-    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
         this(screen, parent, I18n.translate("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>());
     }

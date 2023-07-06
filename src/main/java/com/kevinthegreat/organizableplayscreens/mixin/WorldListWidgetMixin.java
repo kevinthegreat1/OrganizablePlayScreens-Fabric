@@ -2,6 +2,7 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
+import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SaveVersionInfoInvoker;
@@ -27,7 +28,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -234,7 +234,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> folder.getNonWorldEntries().add(AbstractSingleplayerEntry.of(type, parent, folder, nbtEntry.getString("name")));
+                default -> folder.getNonWorldEntries().add(EntryType.ENTRY_TYPE_MAP.get(type).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
             }
         }
     }
@@ -260,10 +260,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 SingleplayerFolderEntry newFolderEntry = new SingleplayerFolderEntry(parent, newFolder, oldFolderEntry.getName());
                 organizableplayscreens_fromFolder(newFolderEntry, oldFolderEntry, oldCurrentFolder);
                 newFolder.getNonWorldEntries().add(newFolderEntry);
-            } else try {
-                newFolder.getNonWorldEntries().add(oldNonWorldEntry.getClass().getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class, String.class).newInstance(parent, newFolder, oldNonWorldEntry.getName()));
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                OrganizablePlayScreens.LOGGER.error("Failed to instantiate a new instance of " + oldNonWorldEntry.getClass(), e);
+            } else {
+                newFolder.getNonWorldEntries().add(oldNonWorldEntry.getType().singleplayerEntry(parent, newFolder, oldNonWorldEntry.getName()));
             }
         }
         if (oldCurrentFolder == oldFolder) {

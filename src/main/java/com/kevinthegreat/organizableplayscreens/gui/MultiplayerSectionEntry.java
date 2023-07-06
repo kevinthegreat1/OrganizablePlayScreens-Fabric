@@ -7,12 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MultiplayerSectionEntry extends AbstractMultiplayerEntry {
-    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerSectionEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
         super(screen, parent, EntryType.SECTION);
     }
 
-    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerSectionEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         super(screen, parent, EntryType.SECTION, name);
     }

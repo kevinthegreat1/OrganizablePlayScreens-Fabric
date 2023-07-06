@@ -30,7 +30,6 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
-    @SuppressWarnings("unused") // Used via reflection
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
         this(screen, parent, I18n.translate("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>(), new ArrayList<>());
     }

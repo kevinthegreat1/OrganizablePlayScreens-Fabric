@@ -13,14 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Map;
-
 public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements AbstractEntry {
-    public static final Map<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = Map.of(
-            EntryType.FOLDER.id(), MultiplayerFolderEntry.class,
-            EntryType.SECTION.id(), MultiplayerSectionEntry.class,
-            EntryType.SEPARATOR.id(), MultiplayerSeparatorEntry.class
-    );
     @NotNull
     protected final MultiplayerScreen screen;
     /**
@@ -46,26 +39,6 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
         this.parent = parent;
         this.type = type;
         this.name = name;
-    }
-
-    public static AbstractMultiplayerEntry of(EntryType entryType, MultiplayerScreen screen, MultiplayerFolderEntry folder) {
-        try {
-            return MULTIPLAYER_ENTRY_TYPE_MAP.get(entryType.id()).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class).newInstance(screen, folder);
-        } catch (ReflectiveOperationException e) {
-            throw createException(e, entryType.id());
-        }
-    }
-
-    public static AbstractMultiplayerEntry of(String type, MultiplayerScreen screen, MultiplayerFolderEntry folder, String name) {
-        try {
-            return MULTIPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class, String.class).newInstance(screen, folder, name);
-        } catch (ReflectiveOperationException e) {
-            throw createException(e, type);
-        }
-    }
-
-    private static RuntimeException createException(ReflectiveOperationException e, String type) {
-        return new RuntimeException("Failed to instantiate an instance of " + MULTIPLAYER_ENTRY_TYPE_MAP.get(type), e);
     }
 
     public @Nullable MultiplayerFolderEntry getParent() {
