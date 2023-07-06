@@ -1,7 +1,5 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
 import net.minecraft.client.gui.DrawContext;
@@ -18,11 +16,11 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Map;
 
 public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry {
-    public static final BiMap<String, Class<? extends AbstractSingleplayerEntry>> SINGLEPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
+    public static final Map<String, Class<? extends AbstractSingleplayerEntry>> SINGLEPLAYER_ENTRY_TYPE_MAP = Map.of(
             EntryType.FOLDER.id(), SingleplayerFolderEntry.class,
             EntryType.SECTION.id(), SingleplayerSectionEntry.class,
             EntryType.SEPARATOR.id(), SingleplayerSeparatorEntry.class
-    ));
+    );
     @NotNull
     protected final SelectWorldScreen screen;
     /**

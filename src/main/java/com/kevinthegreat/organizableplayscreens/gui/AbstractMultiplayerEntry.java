@@ -1,7 +1,5 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import net.minecraft.client.gui.DrawContext;
@@ -18,11 +16,11 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Map;
 
 public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements AbstractEntry {
-    public static final BiMap<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
+    public static final Map<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = Map.of(
             EntryType.FOLDER.id(), MultiplayerFolderEntry.class,
             EntryType.SECTION.id(), MultiplayerSectionEntry.class,
             EntryType.SEPARATOR.id(), MultiplayerSeparatorEntry.class
-    ));
+    );
     @NotNull
     protected final MultiplayerScreen screen;
     /**

@@ -304,7 +304,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     nbtEntry.putBoolean("current", true);
                 }
             }
-            nbtEntry.putString("type", AbstractSingleplayerEntry.SINGLEPLAYER_ENTRY_TYPE_MAP.inverse().get(nonWorldEntry.getClass()));
+            nbtEntry.putString("type", nonWorldEntry.getType().id());
             nbtEntry.putString("name", nonWorldEntry.getName());
             nbtList.add(nbtEntry);
         }

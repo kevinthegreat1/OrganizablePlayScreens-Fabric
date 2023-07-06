@@ -225,7 +225,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                         nbtEntry.putBoolean("current", true);
                     }
                 }
-                nbtEntry.putString("type", AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.inverse().get(nonServerEntry.getClass()));
+                nbtEntry.putString("type", nonServerEntry.getType().id());
                 nbtEntry.putString("name", nonServerEntry.getName());
                 nbtList.add(nbtEntry);
             }
