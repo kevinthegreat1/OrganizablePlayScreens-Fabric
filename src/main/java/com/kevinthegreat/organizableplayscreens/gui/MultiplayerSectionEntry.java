@@ -14,7 +14,7 @@ public class MultiplayerSectionEntry extends AbstractMultiplayerEntry {
 
     @SuppressWarnings("unused") // Used via reflection
     public MultiplayerSectionEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
-        super(screen, parent, name);
+        super(screen, parent, EntryType.SECTION, name);
     }
 
     @Override

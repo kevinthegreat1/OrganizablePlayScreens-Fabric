@@ -35,7 +35,7 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
     }
 
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
-        super(screen, parent, name);
+        super(screen, parent, EntryType.FOLDER, name);
         this.entries = entries;
         buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {
             MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();

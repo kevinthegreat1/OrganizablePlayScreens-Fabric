@@ -1,7 +1,9 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
-import com.kevinthegreat.organizableplayscreens.gui.*;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
+import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
@@ -147,8 +149,9 @@ public abstract class SelectWorldScreenMixin extends Screen {
      */
     @Inject(method = "method_19942", at = @At("HEAD"), cancellable = true)
     private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
-        if (levelList.getSelectedOrNull() instanceof SingleplayerFolderEntry folderEntry) {
-            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Text.translatable("organizableplayscreens:folder.deleteFolderQuestion"), Text.translatable("organizableplayscreens:folder.deleteSingleplayerFolderWarning", folderEntry.getName()), Text.translatable("selectWorld.deleteButton"), ScreenTexts.CANCEL));
+        if (levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry entry) {
+            boolean isFolder = entry instanceof SingleplayerFolderEntry;
+            client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Text.translatable("organizableplayscreens:entry.deleteEntryQuestion", entry.getType().text().getString()), Text.translatable(isFolder ? "organizableplayscreens:folder.deleteSingleplayerFolderWarning" : "organizableplayscreens:entry.deleteEntryWarning", entry.getName()), Text.translatable("selectWorld.deleteButton"), ScreenTexts.CANCEL));
             ci.cancel();
         }
     }
@@ -257,8 +260,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
         WorldListWidget.Entry entry = levelList.getSelectedOrNull();
         if (entry instanceof WorldListWidget.WorldEntry) {
             selectButton.setMessage(Text.translatable("selectWorld.select"));
-        } else if (entry instanceof SingleplayerFolderEntry) {
-            selectButton.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
+        } else if (entry instanceof AbstractSingleplayerEntry) {
+            if (entry instanceof SingleplayerFolderEntry) {
+                selectButton.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
+            } else {
+                selectButton.active = false;
+            }
             recreateButton.active = false;
         }
         boolean notSearching = searchBox.getText().isEmpty();

@@ -14,7 +14,7 @@ public class SingleplayerSectionEntry extends AbstractSingleplayerEntry {
 
     @SuppressWarnings("unused") // Used via reflection
     public SingleplayerSectionEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
-        super(screen, parent, name);
+        super(screen, parent, EntryType.SECTION, name);
     }
 
     @Override

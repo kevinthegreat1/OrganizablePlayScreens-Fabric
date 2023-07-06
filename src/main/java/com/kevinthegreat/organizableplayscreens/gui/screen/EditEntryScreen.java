@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
+import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
@@ -24,16 +24,15 @@ public class EditEntryScreen extends Screen {
      * Calling this with false will not change anything.
      */
     private final BooleanConsumer callback;
-    private final Function<EntryType, Mutable<String>> factory;
+    private final Function<EntryType, AbstractEntry> factory;
     /**
      * The name string to be edited.
      */
-    private Mutable<String> entryName;
+    private AbstractEntry entry;
     /**
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
     private final boolean newEntry;
-    private EntryType entryType;
     private Text typeTitle;
     private Text typeEnterName;
     private TextFieldWidget nameField;
@@ -42,22 +41,21 @@ public class EditEntryScreen extends Screen {
     private ButtonWidget buttonSeparator;
     private ButtonWidget buttonDone;
 
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, Mutable<String>> factory) {
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry> factory) {
         this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, Mutable<String> entryName) {
-        this(parent, callback, type -> entryName, entryName, false);
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry entry) {
+        this(parent, callback, type -> entry, entry, false);
     }
 
-    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
+    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry> factory, AbstractEntry entry, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;
         this.factory = factory;
-        this.entryName = entryName;
+        this.entry = entry;
         this.newEntry = newEntry;
-        this.entryType = EntryType.FOLDER;
     }
 
     @Override
@@ -67,12 +65,12 @@ public class EditEntryScreen extends Screen {
             buttonSection = addDrawableChild(ButtonWidget.builder(EntryType.SECTION.text(), buttonWidget -> setType(EntryType.SECTION)).dimensions(width / 2 - 25, 40, 50, 20).build());
             buttonSeparator = addDrawableChild(ButtonWidget.builder(EntryType.SEPARATOR.text(), buttonWidget -> setType(EntryType.SEPARATOR)).dimensions(width / 2 + 25, 40, 50, 20).build());
         }
-        typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entryType.text().getString());
-        typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", entryType.text().getString());
+        typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entry.getType().text().getString());
+        typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", entry.getType().text().getString());
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, typeEnterName);
         nameField.setMaxLength(128);
         nameField.setFocused(true);
-        nameField.setText(entryName.getValue());
+        nameField.setText(entry.getValue());
         nameField.setChangedListener(this::updateDoneButton);
         addSelectableChild(nameField);
         buttonDone = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
@@ -86,9 +84,8 @@ public class EditEntryScreen extends Screen {
      * @param entryType the type of the entry
      */
     private void setType(EntryType entryType) {
-        this.entryType = entryType;
-        entryName = factory.apply(entryType);
-        nameField.setText(entryName.getValue());
+        entry = factory.apply(entryType);
+        nameField.setText(entry.getValue());
         clearAndInit();
     }
 
@@ -133,7 +130,7 @@ public class EditEntryScreen extends Screen {
      * Sets the name to the folder and calls the callback with true.
      */
     private void saveAndClose() {
-        entryName.setValue(nameField.getText());
+        entry.setValue(nameField.getText());
         callback.accept(true);
     }
 
@@ -142,9 +139,9 @@ public class EditEntryScreen extends Screen {
      */
     private void updateButtons() {
         if (newEntry) {
-            buttonFolder.active = entryType != EntryType.FOLDER;
-            buttonSection.active = entryType != EntryType.SECTION;
-            buttonSeparator.active = entryType != EntryType.SEPARATOR;
+            buttonFolder.active = entry.getType() != EntryType.FOLDER;
+            buttonSection.active = entry.getType() != EntryType.SECTION;
+            buttonSeparator.active = entry.getType() != EntryType.SEPARATOR;
         }
         updateDoneButton(nameField.getText());
     }
@@ -155,7 +152,7 @@ public class EditEntryScreen extends Screen {
      * @param text the text to check for changes
      */
     private void updateDoneButton(String text) {
-        buttonDone.active = newEntry || !entryName.getValue().equals(text);
+        buttonDone.active = newEntry || !entry.getValue().equals(text);
     }
 
     @Override

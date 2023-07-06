@@ -14,7 +14,7 @@ public class SingleplayerSeparatorEntry extends AbstractSingleplayerEntry {
 
     @SuppressWarnings("unused") // Used via reflection
     public SingleplayerSeparatorEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
-        super(screen, parent, name);
+        super(screen, parent, EntryType.SEPARATOR, name);
     }
 
     @Override

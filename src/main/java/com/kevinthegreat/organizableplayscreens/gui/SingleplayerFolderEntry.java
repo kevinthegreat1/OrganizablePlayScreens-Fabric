@@ -40,7 +40,7 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
     }
 
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name, @NotNull List<AbstractSingleplayerEntry> nonWorldEntries, @NotNull List<WorldListWidget.WorldEntry> worldEntries) {
-        super(screen, parent, name);
+        super(screen, parent, EntryType.FOLDER, name);
         this.nonWorldEntries = nonWorldEntries;
         this.worldEntries = worldEntries;
         buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {

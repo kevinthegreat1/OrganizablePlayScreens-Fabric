@@ -11,14 +11,13 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
 
-public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements Mutable<String> {
+public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements AbstractEntry {
     public static final BiMap<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
             EntryType.FOLDER.id(), MultiplayerFolderEntry.class,
             EntryType.SECTION.id(), MultiplayerSectionEntry.class,
@@ -32,19 +31,22 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     @Nullable
     protected MultiplayerFolderEntry parent;
     @NotNull
+    protected final EntryType type;
+    @NotNull
     protected String name;
     /**
      * Used to detect double-clicking.
      */
     private long time;
 
-    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType entryType) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", entryType.text().getString()));
+    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type) {
+        this(screen, parent, type, I18n.translate("organizableplayscreens:entry.new", type.text().getString()));
     }
 
-    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
+    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type, @NotNull String name) {
         this.screen = screen;
         this.parent = parent;
+        this.type = type;
         this.name = name;
     }
 
@@ -76,17 +78,18 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
         this.parent = parent;
     }
 
+    @Override
+    public EntryType getType() {
+        return type;
+    }
+
+    @Override
     public @NotNull String getName() {
         return name;
     }
 
     @Override
-    public @NotNull String getValue() {
-        return name;
-    }
-
-    @Override
-    public void setValue(@NotNull String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
