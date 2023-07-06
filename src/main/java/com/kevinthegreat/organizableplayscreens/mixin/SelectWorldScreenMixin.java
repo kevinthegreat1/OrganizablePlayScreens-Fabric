@@ -26,6 +26,7 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -47,26 +48,32 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * An accessor to access methods in {@link WorldListWidgetMixin}
      */
+    @Unique
     public WorldListWidgetAccessor worldListWidgetAccessor;
     /**
      * This is the vanilla cancel button because this is not saved in a vanilla field.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonCancel;
     /**
      * This button sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonBack;
     /**
      * This button moves the selected entry to the parent folder.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
     /**
      * This button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonNewFolder;
     /**
      * A folder entry to store the folder that is currently being created.
      */
+    @Unique
     @Nullable
     private AbstractSingleplayerEntry organizableplayscreens_newEntry;
 
@@ -178,6 +185,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Adds the non-world entry stored in {@link #organizableplayscreens_newEntry newEntry} to {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
      */
+    @Unique
     private void organizableplayscreens_addEntry(boolean confirmedAction) {
         if (confirmedAction) {
             worldListWidgetAccessor.organizableplayscreens_getCurrentNonWorldEntries().add(organizableplayscreens_newEntry);
@@ -190,6 +198,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Sets the screen back to this after finishing editing the selected non-world entry.
      */
+    @Unique
     private void organizableplayscreens_editEntry(boolean confirmedAction) {
         client.setScreen(this);
     }
@@ -197,6 +206,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Moves the entries inside the selected folder to {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}, deletes the selected non-world entry, updates the displayed entries, and sets the screen back to this.
      */
+    @Unique
     private void organizableplayscreens_deleteEntry(boolean confirmedAction) {
         if (confirmedAction && levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry nonWorld) {
             if (nonWorld instanceof SingleplayerFolderEntry folder) {

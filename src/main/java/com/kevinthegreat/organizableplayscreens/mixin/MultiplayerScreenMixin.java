@@ -26,6 +26,7 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -55,18 +56,22 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * An accessor to access methods in {@link MultiplayerServerListWidgetMixin}
      */
+    @Unique
     public MultiplayerServerListWidgetAccessor serverListWidgetAccessor;
     /**
      * This is the vanilla cancel button because this is not saved in a vanilla field.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonCancel;
     /**
      * This button moves the selected entry to the parent folder.
      */
+    @Unique
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
     /**
      * A folder entry to store the folder that is currently being created.
      */
+    @Unique
     @Nullable
     private AbstractMultiplayerEntry organizableplayscreens_newEntry;
 
@@ -162,6 +167,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Adds the non-server entry stored in {@link #organizableplayscreens_newEntry newEntry} to {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
      */
+    @Unique
     private void organizableplayscreens_addEntry(boolean confirmedAction) {
         if (confirmedAction) {
             serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newEntry);
@@ -174,6 +180,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Sets the screen back to this after finishing editing the selected non-server entry.
      */
+    @Unique
     private void organizableplayscreens_editEntry(boolean confirmedAction) {
         client.setScreen(this);
     }
@@ -181,6 +188,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Deletes the selected non-server entry, updates the displayed entries, and sets the screen back to this.
      */
+    @Unique
     private void organizableplayscreens_deleteEntry(boolean confirmedAction) {
         if (confirmedAction) {
             serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());

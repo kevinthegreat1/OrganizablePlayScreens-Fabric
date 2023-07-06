@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -50,16 +51,19 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     /**
      * A comparator used to sort and search for server entries by address and then name.
      */
+    @Unique
     private static final Comparator<MultiplayerServerListWidget.ServerEntry> serverEntryComparator = Comparator.comparing((MultiplayerServerListWidget.ServerEntry entry) -> entry.getServer().address).thenComparing(entry -> entry.getServer().name);
 
     /**
      * The root folder. Should contain all entries.
      */
+    @Unique
     @NotNull
     private final MultiplayerFolderEntry organizableplayscreens_rootFolder = new MultiplayerFolderEntry(screen, null, "root");
     /**
      * The current folder. Only entries in this folder will be displayed.
      */
+    @Unique
     @NotNull
     private MultiplayerFolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
     /**
@@ -67,6 +71,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      * <p>
      * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
      */
+    @Unique
     private String organizableplayscreens_currentPath;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -172,6 +177,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      * @param folder      the folder to add the entries to
      * @param nbtCompound the NBT compound to read from
      */
+    @Unique
     private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound, List<MultiplayerServerListWidget.ServerEntry> serversSorted) {
         NbtList nbtList = nbtCompound.getList("entries", 10);
         folder.getEntries().clear();
@@ -207,6 +213,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      * @param folder the folder to read from
      * @return the NBT compound with the entries
      */
+    @Unique
     private NbtCompound organizableplayscreens_toNbt(MultiplayerFolderEntry folder) {
         NbtList nbtList = new NbtList();
         for (MultiplayerServerListWidget.Entry entry : folder.getEntries()) {
@@ -268,6 +275,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     /**
      * Updates the path of {@link #organizableplayscreens_currentFolder currentFolder}.
      */
+    @Unique
     private void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
         MultiplayerFolderEntry folder = organizableplayscreens_currentFolder;

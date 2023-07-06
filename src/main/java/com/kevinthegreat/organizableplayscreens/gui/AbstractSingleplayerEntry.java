@@ -77,7 +77,7 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     }
 
     @Override
-    public EntryType getType() {
+    public @NotNull EntryType getType() {
         return type;
     }
 

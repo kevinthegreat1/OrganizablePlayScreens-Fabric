@@ -77,7 +77,7 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     }
 
     @Override
-    public EntryType getType() {
+    public @NotNull EntryType getType() {
         return type;
     }
 
