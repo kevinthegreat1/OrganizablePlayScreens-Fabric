@@ -77,8 +77,8 @@ public class OrganizablePlayScreens implements ModInitializer {
     }
 
     public static void renderSeparatorEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
-        context.drawTextWithShadow(client.textRenderer, "--------------------------------", x + 32 + 3, y + 1, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 12, 0x808080);
+        context.drawTextWithShadow(client.textRenderer, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 23, 0x808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
     }
 

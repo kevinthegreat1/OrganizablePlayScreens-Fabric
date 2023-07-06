@@ -104,10 +104,10 @@ public abstract class SelectWorldScreenMixin extends Screen {
                     parentFolder.getWorldEntries().add(worldEntry);
                     OrganizablePlayScreens.sortWorldEntries(parentFolder.getWorldEntries());
                     worldListWidgetAccessor.organizableplayscreens_getCurrentWorldEntries().remove(worldEntry);
-                } else if (entry instanceof SingleplayerFolderEntry folderEntry) {
-                    folderEntry.setParent(parentFolder);
-                    parentFolder.getNonWorldEntries().add(folderEntry);
-                    worldListWidgetAccessor.organizableplayscreens_getCurrentNonWorldEntries().remove(folderEntry);
+                } else if (entry instanceof AbstractSingleplayerEntry nonWorldEntry) {
+                    nonWorldEntry.setParent(parentFolder);
+                    parentFolder.getNonWorldEntries().add(nonWorldEntry);
+                    worldListWidgetAccessor.organizableplayscreens_getCurrentNonWorldEntries().remove(nonWorldEntry);
                 }
                 levelList.setSelected(null);
                 worldListWidgetAccessor.organizableplayscreens_updateAndSave();
