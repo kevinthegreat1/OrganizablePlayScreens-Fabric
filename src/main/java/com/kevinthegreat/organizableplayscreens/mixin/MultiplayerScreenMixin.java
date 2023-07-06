@@ -2,7 +2,9 @@ package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
-import com.kevinthegreat.organizableplayscreens.gui.*;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
@@ -111,11 +113,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
-            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_addEntry, type -> organizableplayscreens_newEntry = switch (type) {
-                case FOLDER -> new MultiplayerFolderEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
-                case SECTION -> new MultiplayerSectionEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
-                case SEPARATOR -> new MultiplayerSeparatorEntry((MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder());
-            }));
+            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_addEntry, type -> organizableplayscreens_newEntry = AbstractMultiplayerEntry.of(type, (MultiplayerScreen) (Object) this, serverListWidgetAccessor.organizableplayscreens_getCurrentFolder())));
             select(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
         addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));

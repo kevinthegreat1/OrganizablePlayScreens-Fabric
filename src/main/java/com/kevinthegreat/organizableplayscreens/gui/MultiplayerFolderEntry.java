@@ -25,8 +25,9 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
+    @SuppressWarnings("unused") // Used via reflection
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:folder.folder"), new ArrayList<>());
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>());
     }
 
     public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
@@ -55,8 +56,8 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
     }
 
     @Override
-    public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        OrganizablePlayScreens.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) ((MultiplayerScreenAccessor) screen).getServerListWidget()).organizableplayscreens_getCurrentEntries().size(), buttonMoveInto);
+    protected void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+        OrganizablePlayScreens.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
     }
 
     /**

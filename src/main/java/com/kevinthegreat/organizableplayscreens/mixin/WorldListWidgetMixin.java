@@ -163,13 +163,13 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         showLoadingScreen();
         organizableplayscreens_rootFolder.getNonWorldEntries().clear();
         organizableplayscreens_rootFolder.getWorldEntries().clear();
-        organizableplayscreens_loadedFuture = levelsFuture.thenAcceptAsync((levels -> {
+        organizableplayscreens_loadedFuture = levelsFuture.thenAcceptAsync(levels -> {
             try {
                 organizableplayscreens_fromNbtAndUpdate(NbtIo.read(new File(client.runDirectory, "organizable_worlds.dat")), levels);
             } catch (Exception e) {
                 OrganizablePlayScreens.LOGGER.error("Couldn't load world and folder list", e);
             }
-        }), client);
+        }, client);
     }
 
     /**
@@ -226,13 +226,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> {
-                    try {
-                        folder.getNonWorldEntries().add(AbstractSingleplayerEntry.SINGLEPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class, String.class).newInstance(parent, folder, nbtEntry.getString("name")));
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                        OrganizablePlayScreens.LOGGER.error("Failed to instantiate an instance of " + AbstractSingleplayerEntry.SINGLEPLAYER_ENTRY_TYPE_MAP.get(type), e);
-                    }
-                }
+                default -> folder.getNonWorldEntries().add(AbstractSingleplayerEntry.of(type, parent, folder, nbtEntry.getString("name")));
             }
         }
     }

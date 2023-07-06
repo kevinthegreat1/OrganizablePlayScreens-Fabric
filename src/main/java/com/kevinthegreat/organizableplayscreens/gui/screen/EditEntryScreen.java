@@ -1,13 +1,12 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
-import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -25,7 +24,7 @@ public class EditEntryScreen extends Screen {
      * Calling this with false will not change anything.
      */
     private final BooleanConsumer callback;
-    private final Function<Type, Mutable<String>> factory;
+    private final Function<EntryType, Mutable<String>> factory;
     /**
      * The name string to be edited.
      */
@@ -34,53 +33,61 @@ public class EditEntryScreen extends Screen {
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
     private final boolean newEntry;
-    private String typeText;
+    private EntryType entryType;
     private Text typeTitle;
     private Text typeEnterName;
     private TextFieldWidget nameField;
-    private ButtonWidget doneButton;
+    private ButtonWidget buttonFolder;
+    private ButtonWidget buttonSection;
+    private ButtonWidget buttonSeparator;
+    private ButtonWidget buttonDone;
 
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<Type, Mutable<String>> factory) {
-        this(parent, callback, factory, factory.apply(Type.FOLDER), true);
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, Mutable<String>> factory) {
+        this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
     public EditEntryScreen(Screen parent, BooleanConsumer callback, Mutable<String> entryName) {
         this(parent, callback, type -> entryName, entryName, false);
     }
 
-    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<Type, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
+    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, Mutable<String>> factory, Mutable<String> entryName, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;
         this.factory = factory;
         this.entryName = entryName;
         this.newEntry = newEntry;
-        this.typeText = I18n.translate("organizableplayscreens:folder.folder");
+        this.entryType = EntryType.FOLDER;
     }
 
     @Override
     protected void init() {
         if (newEntry) {
-            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), buttonWidget -> changeType(Type.FOLDER, "organizableplayscreens:folder.folder")).dimensions(width / 2 - 75, 40, 50, 20).build());
-            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), buttonWidget -> changeType(Type.SECTION, "organizableplayscreens:entry.section")).dimensions(width / 2 - 25, 40, 50, 20).build());
-            addDrawableChild(ButtonWidget.builder(Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), buttonWidget -> changeType(Type.SEPARATOR, "organizableplayscreens:entry.separator")).dimensions(width / 2 + 25, 40, 50, 20).build());
+            buttonFolder = addDrawableChild(ButtonWidget.builder(EntryType.FOLDER.text(), buttonWidget -> setType(EntryType.FOLDER)).dimensions(width / 2 - 75, 40, 50, 20).build());
+            buttonSection = addDrawableChild(ButtonWidget.builder(EntryType.SECTION.text(), buttonWidget -> setType(EntryType.SECTION)).dimensions(width / 2 - 25, 40, 50, 20).build());
+            buttonSeparator = addDrawableChild(ButtonWidget.builder(EntryType.SEPARATOR.text(), buttonWidget -> setType(EntryType.SEPARATOR)).dimensions(width / 2 + 25, 40, 50, 20).build());
         }
-        typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", typeText);
-        typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", typeText);
+        typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entryType.text().getString());
+        typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", entryType.text().getString());
         nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, typeEnterName);
         nameField.setMaxLength(128);
         nameField.setFocused(true);
         nameField.setText(entryName.getValue());
         nameField.setChangedListener(this::updateDoneButton);
         addSelectableChild(nameField);
-        doneButton = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
+        buttonDone = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
         addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, buttonWidget -> callback.accept(false)).dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
-        updateDoneButton(nameField.getText());
+        updateButtons();
     }
 
-    private void changeType(Type type, String typeKey) {
-        entryName = factory.apply(type);
-        typeText = I18n.translate(typeKey);
+    /**
+     * Sets the type of the entry being created.
+     *
+     * @param entryType the type of the entry
+     */
+    private void setType(EntryType entryType) {
+        this.entryType = entryType;
+        entryName = factory.apply(entryType);
         nameField.setText(entryName.getValue());
         clearAndInit();
     }
@@ -99,7 +106,7 @@ public class EditEntryScreen extends Screen {
      */
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (!doneButton.active || getFocused() != nameField || keyCode != GLFW.GLFW_KEY_ENTER && keyCode != GLFW.GLFW_KEY_KP_ENTER) {
+        if (!buttonDone.active || getFocused() != nameField || keyCode != GLFW.GLFW_KEY_ENTER && keyCode != GLFW.GLFW_KEY_KP_ENTER) {
             return super.keyPressed(keyCode, scanCode, modifiers);
         } else {
             saveAndClose();
@@ -131,12 +138,24 @@ public class EditEntryScreen extends Screen {
     }
 
     /**
+     * Updates the button states based on the current entry type.
+     */
+    private void updateButtons() {
+        if (newEntry) {
+            buttonFolder.active = entryType != EntryType.FOLDER;
+            buttonSection.active = entryType != EntryType.SECTION;
+            buttonSeparator.active = entryType != EntryType.SEPARATOR;
+        }
+        updateDoneButton(nameField.getText());
+    }
+
+    /**
      * Activates the done button when creating a new folder or when the name has been edited.
      *
      * @param text the text to check for changes
      */
     private void updateDoneButton(String text) {
-        doneButton.active = newEntry || !entryName.getValue().equals(text);
+        buttonDone.active = newEntry || !entryName.getValue().equals(text);
     }
 
     @Override
@@ -146,9 +165,5 @@ public class EditEntryScreen extends Screen {
         context.drawTextWithShadow(textRenderer, typeEnterName, width / 2 - 100, 80, 0xa0a0a0);
         nameField.render(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
-    }
-
-    public enum Type {
-        FOLDER, SECTION, SEPARATOR
     }
 }

@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
+import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.fabricmc.api.ModInitializer;
@@ -23,7 +24,6 @@ public class OrganizablePlayScreens implements ModInitializer {
     public static final String MOD_NAME = "Organizable Play Screens";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Text FOLDER_TEXT = Text.translatable(MOD_ID + ":folder.folder");
     private static final Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
     public static final Identifier OPTIONS_BUTTON_TEXTURE = new Identifier(MOD_ID, "textures/gui/options_button.png");
     public static final Tooltip MOVE_ENTRY_INTO_TOOLTIP = Tooltip.of(Text.translatable(MOD_ID + ":folder.moveInto"));
@@ -62,16 +62,37 @@ public class OrganizablePlayScreens implements ModInitializer {
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
     public static void renderFolderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
-        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xffffff);
-        context.drawTextWithShadow(client.textRenderer, FOLDER_TEXT, x + 32 + 3, y + 12, 0x808080);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0x808080);
+        renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
+        buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
+    }
+
+    public static void renderSectionEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0x808080);
+        renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
+    }
+
+    public static void renderSeparatorEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+        context.drawTextWithShadow(client.textRenderer, "--------------------------------", x + 32 + 3, y + 1, 0xFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 12, 0x808080);
+        renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
+    }
+
+    private static void renderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, int listSize, boolean renderOpenButton) {
         if (client.options.getTouchscreen().getValue() || hovered) {
             context.fill(x, y, x + 32, y + 32, 0xa0909090);
             int o = mouseX - x;
             int p = mouseY - y;
-            if (o < 32 && o > 16) {
-                context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 32, 32, 32, 256, 256);
-            } else {
-                context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 0, 32, 32, 256, 256);
+            if (renderOpenButton) {
+                if (o < 32 && o > 16) {
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 32, 32, 32, 256, 256);
+                } else {
+                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 0, 32, 32, 256, 256);
+                }
             }
             if (index > 0) {
                 if (o < 16 && p < 16) {
@@ -88,18 +109,11 @@ public class OrganizablePlayScreens implements ModInitializer {
                 }
             }
         }
-        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
-        buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
     }
 
     public static void updateEntryNbt(NbtCompound nbtEntry, boolean multiplayer) {
-        if (nbtEntry.contains("type", NbtElement.NUMBER_TYPE) && nbtEntry.getBoolean("type")) {
-            nbtEntry.remove("type");
-            nbtEntry.putString("type", OrganizablePlayScreens.MOD_ID + ":folder");
-        } else {
-            nbtEntry.remove("type");
-            nbtEntry.putString("type", multiplayer ? "minecraft:server" : "minecraft:world");
+        if (!nbtEntry.contains("type", NbtElement.STRING_TYPE)) {
+            nbtEntry.putString("type", nbtEntry.getBoolean("type") ? OrganizablePlayScreens.MOD_ID + ":folder" : multiplayer ? "minecraft:server" : "minecraft:world");
         }
     }
 }

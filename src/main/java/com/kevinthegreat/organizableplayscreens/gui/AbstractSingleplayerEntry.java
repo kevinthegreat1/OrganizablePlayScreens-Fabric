@@ -2,9 +2,9 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
@@ -20,9 +20,9 @@ import java.util.Map;
 
 public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements Mutable<String> {
     public static final BiMap<String, Class<? extends AbstractSingleplayerEntry>> SINGLEPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
-            OrganizablePlayScreens.MOD_ID + ":folder", SingleplayerFolderEntry.class,
-            OrganizablePlayScreens.MOD_ID + ":section", SingleplayerSectionEntry.class,
-            OrganizablePlayScreens.MOD_ID + ":separator", SingleplayerSeparatorEntry.class
+            EntryType.FOLDER.id(), SingleplayerFolderEntry.class,
+            EntryType.SECTION.id(), SingleplayerSectionEntry.class,
+            EntryType.SEPARATOR.id(), SingleplayerSeparatorEntry.class
     ));
     @NotNull
     protected final SelectWorldScreen screen;
@@ -38,10 +38,34 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      */
     private long time;
 
-    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String type) {
+    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull EntryType entryType) {
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", entryType.text().getString()));
+    }
+
+    public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
         this.screen = screen;
         this.parent = parent;
-        this.name = I18n.translate("organizableplayscreens:entry.new", type);
+        this.name = name;
+    }
+
+    public static AbstractSingleplayerEntry of(EntryType entryType, SelectWorldScreen screen, SingleplayerFolderEntry folder) {
+        try {
+            return SINGLEPLAYER_ENTRY_TYPE_MAP.get(entryType.id()).getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class).newInstance(screen, folder);
+        } catch (ReflectiveOperationException e) {
+            throw createException(e, entryType.id());
+        }
+    }
+
+    public static AbstractSingleplayerEntry of(String type, SelectWorldScreen screen, SingleplayerFolderEntry folder, String name) {
+        try {
+            return SINGLEPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(SelectWorldScreen.class, SingleplayerFolderEntry.class, String.class).newInstance(screen, folder, name);
+        } catch (ReflectiveOperationException e) {
+            throw createException(e, type);
+        }
+    }
+
+    private static RuntimeException createException(ReflectiveOperationException e, String type) {
+        return new RuntimeException("Failed to instantiate an instance of " + SINGLEPLAYER_ENTRY_TYPE_MAP.get(type), e);
     }
 
     public @Nullable SingleplayerFolderEntry getParent() {
@@ -68,6 +92,13 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
 
     protected void entrySelected(WorldListWidgetAccessor levelList) {
     }
+
+    @Override
+    public final void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_getCurrentNonWorldEntries().size());
+    }
+
+    protected abstract void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
 
     /**
      * Handles key presses for this folder.

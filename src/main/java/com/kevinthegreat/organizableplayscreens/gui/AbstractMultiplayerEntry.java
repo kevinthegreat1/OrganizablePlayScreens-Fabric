@@ -2,9 +2,9 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -20,9 +20,9 @@ import java.util.Map;
 
 public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements Mutable<String> {
     public static final BiMap<String, Class<? extends AbstractMultiplayerEntry>> MULTIPLAYER_ENTRY_TYPE_MAP = HashBiMap.create(Map.of(
-            OrganizablePlayScreens.MOD_ID + ":folder", MultiplayerFolderEntry.class,
-            OrganizablePlayScreens.MOD_ID + ":section", MultiplayerSectionEntry.class,
-            OrganizablePlayScreens.MOD_ID + ":separator", MultiplayerSeparatorEntry.class
+            EntryType.FOLDER.id(), MultiplayerFolderEntry.class,
+            EntryType.SECTION.id(), MultiplayerSectionEntry.class,
+            EntryType.SEPARATOR.id(), MultiplayerSeparatorEntry.class
     ));
     @NotNull
     protected final MultiplayerScreen screen;
@@ -38,10 +38,34 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      */
     private long time;
 
-    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String type) {
+    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType entryType) {
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", entryType.text().getString()));
+    }
+
+    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         this.screen = screen;
         this.parent = parent;
-        this.name = I18n.translate("organizableplayscreens:entry.new", type);
+        this.name = name;
+    }
+
+    public static AbstractMultiplayerEntry of(EntryType entryType, MultiplayerScreen screen, MultiplayerFolderEntry folder) {
+        try {
+            return MULTIPLAYER_ENTRY_TYPE_MAP.get(entryType.id()).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class).newInstance(screen, folder);
+        } catch (ReflectiveOperationException e) {
+            throw createException(e, entryType.id());
+        }
+    }
+
+    public static AbstractMultiplayerEntry of(String type, MultiplayerScreen screen, MultiplayerFolderEntry folder, String name) {
+        try {
+            return MULTIPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class, String.class).newInstance(screen, folder, name);
+        } catch (ReflectiveOperationException e) {
+            throw createException(e, type);
+        }
+    }
+
+    private static RuntimeException createException(ReflectiveOperationException e, String type) {
+        return new RuntimeException("Failed to instantiate an instance of " + MULTIPLAYER_ENTRY_TYPE_MAP.get(type), e);
     }
 
     public @Nullable MultiplayerFolderEntry getParent() {
@@ -65,6 +89,13 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     public void setValue(@NotNull String name) {
         this.name = name;
     }
+
+    @Override
+    public final void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) ((MultiplayerScreenAccessor) screen).getServerListWidget()).organizableplayscreens_getCurrentEntries().size());
+    }
+
+    protected abstract void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
 
     /**
      * Handles key presses for this folder.

@@ -30,8 +30,9 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
      */
     private final ButtonWidget buttonMoveInto;
 
+    @SuppressWarnings("unused") // Used via reflection
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:folder.folder"), new ArrayList<>(), new ArrayList<>());
+        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>(), new ArrayList<>());
     }
 
     public SingleplayerFolderEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull String name) {
@@ -69,8 +70,8 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
     }
 
     @Override
-    public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        OrganizablePlayScreens.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_getCurrentNonWorldEntries().size(), buttonMoveInto);
+    protected void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+        OrganizablePlayScreens.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
     }
 
     @Override

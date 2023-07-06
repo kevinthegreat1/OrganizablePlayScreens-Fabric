@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -197,13 +196,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                default -> {
-                    try {
-                        folder.getEntries().add(AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.get(type).getDeclaredConstructor(MultiplayerScreen.class, MultiplayerFolderEntry.class, String.class).newInstance(screen, folder, nbtEntry.getString("name")));
-                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                        OrganizablePlayScreens.LOGGER.error("Failed to instantiate an instance of " + AbstractMultiplayerEntry.MULTIPLAYER_ENTRY_TYPE_MAP.get(type), e);
-                    }
-                }
+                default -> folder.getEntries().add(AbstractMultiplayerEntry.of(type, screen, folder, nbtEntry.getString("name")));
             }
         }
     }
