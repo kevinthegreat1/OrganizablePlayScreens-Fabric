@@ -14,6 +14,7 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
@@ -203,7 +204,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                default -> folder.getEntries().add(EntryType.ENTRY_TYPE_MAP.get(type).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
+                default -> folder.getEntries().add(EntryType.ENTRY_TYPE_MAP.get(new Identifier(type)).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
             }
         }
     }
@@ -233,7 +234,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                         nbtEntry.putBoolean("current", true);
                     }
                 }
-                nbtEntry.putString("type", nonServerEntry.getType().id());
+                nbtEntry.putString("type", nonServerEntry.getType().id().toString());
                 nbtEntry.putString("name", nonServerEntry.getName());
                 nbtList.add(nbtEntry);
             }

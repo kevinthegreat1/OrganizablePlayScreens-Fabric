@@ -13,6 +13,7 @@ import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.NotNull;
@@ -234,7 +235,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> folder.getNonWorldEntries().add(EntryType.ENTRY_TYPE_MAP.get(type).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
+                default -> folder.getNonWorldEntries().add(EntryType.ENTRY_TYPE_MAP.get(new Identifier(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
             }
         }
     }
@@ -312,7 +313,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     nbtEntry.putBoolean("current", true);
                 }
             }
-            nbtEntry.putString("type", nonWorldEntry.getType().id());
+            nbtEntry.putString("type", nonWorldEntry.getType().id().toString());
             nbtEntry.putString("name", nonWorldEntry.getName());
             nbtList.add(nbtEntry);
         }
