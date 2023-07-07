@@ -30,10 +30,25 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      */
     private long time;
 
+    /**
+     * Creates a new entry with the default name.
+     *
+     * @param screen the screen this entry is on
+     * @param parent the parent folder of this entry
+     * @param type   the type of this entry
+     */
     public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type) {
         this(screen, parent, type, I18n.translate("organizableplayscreens:entry.new", type.text().getString()));
     }
 
+    /**
+     * Creates a new entry with the specified name.
+     *
+     * @param screen the screen this entry is on
+     * @param parent the parent folder of this entry
+     * @param type   the type of this entry
+     * @param name   the name of this entry
+     */
     public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type, @NotNull String name) {
         this.screen = screen;
         this.parent = parent;
@@ -68,8 +83,6 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     public final void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
         render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerServerListWidgetAccessor) ((MultiplayerScreenAccessor) screen).getServerListWidget()).organizableplayscreens_getCurrentEntries().size());
     }
-
-    protected abstract void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
 
     /**
      * Handles key presses for this folder.

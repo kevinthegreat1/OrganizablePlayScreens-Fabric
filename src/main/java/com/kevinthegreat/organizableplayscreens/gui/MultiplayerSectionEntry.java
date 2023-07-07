@@ -1,6 +1,5 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,7 @@ public class MultiplayerSectionEntry extends AbstractMultiplayerEntry {
     }
 
     @Override
-    protected void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        OrganizablePlayScreens.renderSectionEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
+    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+        AbstractEntry.renderSectionEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
     }
 }

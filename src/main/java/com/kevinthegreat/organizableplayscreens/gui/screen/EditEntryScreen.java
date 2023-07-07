@@ -24,6 +24,9 @@ public class EditEntryScreen extends Screen {
      * Calling this with false will not change anything.
      */
     private final BooleanConsumer callback;
+    /**
+     * Used to create a new entry of the specific type when the type is changed.
+     */
     private final Function<EntryType, AbstractEntry> factory;
     /**
      * The name string to be edited.
@@ -41,10 +44,22 @@ public class EditEntryScreen extends Screen {
     private ButtonWidget buttonSeparator;
     private ButtonWidget buttonDone;
 
+    /**
+     * Creates an edit entry screen for a new entry.
+     * @param parent the parent screen
+     * @param callback the callback to be called when this screen is closed
+     * @param factory the factory to be used to create a new entry of the specific type
+     */
     public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry> factory) {
         this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
+    /**
+     * Creates an edit entry screen for editing an existing entry.
+     * @param parent the parent screen
+     * @param callback the callback to be called when this screen is closed
+     * @param entry the entry to be edited
+     */
     public EditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry entry) {
         this(parent, callback, type -> entry, entry, false);
     }

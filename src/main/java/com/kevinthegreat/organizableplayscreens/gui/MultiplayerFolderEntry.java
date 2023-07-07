@@ -55,8 +55,8 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
     }
 
     @Override
-    protected void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        OrganizablePlayScreens.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
+    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+        AbstractEntry.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
     }
 
     /**
