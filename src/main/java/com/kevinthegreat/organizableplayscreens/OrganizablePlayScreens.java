@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
+import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.fabricmc.api.ModInitializer;
@@ -50,7 +51,7 @@ public class OrganizablePlayScreens implements ModInitializer {
 
     public static void updateEntryNbt(NbtCompound nbtEntry, boolean multiplayer) {
         if (!nbtEntry.contains("type", NbtElement.STRING_TYPE)) {
-            nbtEntry.putString("type", nbtEntry.getBoolean("type") ? OrganizablePlayScreens.MOD_ID + ":folder" : multiplayer ? "minecraft:server" : "minecraft:world");
+            nbtEntry.putString("type", nbtEntry.getBoolean("type") ? EntryType.FOLDER.id().toString() : multiplayer ? "minecraft:server" : "minecraft:world");
         }
     }
 }
