@@ -213,7 +213,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Edits the selected server to match {@link MultiplayerScreen#selectedEntry selectedEntry} in {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
      */
-    @Inject(method = "editEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
+    @Inject(method = "editEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
     private void organizableplayscreens_editServer(boolean confirmedAction, CallbackInfo ci) {
         serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().set(serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
         serverListWidgetAccessor.organizableplayscreens_updateAndSave();
