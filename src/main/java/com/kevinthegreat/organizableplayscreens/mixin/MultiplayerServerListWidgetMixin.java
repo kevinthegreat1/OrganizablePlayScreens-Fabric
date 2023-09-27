@@ -190,7 +190,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             switch (type) {
                 case "minecraft:server" -> {
                     if (!nbtEntry.getBoolean("hidden")) {
-                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), false)), serverEntryComparator);
+                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), null)), serverEntryComparator);
                         if (index >= 0) {
                             folder.getEntries().add(serversSorted.remove(index));
                         }

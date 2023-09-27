@@ -104,11 +104,6 @@ public class EditEntryScreen extends Screen {
         clearAndInit();
     }
 
-    @Override
-    public void tick() {
-        nameField.tick();
-    }
-
     /**
      * Handles key presses for the screen. Saves and closes the screen if the done button is active, the name text field is not focused, and {@link GLFW#GLFW_KEY_ENTER} or {@link GLFW#GLFW_KEY_KP_ENTER} is pressed.
      *
@@ -172,7 +167,7 @@ public class EditEntryScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, typeTitle, width / 2, 20, 0xffffff);
         context.drawTextWithShadow(textRenderer, typeEnterName, width / 2 - 100, 80, 0xa0a0a0);
         nameField.render(context, mouseX, mouseY, delta);

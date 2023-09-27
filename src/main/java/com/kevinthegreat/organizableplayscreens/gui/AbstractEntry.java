@@ -15,7 +15,12 @@ import java.util.function.Supplier;
  */
 public interface AbstractEntry extends Supplier<EntryType>, Mutable<String> {
     MinecraftClient client = MinecraftClient.getInstance();
-    Identifier SERVER_SELECTION_TEXTURE = new Identifier("textures/gui/server_selection.png");
+    Identifier JOIN_TEXTURE = new Identifier("server_list/join");
+    Identifier JOIN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/join_highlighted");
+    Identifier MOVE_UP_TEXTURE = new Identifier("server_list/move_up");
+    Identifier MOVE_UP_HIGHLIGHTED_TEXTURE = new Identifier("server_list/move_up_highlighted");
+    Identifier MOVE_DOWN_TEXTURE = new Identifier("server_list/move_down");
+    Identifier MOVE_DOWN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/move_down_highlighted");
 
     @Override
     default EntryType get() {
@@ -86,23 +91,23 @@ public interface AbstractEntry extends Supplier<EntryType>, Mutable<String> {
             int p = mouseY - y;
             if (renderOpenButton) {
                 if (o < 32 && o > 16) {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 32, 32, 32, 256, 256);
+                    context.drawGuiTexture(JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 0, 0, 32, 32, 256, 256);
+                    context.drawGuiTexture(JOIN_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index > 0) {
                 if (o < 16 && p < 16) {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 96, 32, 32, 32, 256, 256);
+                    context.drawGuiTexture(MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 96, 0, 32, 32, 256, 256);
+                    context.drawGuiTexture(MOVE_UP_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index < listSize - 1) {
                 if (o < 16 && p > 16) {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 64, 32, 32, 32, 256, 256);
+                    context.drawGuiTexture(MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawTexture(SERVER_SELECTION_TEXTURE, x, y, 64, 0, 32, 32, 256, 256);
+                    context.drawGuiTexture(MOVE_DOWN_TEXTURE, x, y, 32, 32);
                 }
             }
         }

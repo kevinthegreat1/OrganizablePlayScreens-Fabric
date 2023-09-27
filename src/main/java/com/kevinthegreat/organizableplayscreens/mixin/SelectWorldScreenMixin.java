@@ -7,6 +7,7 @@ import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
+import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -129,7 +129,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
             }));
             levelList.setSelected(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
-        addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
+        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
     /**

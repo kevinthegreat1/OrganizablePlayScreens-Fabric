@@ -8,6 +8,7 @@ import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetA
 import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
+import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -124,7 +124,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
             }));
             select(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
-        addDrawableChild(new TexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
+        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
     }
 
     /**

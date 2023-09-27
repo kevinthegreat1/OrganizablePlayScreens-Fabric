@@ -114,7 +114,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
      */
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 12, 0xFFFFFF);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
