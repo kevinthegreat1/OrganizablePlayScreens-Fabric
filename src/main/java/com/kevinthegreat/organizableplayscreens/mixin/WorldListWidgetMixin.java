@@ -28,7 +28,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -82,8 +83,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     @Unique
     private String organizableplayscreens_currentPath;
 
-    public WorldListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
-        super(minecraftClient, i, j, k, l, m);
+    public WorldListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l) {
+        super(minecraftClient, i, j, k, l);
     }
 
     @Override
@@ -143,7 +144,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      * Loads and displays folders and worlds from {@code oldWidget} asynchronously after it finishes loading folders and worlds and sets {@link #organizableplayscreens_loadedFuture loadedFuture}.
      */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
-    private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int top, int bottom, int itemHeight, String search, WorldListWidget oldWidget, CallbackInfo ci) {
+    private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int y, int itemHeight, String search, WorldListWidget oldWidget, CallbackInfo ci) {
         showLoadingScreen();
         organizableplayscreens_loadedFuture = ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_loadedFuture.thenRunAsync(() -> {
             organizableplayscreens_worlds.clear();
@@ -172,7 +173,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         organizableplayscreens_rootFolder.getWorldEntries().clear();
         organizableplayscreens_loadedFuture = levelsFuture.thenAcceptAsync(levels -> {
             try {
-                organizableplayscreens_fromNbtAndUpdate(NbtIo.read(new File(client.runDirectory, "organizable_worlds.dat")), levels);
+                organizableplayscreens_fromNbtAndUpdate(NbtIo.read(client.runDirectory.toPath().resolve("organizable_worlds.dat")), levels);
             } catch (Exception e) {
                 OrganizablePlayScreens.LOGGER.error("Couldn't load world and folder list", e);
             }
@@ -286,11 +287,12 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     public void organizableplayscreens_saveFile() {
         try {
             NbtCompound nbtCompound = organizableplayscreens_toNbt(organizableplayscreens_rootFolder);
-            File file = File.createTempFile("organizable_worlds", ".dat", client.runDirectory);
-            NbtIo.write(nbtCompound, file);
-            File file2 = new File(client.runDirectory, "organizable_worlds.dat_old");
-            File file3 = new File(client.runDirectory, "organizable_worlds.dat");
-            Util.backupAndReplace(file3, file, file2);
+            Path runDirectory = client.runDirectory.toPath();
+            Path tempFile = Files.createTempFile(runDirectory, "organizable_worlds", ".dat");
+            NbtIo.write(nbtCompound, tempFile);
+            Path backup = runDirectory.resolve("organizable_worlds.dat_old");
+            Path file = runDirectory.resolve("organizable_worlds.dat");
+            Util.backupAndReplace(file, tempFile, backup);
         } catch (Exception e) {
             OrganizablePlayScreens.LOGGER.error("Couldn't save world and folder list", e);
         }
@@ -381,7 +383,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 SingleplayerFolderEntry folderEntry = organizableplayscreens_worlds.get(worldEntry);
                 if (folderEntry != null) {
                     organizableplayscreens_currentFolder = folderEntry;
-                    parent.worldSelected(true, true);
+                    parent.worldSelected(null);
                 }
             }
             children().addAll(organizableplayscreens_currentFolder.getNonWorldEntries());

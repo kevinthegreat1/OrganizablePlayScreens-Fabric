@@ -26,7 +26,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,8 +77,8 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Unique
     private String organizableplayscreens_currentPath;
 
-    public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
-        super(minecraftClient, i, j, k, l, m);
+    public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l) {
+        super(minecraftClient, i, j, k, l);
     }
 
     @Override
@@ -130,7 +131,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Override
     public void organizableplayscreens_loadFile() {
         try {
-            NbtCompound nbtCompound = NbtIo.read(new File(client.runDirectory, "organizable_servers.dat"));
+            NbtCompound nbtCompound = NbtIo.read(client.runDirectory.toPath().resolve("organizable_servers.dat"));
             List<MultiplayerServerListWidget.ServerEntry> serversSorted = new ArrayList<>(servers);
             serversSorted.sort(serverEntryComparator);
             if (nbtCompound != null) {
@@ -154,11 +155,12 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     public void organizableplayscreens_saveFile() {
         try {
             NbtCompound nbtCompound = organizableplayscreens_toNbt(organizableplayscreens_rootFolder);
-            File file = File.createTempFile("organizable_servers", ".dat", client.runDirectory);
-            NbtIo.write(nbtCompound, file);
-            File file2 = new File(client.runDirectory, "organizable_servers.dat_old");
-            File file3 = new File(client.runDirectory, "organizable_servers.dat");
-            Util.backupAndReplace(file3, file, file2);
+            Path runDirectory = client.runDirectory.toPath();
+            Path tempFile = Files.createTempFile(runDirectory, "organizable_servers", ".dat");
+            NbtIo.write(nbtCompound, tempFile);
+            Path backup = runDirectory.resolve("organizable_servers.dat_old");
+            Path file = runDirectory.resolve("organizable_servers.dat");
+            Util.backupAndReplace(file, tempFile, backup);
         } catch (Exception e) {
             OrganizablePlayScreens.LOGGER.error("Couldn't save server and folder list", e);
         }

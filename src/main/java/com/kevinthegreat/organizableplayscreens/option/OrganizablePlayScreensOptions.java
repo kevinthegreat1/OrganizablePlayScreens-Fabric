@@ -20,6 +20,8 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.Util;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
@@ -34,7 +36,7 @@ public class OrganizablePlayScreensOptions {
     public static final Text X = Text.translatable("organizableplayscreens:options.x");
     public static final Text Y = Text.translatable("organizableplayscreens:options.y");
     public static final String[] KEYS = new String[]{"organizableplayscreens:options.backButton", "organizableplayscreens:options.moveEntryBackButton", "organizableplayscreens:options.newFolderButton", "organizableplayscreens:options.optionsButton", "organizableplayscreens:options.moveEntryIntoButton"};
-    private final File optionsFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), OrganizablePlayScreens.MOD_ID + ".json");
+    private final Path optionsFile = FabricLoader.getInstance().getConfigDir().resolve(OrganizablePlayScreens.MOD_ID + ".json");
     public final SimpleOption<Boolean> buttonType = new SimpleOption<>("organizableplayscreens:options.buttonType", SimpleOption.emptyTooltip(), (optionText, value) -> Text.translatable(value ? "organizableplayscreens:options.textField" : "organizableplayscreens:options.slider"), SimpleOption.BOOLEAN, false, value -> {
         if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen organizablePlayScreensOptionsScreen) {
             organizablePlayScreensOptionsScreen.clearAndInit();
@@ -103,11 +105,11 @@ public class OrganizablePlayScreensOptions {
      * Loads options from {@code /config/organizable-play-screens.json} with Gson.
      */
     public void load() {
-        if (!optionsFile.exists()) {
+        if (!Files.isRegularFile(optionsFile)) {
             return;
         }
         JsonObject optionsJson;
-        try (BufferedReader reader = new BufferedReader(new FileReader(optionsFile))) {
+        try (BufferedReader reader = Files.newBufferedReader(optionsFile)) {
             optionsJson = JsonParser.parseReader(reader).getAsJsonObject();
         } catch (FileNotFoundException e) {
             OrganizablePlayScreens.LOGGER.warn("Options file not found", e);
@@ -146,19 +148,19 @@ public class OrganizablePlayScreensOptions {
                 saveOption(optionsJson, namedOption.getLeft(), namedOption.getRight());
             }
         }
-        File tempFile;
+        Path tempFile;
         try {
-            tempFile = File.createTempFile(OrganizablePlayScreens.MOD_ID, ".json", optionsFile.getParentFile());
+            tempFile = Files.createTempFile(optionsFile.getParent(), OrganizablePlayScreens.MOD_ID, ".json");
         } catch (IOException e) {
             OrganizablePlayScreens.LOGGER.error("Failed to save options file", e);
             return;
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(tempFile)) {
             GSON.toJson(optionsJson, writer);
         } catch (IOException e) {
             OrganizablePlayScreens.LOGGER.error("Failed to write options", e);
         }
-        File backup = new File(optionsFile.getParentFile(), OrganizablePlayScreens.MOD_ID + ".json_old");
+        Path backup = optionsFile.getParent().resolve(OrganizablePlayScreens.MOD_ID + ".json_old");
         Util.backupAndReplace(optionsFile, tempFile, backup);
     }
 

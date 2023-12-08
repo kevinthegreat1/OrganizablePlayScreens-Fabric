@@ -165,9 +165,4 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     public Text getNarration() {
         return Text.translatable("narrator.select", name);
     }
-
-    @Override
-    public boolean isAvailable() {
-        return true;
-    }
 }

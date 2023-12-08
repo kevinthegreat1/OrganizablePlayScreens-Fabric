@@ -20,6 +20,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
@@ -96,7 +97,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(ZZ)V"))
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Lnet/minecraft/world/level/storage/LevelSummary;)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
@@ -129,7 +130,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
             }));
             levelList.setSelected(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
-        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this))));
+        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
     }
 
     /**
@@ -231,20 +232,16 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Handles keypress for the screen.
+     * Handles escape key and the screen buttons.
      * <p>
-     * Handles escape key first, then the screen buttons, then the search box, and finally the world list widget.
      * First, sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
      * Then, calls {@link Screen#keyPressed(int, int, int)}.
-     * Then, calls {@link TextFieldWidget#keyPressed(int, int, int)} for {@code searchBox}.
-     * Finally, calls {@link WorldListWidgetMixin#keyPressed(int, int, int)}.
      *
      * @param keyCode the key code that was pressed
      */
-    @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
-    private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && worldListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(keyCode, scanCode, modifiers) || searchBox.keyPressed(keyCode, scanCode, modifiers) || levelList.keyPressed(keyCode, scanCode, modifiers));
-        cir.cancel();
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && worldListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     /**
@@ -269,7 +266,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * Updates the activation states of buttons. Called at the end of {@link #init()} and every time an entry is selected.
      */
     @Inject(method = "worldSelected", at = @At("RETURN"))
-    private void organizableplayscreens_updateButtonStates(boolean buttonsActive, boolean deleteButtonActive, CallbackInfo ci) {
+    private void organizableplayscreens_updateButtonStates(LevelSummary levelSummary, CallbackInfo ci) {
         WorldListWidget.Entry entry = levelList.getSelectedOrNull();
         if (entry instanceof WorldListWidget.WorldEntry) {
             selectButton.setMessage(Text.translatable("selectWorld.select"));
