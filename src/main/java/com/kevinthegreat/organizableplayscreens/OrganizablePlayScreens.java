@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
-import com.kevinthegreat.organizableplayscreens.gui.EntryType;
+import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.fabricmc.api.ModInitializer;

@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
+import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import org.jetbrains.annotations.NotNull;

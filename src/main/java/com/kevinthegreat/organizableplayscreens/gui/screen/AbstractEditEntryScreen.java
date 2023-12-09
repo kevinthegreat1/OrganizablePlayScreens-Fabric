@@ -1,21 +1,22 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
+import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
-import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
+public abstract class AbstractEditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
     private final Screen parent;
 
     /**
@@ -40,9 +41,7 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
     private Text typeTitle;
     private Text typeEnterName;
     private TextFieldWidget nameField;
-    private ButtonWidget buttonFolder;
-    private ButtonWidget buttonSection;
-    private ButtonWidget buttonSeparator;
+    private final Map<EntryType, ButtonWidget> entryTypeButtons = new HashMap<>();
     private ButtonWidget buttonDone;
 
     /**
@@ -51,7 +50,7 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
      * @param callback the callback to be called when this screen is closed
      * @param factory the factory to be used to create a new entry of the specific type
      */
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory) {
+    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory) {
         this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
@@ -61,11 +60,11 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
      * @param callback the callback to be called when this screen is closed
      * @param entry the entry to be edited
      */
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<E> entry) {
+    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<E> entry) {
         this(parent, callback, type -> entry, entry, false);
     }
 
-    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory, AbstractEntry<E> entry, boolean newEntry) {
+    private AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory, AbstractEntry<E> entry, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;
@@ -74,12 +73,19 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
         this.newEntry = newEntry;
     }
 
+    protected abstract List<EntryType> getEntryTypes();
+
     @Override
     protected void init() {
         if (newEntry) {
-            buttonFolder = addDrawableChild(ButtonWidget.builder(EntryType.FOLDER.text(), buttonWidget -> setType(EntryType.FOLDER)).dimensions(width / 2 - 75, 40, 50, 20).build());
-            buttonSection = addDrawableChild(ButtonWidget.builder(EntryType.SECTION.text(), buttonWidget -> setType(EntryType.SECTION)).dimensions(width / 2 - 25, 40, 50, 20).build());
-            buttonSeparator = addDrawableChild(ButtonWidget.builder(EntryType.SEPARATOR.text(), buttonWidget -> setType(EntryType.SEPARATOR)).dimensions(width / 2 + 25, 40, 50, 20).build());
+            GridWidget gridWidget = new GridWidget();
+            List<EntryType> entryTypes = getEntryTypes();
+            GridWidget.Adder adder = gridWidget.createAdder(entryTypes.size());
+            for (EntryType entryType : entryTypes) {
+                entryTypeButtons.put(entryType, adder.add(addDrawableChild(ButtonWidget.builder(entryType.text(), buttonWidget_ -> setType(entryType)).width(50).build())));
+            }
+            gridWidget.refreshPositions();
+            SimplePositioningWidget.setPos(gridWidget, 0, 40, width, 40);
         }
         typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entry.getType().text().getString());
         typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", entry.getType().text().getString());
@@ -88,7 +94,7 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
         nameField.setFocused(true);
         nameField.setText(entry.getValue());
         nameField.setChangedListener(this::updateDoneButton);
-        addSelectableChild(nameField);
+        addDrawableChild(nameField);
         buttonDone = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
         addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, buttonWidget -> callback.accept(false)).dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
         updateButtons();
@@ -150,9 +156,10 @@ public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> e
      */
     private void updateButtons() {
         if (newEntry) {
-            buttonFolder.active = entry.getType() != EntryType.FOLDER;
-            buttonSection.active = entry.getType() != EntryType.SECTION;
-            buttonSeparator.active = entry.getType() != EntryType.SEPARATOR;
+            EntryType currentType = entry.getType();
+            for (Map.Entry<EntryType, ButtonWidget> entry : entryTypeButtons.entrySet()) {
+                entry.getValue().active = entry.getKey() != currentType;
+            }
         }
         updateDoneButton(nameField.getText());
     }

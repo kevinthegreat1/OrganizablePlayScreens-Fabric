@@ -6,7 +6,7 @@ import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
-import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.MultiplayerEditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
@@ -119,7 +119,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
-            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_addEntry, type -> {
+            client.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
                 MultiplayerFolderEntry folder = serverListWidgetAccessor.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.multiplayerEntry((MultiplayerScreen) (Object) this, folder);
             }));
@@ -134,7 +134,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "method_19915", at = @At(value = "RETURN"))
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (serverListWidget.getSelectedOrNull() instanceof AbstractMultiplayerEntry entry) {
-            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_editEntry, entry));
+            client.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
         }
     }
 

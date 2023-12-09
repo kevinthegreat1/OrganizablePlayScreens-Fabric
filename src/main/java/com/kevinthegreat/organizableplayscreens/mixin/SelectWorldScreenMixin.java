@@ -5,8 +5,8 @@ import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
-import com.kevinthegreat.organizableplayscreens.gui.screen.EditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.SingleplayerEditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.DrawContext;
@@ -128,7 +128,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         organizableplayscreens_buttonNewFolder = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
-            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_addEntry, type -> {
+            client.setScreen(new SingleplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
                 SingleplayerFolderEntry folder = worldListWidgetAccessor.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.singleplayerEntry((SelectWorldScreen) (Object) this, folder);
             }));
@@ -154,7 +154,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Inject(method = "method_19943", at = @At("HEAD"), cancellable = true)
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry entry) {
-            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_editEntry, entry));
+            client.setScreen(new SingleplayerEditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
             ci.cancel();
         }
     }

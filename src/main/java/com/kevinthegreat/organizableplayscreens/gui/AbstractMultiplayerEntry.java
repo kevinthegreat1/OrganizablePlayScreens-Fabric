@@ -1,5 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
+import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import net.minecraft.client.gui.DrawContext;

@@ -1,8 +1,8 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
-import com.kevinthegreat.organizableplayscreens.gui.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SaveVersionInfoInvoker;
@@ -236,7 +236,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> folder.getNonWorldEntries().add(EntryType.ENTRY_TYPE_MAP.get(new Identifier(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
+                default -> folder.getNonWorldEntries().add(EntryType.get(new Identifier(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
             }
         }
     }
