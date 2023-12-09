@@ -45,7 +45,7 @@ dependencies {
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-//	modImplementation "gg.essential:essential-${project.minecraft_version}-fabric:${project.essential_version}"
+	modImplementation "gg.essential:essential-${project.essential_minecraft_version}-fabric:${project.essential_version}"
 }
 
 processResources {
