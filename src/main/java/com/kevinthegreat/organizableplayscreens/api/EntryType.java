@@ -28,9 +28,9 @@ public class EntryType {
      * A list of all singleplayer entry types.
      */
     private static final List<EntryType> SINGLEPLAYER_ENTRY_TYPES = new ArrayList<>();
-    public static final EntryType FOLDER = register(new Identifier(OrganizablePlayScreens.MOD_ID, "folder"), OrganizablePlayScreens.MOD_ID + ":folder.folder", MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
-    public static final EntryType SECTION = register(new Identifier(OrganizablePlayScreens.MOD_ID, "section"), OrganizablePlayScreens.MOD_ID + ":entry.section", MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
-    public static final EntryType SEPARATOR = register(new Identifier(OrganizablePlayScreens.MOD_ID, "separator"), OrganizablePlayScreens.MOD_ID + ":entry.separator", MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
+    public static final EntryType FOLDER = register(new Identifier(OrganizablePlayScreens.MOD_ID, "folder"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
+    public static final EntryType SECTION = register(new Identifier(OrganizablePlayScreens.MOD_ID, "section"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
+    public static final EntryType SEPARATOR = register(new Identifier(OrganizablePlayScreens.MOD_ID, "separator"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
     /**
      * Identifier of the entry type.
      */
@@ -56,9 +56,9 @@ public class EntryType {
      */
     private final Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory;
 
-    private EntryType(Identifier id, String key, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+    private EntryType(Identifier id, Text text, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
         this.id = id;
-        this.text = Text.translatable(key);
+        this.text = text;
         this.multiplayerNewEntryFactory = multiplayerNewEntryFactory;
         this.multiplayerEntryFactory = multiplayerEntryFactory;
         this.singleplayerNewEntryFactory = singleplayerNewEntryFactory;
@@ -66,16 +66,17 @@ public class EntryType {
     }
 
     /**
-     * Creates a new entry type for both multiplayer and singleplayer.
-     * @param id the identifier of the entry type
-     * @param key the translation key of the entry type
-     * @param multiplayerNewEntryFactory the factory used to create a new multiplayer entry of the specific type with a default name
-     * @param multiplayerEntryFactory the factory used to create a multiplayer entry of the specific type with a given name
+     * Creates and registers a new entry type for both multiplayer and singleplayer.
+     *
+     * @param id                          the identifier of the entry type
+     * @param text                        the name of the entry type
+     * @param multiplayerNewEntryFactory  the factory used to create a new multiplayer entry of the specific type with a default name
+     * @param multiplayerEntryFactory     the factory used to create a multiplayer entry of the specific type with a given name
      * @param singleplayerNewEntryFactory the factory used to create a new singleplayer entry of the specific type with a default name
-     * @param singleplayerEntryFactory the factory used to create a singleplayer entry of the specific type with a given name
+     * @param singleplayerEntryFactory    the factory used to create a singleplayer entry of the specific type with a given name
      */
-    public static EntryType register(@NotNull Identifier id, @NotNull String key, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
-        EntryType entryType = new EntryType(id, key, multiplayerNewEntryFactory, multiplayerEntryFactory, singleplayerNewEntryFactory, singleplayerEntryFactory);
+    public static EntryType register(@NotNull Identifier id, @NotNull Text text, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+        EntryType entryType = new EntryType(id, text, multiplayerNewEntryFactory, multiplayerEntryFactory, singleplayerNewEntryFactory, singleplayerEntryFactory);
         ENTRY_TYPE_MAP.put(id, entryType);
         if (multiplayerNewEntryFactory != null && multiplayerEntryFactory != null) {
             MULTIPLAYER_ENTRY_TYPES.add(entryType);
@@ -87,27 +88,29 @@ public class EntryType {
     }
 
     /**
-     * Creates a new entry type for multiplayer only.
-     * @param id the identifier of the entry type
-     * @param key the translation key of the entry type
+     * Creates and registers a new entry type for multiplayer only.
+     *
+     * @param id                         the identifier of the entry type
+     * @param text                       the name of the entry type
      * @param multiplayerNewEntryFactory the factory used to create a new multiplayer entry of the specific type with a default name
-     * @param multiplayerEntryFactory the factory used to create a multiplayer entry of the specific type with a given name
+     * @param multiplayerEntryFactory    the factory used to create a multiplayer entry of the specific type with a given name
      * @return the entry type
      */
-    public static EntryType registerMultiplayer(@NotNull Identifier id, @NotNull String key, @NotNull BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, @NotNull Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory) {
-        return register(id, key, multiplayerNewEntryFactory, multiplayerEntryFactory, null, null);
+    public static EntryType registerMultiplayer(@NotNull Identifier id, @NotNull Text text, @NotNull BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, @NotNull Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory) {
+        return register(id, text, multiplayerNewEntryFactory, multiplayerEntryFactory, null, null);
     }
 
     /**
-     * Creates a new entry type for singleplayer only.
-     * @param id the identifier of the entry type
-     * @param key the translation key of the entry type
+     * Creates and registers a new entry type for singleplayer only.
+     *
+     * @param id                          the identifier of the entry type
+     * @param text                        the name of the entry type
      * @param singleplayerNewEntryFactory the factory used to create a new singleplayer entry of the specific type with a default name
-     * @param singleplayerEntryFactory the factory used to create a singleplayer entry of the specific type with a given name
+     * @param singleplayerEntryFactory    the factory used to create a singleplayer entry of the specific type with a given name
      * @return the entry type
      */
-    public static EntryType registerSingleplayer(@NotNull Identifier id, @NotNull String key, @NotNull BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, @NotNull Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
-        return register(id, key, null, null, singleplayerNewEntryFactory, singleplayerEntryFactory);
+    public static EntryType registerSingleplayer(@NotNull Identifier id, @NotNull Text text, @NotNull BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, @NotNull Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+        return register(id, text, null, null, singleplayerNewEntryFactory, singleplayerEntryFactory);
     }
 
     public static EntryType get(Identifier id) {
@@ -132,6 +135,7 @@ public class EntryType {
 
     /**
      * Creates a new multiplayer entry of the specific type with a default name.
+     *
      * @param screen the multiplayer screen
      * @param folder the folder the entry is in
      * @return the entry
@@ -142,9 +146,10 @@ public class EntryType {
 
     /**
      * Creates a new multiplayer entry of the specific type with a given name.
+     *
      * @param screen the multiplayer screen
      * @param folder the folder the entry is in
-     * @param name the name of the entry
+     * @param name   the name of the entry
      * @return the entry
      */
     public AbstractMultiplayerEntry multiplayerEntry(MultiplayerScreen screen, MultiplayerFolderEntry folder, String name) {
@@ -153,6 +158,7 @@ public class EntryType {
 
     /**
      * Creates a new singleplayer entry of the specific type with a default name.
+     *
      * @param screen the singleplayer screen
      * @param folder the folder the entry is in
      * @return the entry
@@ -163,9 +169,10 @@ public class EntryType {
 
     /**
      * Creates a new singleplayer entry of the specific type with a given name.
+     *
      * @param screen the singleplayer screen
      * @param folder the folder the entry is in
-     * @param name the name of the entry
+     * @param name   the name of the entry
      * @return the entry
      */
     public AbstractSingleplayerEntry singleplayerEntry(SelectWorldScreen screen, SingleplayerFolderEntry folder, String name) {
