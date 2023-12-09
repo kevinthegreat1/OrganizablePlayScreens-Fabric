@@ -2,7 +2,6 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
+public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implements AbstractFolderEntry<WorldListWidget.Entry> {
     /**
      * All non-world entries in this folder.
      */
@@ -68,9 +67,12 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
         return worldEntries;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        AbstractEntry.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
+    public ButtonWidget getButtonMoveInto() {
+        return buttonMoveInto;
     }
 
     @Override
@@ -89,14 +91,5 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    /**
-     * Updates the activation state of {@link #buttonMoveInto}.
-     */
-    @Override
-    public void updateButtonStates() {
-        WorldListWidget.Entry entry = ((SelectWorldScreenAccessor) screen).getLevelList().getSelectedOrNull();
-        buttonMoveInto.active = entry != null && entry != this;
     }
 }

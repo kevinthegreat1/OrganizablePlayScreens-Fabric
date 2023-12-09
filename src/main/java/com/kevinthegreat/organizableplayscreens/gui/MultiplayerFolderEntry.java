@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
+public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<MultiplayerServerListWidget.Entry> {
     /**
      * All entries in this folder.
      */
@@ -54,9 +54,12 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
         return entries;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        AbstractEntry.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, buttonMoveInto);
+    public ButtonWidget getButtonMoveInto() {
+        return buttonMoveInto;
     }
 
     /**
@@ -70,13 +73,5 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    /**
-     * Updates the activation state of {@link #buttonMoveInto}.
-     */
-    public void updateButtonStates() {
-        MultiplayerServerListWidget.Entry entry = ((MultiplayerScreenAccessor) screen).getServerListWidget().getSelectedOrNull();
-        buttonMoveInto.active = entry != null && entry != this;
     }
 }

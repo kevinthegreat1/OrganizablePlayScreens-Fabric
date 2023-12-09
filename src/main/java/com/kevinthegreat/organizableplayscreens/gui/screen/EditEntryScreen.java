@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
@@ -14,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
 
-public class EditEntryScreen extends Screen {
+public class EditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
     private final Screen parent;
 
     /**
@@ -27,11 +28,11 @@ public class EditEntryScreen extends Screen {
     /**
      * Used to create a new entry of the specific type when the type is changed.
      */
-    private final Function<EntryType, AbstractEntry> factory;
+    private final Function<EntryType, AbstractEntry<E>> factory;
     /**
      * The name string to be edited.
      */
-    private AbstractEntry entry;
+    private AbstractEntry<E> entry;
     /**
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
@@ -50,7 +51,7 @@ public class EditEntryScreen extends Screen {
      * @param callback the callback to be called when this screen is closed
      * @param factory the factory to be used to create a new entry of the specific type
      */
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry> factory) {
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory) {
         this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
@@ -60,11 +61,11 @@ public class EditEntryScreen extends Screen {
      * @param callback the callback to be called when this screen is closed
      * @param entry the entry to be edited
      */
-    public EditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry entry) {
+    public EditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<E> entry) {
         this(parent, callback, type -> entry, entry, false);
     }
 
-    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry> factory, AbstractEntry entry, boolean newEntry) {
+    private EditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory, AbstractEntry<E> entry, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;

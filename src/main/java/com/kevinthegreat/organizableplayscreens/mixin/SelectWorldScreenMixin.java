@@ -1,6 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
@@ -30,7 +31,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @SuppressWarnings("JavadocReference")
 @Mixin(SelectWorldScreen.class)
@@ -46,6 +46,10 @@ public abstract class SelectWorldScreenMixin extends Screen {
     protected TextFieldWidget searchBox;
     @Shadow
     private WorldListWidget levelList;
+    @Shadow
+    private ButtonWidget editButton;
+    @Shadow
+    private ButtonWidget deleteButton;
     /**
      * An accessor to access methods in {@link WorldListWidgetMixin}
      */
@@ -124,7 +128,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         organizableplayscreens_buttonNewFolder = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
-            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
+            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_addEntry, type -> {
                 SingleplayerFolderEntry folder = worldListWidgetAccessor.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.singleplayerEntry((SelectWorldScreen) (Object) this, folder);
             }));
@@ -150,7 +154,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Inject(method = "method_19943", at = @At("HEAD"), cancellable = true)
     private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
         if (levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry entry) {
-            client.setScreen(new EditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
+            client.setScreen(new EditEntryScreen<>(this, this::organizableplayscreens_editEntry, entry));
             ci.cancel();
         }
     }
@@ -170,7 +174,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Saves the 'cancel' button instance in a field so its text can be changed.
      */
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 5))
+    @Redirect(method = "init", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 0))
     private <T extends Element & Drawable & Selectable> T organizableplayscreens_setCancelButton(SelectWorldScreen selectWorldScreen, T element) {
         organizableplayscreens_buttonCancel = addDrawableChild((ButtonWidget) element);
         return element;
@@ -267,26 +271,21 @@ public abstract class SelectWorldScreenMixin extends Screen {
      */
     @Inject(method = "worldSelected", at = @At("RETURN"))
     private void organizableplayscreens_updateButtonStates(LevelSummary levelSummary, CallbackInfo ci) {
-        WorldListWidget.Entry entry = levelList.getSelectedOrNull();
-        if (entry instanceof WorldListWidget.WorldEntry) {
+        WorldListWidget.Entry selectedEntry = levelList.getSelectedOrNull();
+        if (selectedEntry instanceof WorldListWidget.WorldEntry) {
             selectButton.setMessage(Text.translatable("selectWorld.select"));
-        } else if (entry instanceof AbstractSingleplayerEntry) {
-            if (entry instanceof SingleplayerFolderEntry) {
-                selectButton.setMessage(Text.translatable("organizableplayscreens:folder.openFolder"));
-            } else {
-                selectButton.active = false;
-            }
-            recreateButton.active = false;
+        } else if (selectedEntry instanceof AbstractEntry<?> abstractEntry) {
+            abstractEntry.updateScreenButtonStates(selectButton, editButton, deleteButton, recreateButton);
         }
         boolean notSearching = searchBox.getText().isEmpty();
         worldListWidgetAccessor.organizableplayscreens_updateCurrentPath();
         searchBox.setY(worldListWidgetAccessor.organizableplayscreens_getCurrentPath().isEmpty() ? 22 : 24);
         organizableplayscreens_buttonBack.active = notSearching;
-        organizableplayscreens_buttonMoveEntryBack.active = entry != null && !worldListWidgetAccessor.organizableplayscreens_isRootFolder() && notSearching;
+        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !worldListWidgetAccessor.organizableplayscreens_isRootFolder() && notSearching;
         organizableplayscreens_buttonNewFolder.active = notSearching;
         organizableplayscreens_buttonCancel.setMessage(worldListWidgetAccessor.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
         for (AbstractSingleplayerEntry nonWorldEntry : worldListWidgetAccessor.organizableplayscreens_getCurrentNonWorldEntries()) {
-            nonWorldEntry.updateButtonStates();
+            nonWorldEntry.updateButtonStates(selectedEntry);
         }
     }
 

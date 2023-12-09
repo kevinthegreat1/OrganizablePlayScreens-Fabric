@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry {
+public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry<WorldListWidget.Entry> {
     @NotNull
     protected final SelectWorldScreen screen;
     /**
@@ -156,9 +156,6 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      */
     private void swapEntries(int i, int j) {
         ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_swapEntries(i, j);
-    }
-
-    public void updateButtonStates() {
     }
 
     @Override

@@ -4,16 +4,18 @@ import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.mutable.Mutable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
 /**
  * An abstract entry with a name and type.
  */
-public interface AbstractEntry extends Supplier<EntryType>, Mutable<String> {
+public interface AbstractEntry<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Supplier<EntryType>, Mutable<String> {
     MinecraftClient client = MinecraftClient.getInstance();
     Identifier JOIN_TEXTURE = new Identifier("server_list/join");
     Identifier JOIN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/join_highlighted");
@@ -42,6 +44,31 @@ public interface AbstractEntry extends Supplier<EntryType>, Mutable<String> {
     }
 
     void setName(String name);
+
+    /**
+     * Updates the button states of the given buttons in the screen when this entry is selected.
+     *
+     * @param selectButton   the select/confirm/open button
+     * @param editButton     the edit button
+     * @param deleteButton   the delete button
+     * @param recreateButton the recreate button, only present in the singleplayer screen
+     */
+    default void updateScreenButtonStates(ButtonWidget selectButton, ButtonWidget editButton, ButtonWidget deleteButton, @Nullable ButtonWidget recreateButton) {
+        selectButton.active = false;
+        editButton.active = true;
+        deleteButton.active = true;
+        if (recreateButton != null) {
+            recreateButton.active = false;
+        }
+    }
+
+    /**
+     * Updates the button states of the buttons under this entry when an entry is selected.
+     *
+     * @param entry the selected entry
+     */
+    default void updateButtonStates(E entry) {
+    }
 
     void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
 
