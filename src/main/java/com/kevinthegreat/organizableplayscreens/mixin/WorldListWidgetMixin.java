@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,6 +103,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         return organizableplayscreens_currentFolder.getWorldEntries();
     }
 
+    @Override
     public SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_getWorlds() {
         return organizableplayscreens_worlds;
     }
@@ -336,12 +338,13 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      * Handles key presses for the selected entry.
      *
      * @param keyCode the key code that was pressed
-     * @return whether the key press has been consumed (prevents further processing or not)
      */
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         WorldListWidget.Entry entry = getSelectedOrNull();
-        return entry != null && entry.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        if (entry != null && entry.keyPressed(keyCode, scanCode, modifiers)) {
+            cir.setReturnValue(true);
+        }
     }
 
     /**
@@ -408,6 +411,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     /**
      * {@inheritDoc}
      */
+    @Override
     public void organizableplayscreens_updateCurrentPath() {
         List<String> path = new ArrayList<>();
         SingleplayerFolderEntry folder;

@@ -1,6 +1,5 @@
 package com.kevinthegreat.organizableplayscreens.mixin;
 
-import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.option.ServerList;
 import org.spongepowered.asm.mixin.Final;
@@ -22,7 +21,7 @@ public abstract class ServerEntryMixin {
      */
     @Redirect(method = {"render", "keyPressed", "mouseClicked"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/ServerList;size()I"))
     private int organizableplayscreens_size(ServerList instance) {
-        return ((MultiplayerServerListWidgetAccessor) field_19117).organizableplayscreens_getCurrentEntries().size();
+        return field_19117.organizableplayscreens_getCurrentEntries().size();
     }
 
     /**
@@ -30,7 +29,7 @@ public abstract class ServerEntryMixin {
      */
     @Inject(method = "swapEntries", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_swapEntries(int i, int j, CallbackInfo ci) {
-        ((MultiplayerServerListWidgetAccessor) field_19117).organizableplayscreens_swapEntries(i, j);
+        field_19117.organizableplayscreens_swapEntries(i, j);
         ci.cancel();
     }
 }

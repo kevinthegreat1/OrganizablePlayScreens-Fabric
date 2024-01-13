@@ -6,7 +6,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-public interface AbstractFolderEntry<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AbstractEntry<E> {
+public interface AbstractFolderEntry<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AbstractEntry<T, E> {
     /**
      * Gets the button that moves the selected entry into this folder.
      *

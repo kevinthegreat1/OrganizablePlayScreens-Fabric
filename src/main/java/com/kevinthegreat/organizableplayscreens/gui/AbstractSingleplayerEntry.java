@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
+import net.minecraft.client.input.KeyCodes;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry<WorldListWidget.Entry> {
+public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry<WorldListWidget, WorldListWidget.Entry> {
     @NotNull
     protected final SelectWorldScreen screen;
     /**
@@ -80,12 +81,9 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
         this.name = name;
     }
 
-    protected void entrySelected(WorldListWidgetAccessor levelList) {
-    }
-
     @Override
     public final void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_getCurrentNonWorldEntries().size());
+        render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((SelectWorldScreenAccessor) screen).getLevelList().organizableplayscreens_getCurrentNonWorldEntries().size());
     }
 
     /**
@@ -99,13 +97,13 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
-        if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
+        if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER || KeyCodes.isToggle(keyCode)) {
             levelList.setSelected(this);
-            entrySelected((WorldListWidgetAccessor) levelList);
+            entrySelectionConfirmed(levelList);
             return true;
         } else if (Screen.hasShiftDown()) {
-            int i = ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
-            if (i != -1 && (keyCode == GLFW.GLFW_KEY_DOWN && i < ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0)) {
+            int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
+            if (i != -1 && (keyCode == GLFW.GLFW_KEY_DOWN && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0)) {
                 swapEntries(i, keyCode == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
             }
             return true;
@@ -121,20 +119,20 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
-        int i = ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
+        int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
         double d = mouseX - (double) levelList.getRowLeft();
         double e = mouseY - (double) ((EntryListWidgetInvoker) levelList).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
                 levelList.setSelected(this);
-                entrySelected((WorldListWidgetAccessor) levelList);
+                entrySelectionConfirmed(levelList);
                 return true;
             }
             if (d < 16 && e < 16 && i > 0) {
                 swapEntries(i, i - 1);
                 return true;
             }
-            if (d < 16 && e > 16 && i < ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentNonWorldEntries().size() - 1) {
+            if (d < 16 && e > 16 && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1) {
                 swapEntries(i, i + 1);
                 return true;
             }
@@ -142,7 +140,7 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
 
         levelList.setSelected(this);
         if (Util.getMeasuringTimeMs() - time < 250) {
-            entrySelected((WorldListWidgetAccessor) levelList);
+            entrySelectionConfirmed(levelList);
         }
         time = Util.getMeasuringTimeMs();
         return false;
@@ -156,7 +154,7 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      * @see WorldListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
      */
     private void swapEntries(int i, int j) {
-        ((WorldListWidgetAccessor) ((SelectWorldScreenAccessor) screen).getLevelList()).organizableplayscreens_swapEntries(i, j);
+        ((SelectWorldScreenAccessor) screen).getLevelList().organizableplayscreens_swapEntries(i, j);
     }
 
     @Override

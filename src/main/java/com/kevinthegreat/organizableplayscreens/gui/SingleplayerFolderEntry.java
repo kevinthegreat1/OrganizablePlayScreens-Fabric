@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implements AbstractFolderEntry<WorldListWidget.Entry> {
+public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implements AbstractFolderEntry<WorldListWidget, WorldListWidget.Entry> {
     /**
      * All non-world entries in this folder.
      */
@@ -46,17 +46,17 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implement
             WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
             WorldListWidget.Entry entry = levelList.getSelectedOrNull();
             if (entry instanceof WorldListWidget.WorldEntry worldEntry) {
-                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getWorlds().put(worldEntry, this);
+                levelList.organizableplayscreens_getWorlds().put(worldEntry, this);
                 worldEntries.add(worldEntry);
                 OrganizablePlayScreens.sortWorldEntries(worldEntries);
-                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentWorldEntries().remove(worldEntry);
+                levelList.organizableplayscreens_getCurrentWorldEntries().remove(worldEntry);
             } else if (entry instanceof AbstractSingleplayerEntry nonWorldEntry) {
                 nonWorldEntry.parent = this;
                 nonWorldEntries.add(nonWorldEntry);
-                ((WorldListWidgetAccessor) levelList).organizableplayscreens_getCurrentNonWorldEntries().remove(nonWorldEntry);
+                levelList.organizableplayscreens_getCurrentNonWorldEntries().remove(nonWorldEntry);
             }
             levelList.setSelected(null);
-            ((WorldListWidgetAccessor) levelList).organizableplayscreens_updateAndSave();
+            levelList.organizableplayscreens_updateAndSave();
         }).width(20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP).build();
     }
 
@@ -77,7 +77,8 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implement
     }
 
     @Override
-    protected void entrySelected(WorldListWidgetAccessor levelList) {
+    public void entrySelectionConfirmed(WorldListWidget levelList) {
+        super.entrySelectionConfirmed(levelList);
         levelList.organizableplayscreens_setCurrentFolder(this);
     }
 

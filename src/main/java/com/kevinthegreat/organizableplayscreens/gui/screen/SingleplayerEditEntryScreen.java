@@ -9,12 +9,12 @@ import net.minecraft.client.gui.screen.world.WorldListWidget;
 import java.util.List;
 import java.util.function.Function;
 
-public class SingleplayerEditEntryScreen extends AbstractEditEntryScreen<WorldListWidget.Entry> {
-    public SingleplayerEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<WorldListWidget.Entry>> factory) {
+public class SingleplayerEditEntryScreen extends AbstractEditEntryScreen<WorldListWidget, WorldListWidget.Entry> {
+    public SingleplayerEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<WorldListWidget, WorldListWidget.Entry>> factory) {
         super(parent, callback, factory);
     }
 
-    public SingleplayerEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<WorldListWidget.Entry> entry) {
+    public SingleplayerEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<WorldListWidget, WorldListWidget.Entry> entry) {
         super(parent, callback, entry);
     }
 

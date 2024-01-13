@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractEditEntryScreen<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
+public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
     private final Screen parent;
 
     /**
@@ -29,11 +29,11 @@ public abstract class AbstractEditEntryScreen<E extends AlwaysSelectedEntryListW
     /**
      * Used to create a new entry of the specific type when the type is changed.
      */
-    private final Function<EntryType, AbstractEntry<E>> factory;
+    private final Function<EntryType, AbstractEntry<T, E>> factory;
     /**
      * The name string to be edited.
      */
-    private AbstractEntry<E> entry;
+    private AbstractEntry<T, E> entry;
     /**
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
@@ -50,7 +50,7 @@ public abstract class AbstractEditEntryScreen<E extends AlwaysSelectedEntryListW
      * @param callback the callback to be called when this screen is closed
      * @param factory the factory to be used to create a new entry of the specific type
      */
-    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory) {
+    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<T, E>> factory) {
         this(parent, callback, factory, factory.apply(EntryType.FOLDER), true);
     }
 
@@ -60,11 +60,11 @@ public abstract class AbstractEditEntryScreen<E extends AlwaysSelectedEntryListW
      * @param callback the callback to be called when this screen is closed
      * @param entry the entry to be edited
      */
-    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<E> entry) {
+    public AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<T, E> entry) {
         this(parent, callback, type -> entry, entry, false);
     }
 
-    private AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<E>> factory, AbstractEntry<E> entry, boolean newEntry) {
+    private AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<T, E>> factory, AbstractEntry<T, E> entry, boolean newEntry) {
         super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;

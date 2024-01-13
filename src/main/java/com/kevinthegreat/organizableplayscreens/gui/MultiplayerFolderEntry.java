@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<MultiplayerServerListWidget.Entry> {
+public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> {
     /**
      * All entries in this folder.
      */
@@ -44,8 +44,8 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
                     nonServerEntry.parent = this;
                 }
                 entries.add(entry);
-                ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_getCurrentEntries().remove(entry);
-                ((MultiplayerServerListWidgetAccessor) serverListWidget).organizableplayscreens_updateAndSave();
+                serverListWidget.organizableplayscreens_getCurrentEntries().remove(entry);
+                serverListWidget.organizableplayscreens_updateAndSave();
             }
         }).width(20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP).build();
     }
@@ -60,6 +60,12 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     @Override
     public ButtonWidget getButtonMoveInto() {
         return buttonMoveInto;
+    }
+
+    @Override
+    public void entrySelectionConfirmed(MultiplayerServerListWidget serverListWidget) {
+        super.entrySelectionConfirmed(serverListWidget);
+        serverListWidget.organizableplayscreens_setCurrentFolder(this);
     }
 
     /**

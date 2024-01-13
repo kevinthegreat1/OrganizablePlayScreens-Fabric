@@ -5,15 +5,12 @@ import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.gui.screen.MultiplayerEditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -30,7 +27,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -55,11 +52,6 @@ public abstract class MultiplayerScreenMixin extends Screen {
     public abstract void select(MultiplayerServerListWidget.Entry entry);
 
     /**
-     * An accessor to access methods in {@link MultiplayerServerListWidgetMixin}
-     */
-    @Unique
-    public MultiplayerServerListWidgetAccessor serverListWidgetAccessor;
-    /**
      * This is the vanilla cancel button because this is not saved in a vanilla field.
      */
     @Unique
@@ -81,16 +73,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Sets the accessor to prevent having to cast it every time and loads and displays folders and servers from {@code organizable_servers.dat}.
-     */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
-    private void organizableplayscreens_loadFile(CallbackInfo ci) {
-        serverListWidgetAccessor = (MultiplayerServerListWidgetAccessor) serverListWidget;
-        serverListWidgetAccessor.organizableplayscreens_loadFile();
-    }
-
-    /**
-     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
+     * Loads and displays folders and servers from {@code organizable_servers.dat} and adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
@@ -98,29 +81,31 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;updateButtonActivationStates()V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
+        serverListWidget.organizableplayscreens_loadFile();
+
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
-            if (!serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
+            if (!serverListWidget.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
             }
         }).dimensions(options.backButtonX.getValue(), options.backButtonY.getValue(), 20, 20).build());
         organizableplayscreens_buttonMoveEntryBack = addDrawableChild(ButtonWidget.builder(Text.of("←+"), buttonWidget -> {
-            if (!serverListWidgetAccessor.organizableplayscreens_isRootFolder()) {
+            if (!serverListWidget.organizableplayscreens_isRootFolder()) {
                 MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
                 if (entry != null) {
-                    MultiplayerFolderEntry parentFolder = serverListWidgetAccessor.organizableplayscreens_getCurrentFolder().getParent();
+                    MultiplayerFolderEntry parentFolder = serverListWidget.organizableplayscreens_getCurrentFolder().getParent();
                     if (entry instanceof AbstractMultiplayerEntry nonServerEntry) {
                         nonServerEntry.setParent(parentFolder);
                     }
                     parentFolder.getEntries().add(entry);
-                    serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(entry);
-                    serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+                    serverListWidget.organizableplayscreens_getCurrentEntries().remove(entry);
+                    serverListWidget.organizableplayscreens_updateAndSave();
                 }
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
         addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             client.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
-                MultiplayerFolderEntry folder = serverListWidgetAccessor.organizableplayscreens_getCurrentFolder();
+                MultiplayerFolderEntry folder = serverListWidget.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.multiplayerEntry((MultiplayerScreen) (Object) this, folder);
             }));
             select(organizableplayscreens_newEntry);
@@ -152,10 +137,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Saves the 'cancel' button instance in a field so its text can be changed.
      */
-    @Redirect(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;", ordinal = 6))
-    private <T extends Element & Drawable & Selectable> T organizableplayscreens_setCancelButton(MultiplayerScreen instance, T element) {
-        organizableplayscreens_buttonCancel = addDrawableChild((ButtonWidget) element);
-        return element;
+    @ModifyExpressionValue(method = "init", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;build()Lnet/minecraft/client/gui/widget/ButtonWidget;", ordinal = 0))
+    private ButtonWidget organizableplayscreens_setCancelButton(ButtonWidget buttonCancel) {
+        return organizableplayscreens_buttonCancel = buttonCancel;
     }
 
     /**
@@ -163,7 +147,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "method_19912", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_modifyCancelButton(ButtonWidget buttonWidget, CallbackInfo ci) {
-        if (serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent()) {
+        if (serverListWidget.organizableplayscreens_setCurrentFolderToParent()) {
             ci.cancel();
         }
     }
@@ -174,8 +158,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Unique
     private void organizableplayscreens_addEntry(boolean confirmedAction) {
         if (confirmedAction) {
-            serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newEntry);
-            serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+            serverListWidget.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newEntry);
+            serverListWidget.organizableplayscreens_updateAndSave();
             organizableplayscreens_newEntry = null;
         }
         client.setScreen(this);
@@ -195,9 +179,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Unique
     private void organizableplayscreens_deleteEntry(boolean confirmedAction) {
         if (confirmedAction) {
-            serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
+            serverListWidget.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
             select(null);
-            serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+            serverListWidget.organizableplayscreens_updateAndSave();
         }
         client.setScreen(this);
     }
@@ -207,8 +191,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "addEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_addServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().add(MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
-        serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+        serverListWidget.organizableplayscreens_getCurrentEntries().add(MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidget.organizableplayscreens_updateAndSave();
     }
 
     /**
@@ -216,8 +200,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "editEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
     private void organizableplayscreens_editServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().set(serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
-        serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+        serverListWidget.organizableplayscreens_getCurrentEntries().set(serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidget.organizableplayscreens_updateAndSave();
     }
 
     /**
@@ -225,8 +209,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "removeEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setSelected(Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$Entry;)V"))
     private void organizableplayscreens_removeServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidgetAccessor.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
-        serverListWidgetAccessor.organizableplayscreens_updateAndSave();
+        serverListWidget.organizableplayscreens_getCurrentEntries().remove(serverListWidget.getSelectedOrNull());
+        serverListWidget.organizableplayscreens_updateAndSave();
     }
 
     /**
@@ -234,8 +218,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "connect()V", at = @At(value = "RETURN"))
     private void organizableplayscreens_openFolder(CallbackInfo ci) {
-        if (serverListWidget.getSelectedOrNull() instanceof MultiplayerFolderEntry folderEntry) {
-            serverListWidgetAccessor.organizableplayscreens_setCurrentFolder(folderEntry);
+        if (serverListWidget.getSelectedOrNull() instanceof AbstractMultiplayerEntry entry) {
+            entry.entrySelectionConfirmed(serverListWidget);
         }
     }
 
@@ -246,9 +230,8 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && serverListWidgetAccessor.organizableplayscreens_setCurrentFolderToParent() && !Compatibility.essential_preventMultiplayerFeatures()) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && serverListWidget.organizableplayscreens_setCurrentFolderToParent() && !Compatibility.essential_preventMultiplayerFeatures()) {
             cir.setReturnValue(true);
-            cir.cancel();
         }
     }
 
@@ -259,7 +242,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawCenteredTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_renderPath(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.drawCenteredTextWithShadow(textRenderer, serverListWidgetAccessor.organizableplayscreens_getCurrentPath(), width / 2, 6, 0xa0a0a0);
+        context.drawCenteredTextWithShadow(textRenderer, serverListWidget.organizableplayscreens_getCurrentPath(), width / 2, 6, 0xa0a0a0);
     }
 
     /**
@@ -273,12 +256,12 @@ public abstract class MultiplayerScreenMixin extends Screen {
         MultiplayerServerListWidget.Entry selectedEntry = serverListWidget.getSelectedOrNull();
         if (selectedEntry instanceof MultiplayerServerListWidget.ServerEntry) {
             buttonJoin.setMessage(Text.translatable("selectServer.select"));
-        } else if (selectedEntry instanceof AbstractEntry<?> abstractEntry) {
+        } else if (selectedEntry instanceof AbstractEntry<?, ?> abstractEntry) {
             abstractEntry.updateScreenButtonStates(buttonJoin, buttonEdit, buttonDelete, null);
         }
-        organizableplayscreens_buttonCancel.setMessage(serverListWidgetAccessor.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
-        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !serverListWidgetAccessor.organizableplayscreens_isRootFolder();
-        for (MultiplayerServerListWidget.Entry entry : serverListWidgetAccessor.organizableplayscreens_getCurrentEntries()) {
+        organizableplayscreens_buttonCancel.setMessage(serverListWidget.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
+        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !serverListWidget.organizableplayscreens_isRootFolder();
+        for (MultiplayerServerListWidget.Entry entry : serverListWidget.organizableplayscreens_getCurrentEntries()) {
             if (entry instanceof MultiplayerFolderEntry folderEntry) {
                 folderEntry.updateButtonStates(selectedEntry);
             }
@@ -288,10 +271,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
     /**
      * Saves the folders and servers when the screen is closed.
      */
-    @Override
-    public void removed() {
-        serverListWidgetAccessor.organizableplayscreens_saveFile();
-        super.removed();
+    @Inject(method = "removed", at = @At(value = "RETURN"))
+    private void organizableplayscreens_removed(CallbackInfo ci) {
+        serverListWidget.organizableplayscreens_saveFile();
     }
 
     /**
@@ -301,6 +283,6 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Override
     public boolean shouldCloseOnEsc() {
-        return serverListWidgetAccessor.organizableplayscreens_isRootFolder();
+        return serverListWidget.organizableplayscreens_isRootFolder();
     }
 }

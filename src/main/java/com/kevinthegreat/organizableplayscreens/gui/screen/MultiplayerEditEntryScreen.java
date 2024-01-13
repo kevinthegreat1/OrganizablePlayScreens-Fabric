@@ -9,12 +9,12 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import java.util.List;
 import java.util.function.Function;
 
-public class MultiplayerEditEntryScreen extends AbstractEditEntryScreen<MultiplayerServerListWidget.Entry> {
-    public MultiplayerEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<MultiplayerServerListWidget.Entry>> factory) {
+public class MultiplayerEditEntryScreen extends AbstractEditEntryScreen<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> {
+    public MultiplayerEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry>> factory) {
         super(parent, callback, factory);
     }
 
-    public MultiplayerEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<MultiplayerServerListWidget.Entry> entry) {
+    public MultiplayerEditEntryScreen(Screen parent, BooleanConsumer callback, AbstractEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> entry) {
         super(parent, callback, entry);
     }
 

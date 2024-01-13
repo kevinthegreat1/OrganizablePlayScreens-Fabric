@@ -30,6 +30,12 @@
       "organizableplayscreens.mixins.json"
   ],
   "accessWidener": "organizableplayscreens.accesswidener",
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_528": ["com/kevinthegreat/organizableplayscreens/gui/WorldListWidgetAccessor"],
+      "net/minecraft/class_4267": ["com/kevinthegreat/organizableplayscreens/gui/MultiplayerServerListWidgetAccessor"]
+    }
+  },
 
   "depends": {
     "fabricloader": ">=0.14.22",

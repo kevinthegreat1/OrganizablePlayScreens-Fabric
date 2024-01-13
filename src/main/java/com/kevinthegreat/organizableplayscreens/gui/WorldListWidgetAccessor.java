@@ -5,46 +5,43 @@ import net.minecraft.client.gui.screen.world.WorldListWidget;
 import java.util.List;
 import java.util.SortedMap;
 
-/**
- * Cast a {@link WorldListWidget} instance to this to use the following methods implemented in {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin WorldListWidgetMixin}.
- */
 @SuppressWarnings("JavadocReference")
 public interface WorldListWidgetAccessor {
     /**
      * Saves the folders and worlds to {@code organizable_worlds.dat}.
      */
-    void organizableplayscreens_saveFile();
+    default void organizableplayscreens_saveFile() {}
 
     /**
      * Updates the displayed entries and saves the folders and worlds to {@code organizable_worlds.dat}.
      */
-    void organizableplayscreens_updateAndSave();
+    default void organizableplayscreens_updateAndSave() {}
 
-    SingleplayerFolderEntry organizableplayscreens_getCurrentFolder();
+    default SingleplayerFolderEntry organizableplayscreens_getCurrentFolder() {return null;}
 
-    List<AbstractSingleplayerEntry> organizableplayscreens_getCurrentNonWorldEntries();
+    default List<AbstractSingleplayerEntry> organizableplayscreens_getCurrentNonWorldEntries() {return null;}
 
-    List<WorldListWidget.WorldEntry> organizableplayscreens_getCurrentWorldEntries();
+    default List<WorldListWidget.WorldEntry> organizableplayscreens_getCurrentWorldEntries() {return null;}
 
-    SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_getWorlds();
+    default SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_getWorlds() {return null;}
 
-    boolean organizableplayscreens_isRootFolder();
+    default boolean organizableplayscreens_isRootFolder() {return false;}
 
-    String organizableplayscreens_getCurrentPath();
+    default String organizableplayscreens_getCurrentPath() {return null;}
 
     /**
      * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
      *
      * @param folderEntry the new folder.
      */
-    void organizableplayscreens_setCurrentFolder(SingleplayerFolderEntry folderEntry);
+    default void organizableplayscreens_setCurrentFolder(SingleplayerFolderEntry folderEntry) {}
 
     /**
      * Trys to set {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent and update the displayed entries.
      *
      * @return {@code true} if the folder has a parent and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} was changed.
      */
-    boolean organizableplayscreens_setCurrentFolderToParent();
+    default boolean organizableplayscreens_setCurrentFolderToParent() {return false;}
 
     /**
      * Swaps the entries at {@code i} and {@code j} and updates and saves the entries.
@@ -52,12 +49,12 @@ public interface WorldListWidgetAccessor {
      * @param i the index of the selected entry
      * @param j the index of the entry to swap with
      */
-    void organizableplayscreens_swapEntries(int i, int j);
+    default void organizableplayscreens_swapEntries(int i, int j) {}
 
     /**
      * Updates the path of {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
      *
      * @see com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentPath currentPath
      */
-    void organizableplayscreens_updateCurrentPath();
+    default void organizableplayscreens_updateCurrentPath() {}
 }

@@ -7,6 +7,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +18,7 @@ import java.util.function.Supplier;
 /**
  * An abstract entry with a name and type.
  */
-public interface AbstractEntry<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Supplier<EntryType>, Mutable<String> {
+public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Supplier<EntryType>, Mutable<String> {
     MinecraftClient client = MinecraftClient.getInstance();
     Identifier JOIN_TEXTURE = new Identifier("server_list/join");
     Identifier JOIN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/join_highlighted");
@@ -45,6 +47,10 @@ public interface AbstractEntry<E extends AlwaysSelectedEntryListWidget.Entry<E>>
     }
 
     void setName(String name);
+
+    default void entrySelectionConfirmed(T listWidget) {
+        client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+    }
 
     /**
      * Updates the button states of the given buttons in the screen when this entry is selected.
