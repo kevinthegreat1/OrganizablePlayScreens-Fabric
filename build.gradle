@@ -33,9 +33,6 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 
-	// Fabric API
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modImplementation "gg.essential:essential-${project.essential_minecraft_version}-fabric:${project.essential_version}"
 }
