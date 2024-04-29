@@ -134,8 +134,8 @@ public class OrganizablePlayScreensOptions {
      */
     private <T> void parseOption(JsonObject optionsJson, String name, SimpleOption<T> option) {
         DataResult<T> dataResult = option.getCodec().parse(JsonOps.INSTANCE, optionsJson.get(name));
-        dataResult.error().ifPresent(error -> OrganizablePlayScreens.LOGGER.error("Error parsing option value " + optionsJson.get(name) + " for option " + name + ": " + error));
-        dataResult.result().ifPresent(option::setValue);
+        dataResult.ifError(error -> OrganizablePlayScreens.LOGGER.error("Error parsing option value {} for option {}: {}", optionsJson.get(name), name, error));
+        dataResult.ifSuccess(option::setValue);
     }
 
     /**
@@ -173,8 +173,8 @@ public class OrganizablePlayScreensOptions {
      */
     private <T> void saveOption(JsonObject optionsJson, String name, SimpleOption<T> option) {
         DataResult<JsonElement> dataResult = option.getCodec().encodeStart(JsonOps.INSTANCE, option.getValue());
-        dataResult.error().ifPresent(error -> OrganizablePlayScreens.LOGGER.error("Error encoding option value " + option.getValue() + " for option " + name + ": " + error));
-        dataResult.result().ifPresent(optionJson -> optionsJson.add(name, optionJson));
+        dataResult.ifError(error -> OrganizablePlayScreens.LOGGER.error("Error encoding option value {} for option {}: {}", option.getValue(), name, error));
+        dataResult.ifSuccess(optionJson -> optionsJson.add(name, optionJson));
     }
 
     /**

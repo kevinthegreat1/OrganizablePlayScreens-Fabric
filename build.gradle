@@ -28,7 +28,9 @@ dependencies {
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation "gg.essential:essential-${project.essential_minecraft_version}-fabric:${project.essential_version}"
+	modCompileOnly "gg.essential:essential-${project.essential_minecraft_version}-fabric:${project.essential_version}"
+
+	modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 processResources {
@@ -40,8 +42,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {
@@ -50,8 +51,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
@@ -92,15 +93,13 @@ publishMods {
 		projectId = "687113"
 		projectSlug = "organizable-play-screens" // Required for discord webhook
 		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-		minecraftVersions.add("1.20.3")
-		minecraftVersions.add("1.20.4")
+		minecraftVersions.add("1.20.5")
 		requires("fabric-api")
 	}
 	modrinth {
 		projectId = "zKrZtg3n"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add("1.20.3")
-		minecraftVersions.add("1.20.4")
+		minecraftVersions.add("1.20.5")
 	}
 	github {
 		repository = "kevinthegreat1/OrganizablePlayScreens-Fabric"
