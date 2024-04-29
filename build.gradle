@@ -1,29 +1,23 @@
 plugins {
-	id 'fabric-loom' version '1.4-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
+	id "me.modmuss50.mod-publish-plugin" version "0.5.1"
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-// Add minecraft version to the build jar name
-archivesBaseName = project.archives_base_name + '-' + project.minecraft_version
-version = project.mod_version
+version = project.mod_version + '+' + project.minecraft_version
 group = project.maven_group
 
-loom {
-	accessWidenerPath = file("src/main/resources/organizableplayscreens.accesswidener")
+base {
+	archivesName = project.archives_base_name
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-
 	maven { url "https://maven.terraformersmc.com/releases/" }
     maven { url "https://repo.essential.gg/repository/maven-public/" }
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/organizableplayscreens.accesswidener")
 }
 
 dependencies {
@@ -55,11 +49,14 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
 
@@ -70,7 +67,7 @@ test {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create("mavenJava", MavenPublication) {
 			from components.java
 		}
 	}
@@ -81,5 +78,33 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+	}
+}
+
+publishMods {
+	file = remapJar.archiveFile
+	displayName = "Folders! ${mod_version} for ${minecraft_version}"
+	changelog = rootProject.file("CHANGELOG.md").text
+	type = STABLE
+	modLoaders.add("fabric")
+
+	curseforge {
+		projectId = "687113"
+		projectSlug = "organizable-play-screens" // Required for discord webhook
+		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+		minecraftVersions.add("1.20.3")
+		minecraftVersions.add("1.20.4")
+		requires("fabric-api")
+	}
+	modrinth {
+		projectId = "zKrZtg3n"
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		minecraftVersions.add("1.20.3")
+		minecraftVersions.add("1.20.4")
+	}
+	github {
+		repository = "kevinthegreat1/OrganizablePlayScreens-Fabric"
+		accessToken = providers.environmentVariable("GITHUB_TOKEN")
+		commitish = "main"
 	}
 }
