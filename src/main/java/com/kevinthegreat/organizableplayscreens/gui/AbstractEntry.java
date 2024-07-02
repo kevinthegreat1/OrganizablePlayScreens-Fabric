@@ -20,12 +20,12 @@ import java.util.function.Supplier;
  */
 public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Supplier<EntryType>, Mutable<String> {
     MinecraftClient client = MinecraftClient.getInstance();
-    Identifier JOIN_TEXTURE = new Identifier("server_list/join");
-    Identifier JOIN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/join_highlighted");
-    Identifier MOVE_UP_TEXTURE = new Identifier("server_list/move_up");
-    Identifier MOVE_UP_HIGHLIGHTED_TEXTURE = new Identifier("server_list/move_up_highlighted");
-    Identifier MOVE_DOWN_TEXTURE = new Identifier("server_list/move_down");
-    Identifier MOVE_DOWN_HIGHLIGHTED_TEXTURE = new Identifier("server_list/move_down_highlighted");
+    Identifier JOIN_TEXTURE = Identifier.of("server_list/join");
+    Identifier JOIN_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/join_highlighted");
+    Identifier MOVE_UP_TEXTURE = Identifier.of("server_list/move_up");
+    Identifier MOVE_UP_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/move_up_highlighted");
+    Identifier MOVE_DOWN_TEXTURE = Identifier.of("server_list/move_down");
+    Identifier MOVE_DOWN_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/move_down_highlighted");
 
     @Override
     default EntryType get() {

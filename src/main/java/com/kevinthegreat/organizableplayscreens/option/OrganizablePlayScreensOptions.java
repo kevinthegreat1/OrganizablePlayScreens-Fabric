@@ -39,7 +39,7 @@ public class OrganizablePlayScreensOptions {
     private final Path optionsFile = FabricLoader.getInstance().getConfigDir().resolve(OrganizablePlayScreens.MOD_ID + ".json");
     public final SimpleOption<Boolean> buttonType = new SimpleOption<>("organizableplayscreens:options.buttonType", SimpleOption.emptyTooltip(), (optionText, value) -> Text.translatable(value ? "organizableplayscreens:options.textField" : "organizableplayscreens:options.slider"), SimpleOption.BOOLEAN, false, value -> {
         if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen organizablePlayScreensOptionsScreen) {
-            organizablePlayScreensOptionsScreen.clearAndInit();
+            MinecraftClient.getInstance().setScreen(new OrganizablePlayScreensOptionsScreen(organizablePlayScreensOptionsScreen.getParent()));
         }
     });
     public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, value -> updateResetButton(0));

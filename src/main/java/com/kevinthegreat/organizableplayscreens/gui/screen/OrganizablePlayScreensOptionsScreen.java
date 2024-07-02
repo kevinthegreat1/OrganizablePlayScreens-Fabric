@@ -8,6 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.screen.ScreenTexts;
@@ -20,6 +21,8 @@ import java.util.List;
  * The options screen for Organizable Play Screens.
  */
 public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
+    private static final int MARGIN_TOP = 46;
+    private static final int ROW_HEIGHT = 34;
     /**
      * {@code 'X:'} text used in front of text field options.
      */
@@ -55,10 +58,9 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
     }
 
     /**
-     * Initializes the screen.
+     * Initializes the body of the screen.
      * Creates option buttons and reset buttons row by row.
      * Adds the reset buttons to {@link #resetButtons}.
-     * Creates button type button and done button at the end.
      */
     @Override
     protected void init() {
@@ -67,7 +69,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         ImmutableList.Builder<ButtonWidget> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
         for (List<Pair<String, SimpleOption<?>>> optionRow : options.optionsArray) {
             int j = 0;
-            int y = height / 6 - 1 + i * 36;
+            int y = MARGIN_TOP + i * ROW_HEIGHT;
             for (Pair<String, SimpleOption<?>> namedOption : optionRow) {
                 int x = width / 2 - 155 + j * 135;
                 addDrawableChild(namedOption.getRight().createWidget(gameOptions, x, y, 125));
@@ -75,7 +77,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
             }
             ButtonWidget resetButton = ButtonWidget.builder(Text.translatable("controls.reset"), (buttonWidget) -> {
                 OrganizablePlayScreensOptions.reset(optionRow);
-                clearAndInit();
+                MinecraftClient.getInstance().setScreen(new OrganizablePlayScreensOptionsScreen(parent));
             }).dimensions(width / 2 - 155 + j * 135, y, 40, 20).build();
             resetButtonsBuilder.add(resetButton);
             addDrawableChild(resetButton);
@@ -84,22 +86,31 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
             }
         }
         resetButtons = resetButtonsBuilder.build();
-        addDrawableChild(options.buttonType.createWidget(gameOptions, width / 2 - 155, height - 28, 150));
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
-            options.save();
-            client.setScreen(parent);
-        }).dimensions(width / 2 + 5, height - 28, 150, 20).build());
         options.updateResetButtons();
     }
 
     /**
-     * Clears and re-initializes the screen.
-     * Used to replace buttons when option value is reset or when button type is changed.
-     * Overridden to make method public so {@link OrganizablePlayScreensOptions} can call this when changing button type.
+     * Adds the option buttons.
+     * Overridden to do nothing since the buttons are added in {@link #init()} due to the custom layout.
      */
     @Override
-    public void clearAndInit() {
-        super.clearAndInit();
+    protected void addOptions() {}
+
+    /**
+     * Initializes the footer of the screen.
+     * Creates button type button and done button in the footer.
+     */
+    @Override
+    protected void initFooter() {
+        GridWidget gridWidget = new GridWidget().setColumnSpacing(10);
+        GridWidget.Adder adder = gridWidget.createAdder(2);
+        adder.add(options.buttonType.createWidget(gameOptions));
+        adder.add(ButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
+            options.save();
+            client.setScreen(parent);
+        }).build());
+        gridWidget.refreshPositions();
+        layout.addFooter(gridWidget);
     }
 
     /**
@@ -114,23 +125,21 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
      */
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 12, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, height / 6 - 12 + i, 0xFFFFFF);
-            i += 36;
+            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFF);
+            i += ROW_HEIGHT;
         }
         if (options.buttonType.getValue()) {
             for (i = 0; i < 5; i++) {
-                int y = height / 6 - 1 + i * 36;
+                int y = MARGIN_TOP + i * ROW_HEIGHT;
                 int x = width / 2 - 155;
                 context.drawTextWithShadow(textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFF);
                 x = width / 2 - 155 + 135;
                 context.drawTextWithShadow(textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFF);
             }
         }
-        super.render(context, mouseX, mouseY, delta);
     }
 
     /**

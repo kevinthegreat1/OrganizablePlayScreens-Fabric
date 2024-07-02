@@ -206,7 +206,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                default -> folder.getEntries().add(EntryType.get(new Identifier(type)).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
+                default -> folder.getEntries().add(EntryType.get(Identifier.of(type)).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
             }
         }
     }

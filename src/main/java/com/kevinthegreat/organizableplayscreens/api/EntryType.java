@@ -28,9 +28,9 @@ public class EntryType {
      * A list of all singleplayer entry types.
      */
     private static final List<EntryType> SINGLEPLAYER_ENTRY_TYPES = new ArrayList<>();
-    public static final EntryType FOLDER = register(new Identifier(OrganizablePlayScreens.MOD_ID, "folder"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
-    public static final EntryType SECTION = register(new Identifier(OrganizablePlayScreens.MOD_ID, "section"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
-    public static final EntryType SEPARATOR = register(new Identifier(OrganizablePlayScreens.MOD_ID, "separator"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
+    public static final EntryType FOLDER = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "folder"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
+    public static final EntryType SECTION = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "section"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
+    public static final EntryType SEPARATOR = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "separator"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
     /**
      * Identifier of the entry type.
      */

@@ -238,7 +238,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> folder.getNonWorldEntries().add(EntryType.get(new Identifier(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
+                default -> folder.getNonWorldEntries().add(EntryType.get(Identifier.of(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
             }
         }
     }

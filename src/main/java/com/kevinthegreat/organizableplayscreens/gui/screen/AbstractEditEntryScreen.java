@@ -175,10 +175,9 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, typeTitle, width / 2, 20, 0xffffff);
         context.drawTextWithShadow(textRenderer, typeEnterName, width / 2 - 100, 80, 0xa0a0a0);
         nameField.render(context, mouseX, mouseY, delta);
-        super.render(context, mouseX, mouseY, delta);
     }
 }
