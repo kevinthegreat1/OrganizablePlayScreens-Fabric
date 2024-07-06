@@ -48,9 +48,6 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     protected abstract boolean shouldShow(String search, LevelSummary summary);
 
     @Shadow
-    protected abstract void showLoadingScreen();
-
-    @Shadow
     protected abstract void narrateScreenIfNarrationEnabled();
 
     @Shadow
@@ -147,7 +144,6 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      */
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void organizableplayscreens_loadFromListWidget(SelectWorldScreen parent, MinecraftClient client, int width, int height, int y, int itemHeight, String search, WorldListWidget oldWidget, CallbackInfo ci) {
-        showLoadingScreen();
         organizableplayscreens_loadedFuture = ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_loadedFuture.thenRunAsync(() -> {
             organizableplayscreens_worlds.clear();
             organizableplayscreens_fromFolder(organizableplayscreens_rootFolder, ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_rootFolder, ((WorldListWidgetMixin) (Object) oldWidget).organizableplayscreens_currentFolder);
@@ -170,7 +166,6 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      */
     @Inject(method = "load", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;levelsFuture:Ljava/util/concurrent/CompletableFuture;", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     public void organizableplayscreens_loadFile(CallbackInfo ci) {
-        showLoadingScreen();
         organizableplayscreens_rootFolder.getNonWorldEntries().clear();
         organizableplayscreens_rootFolder.getWorldEntries().clear();
         organizableplayscreens_loadedFuture = levelsFuture.thenAcceptAsync(levels -> {
