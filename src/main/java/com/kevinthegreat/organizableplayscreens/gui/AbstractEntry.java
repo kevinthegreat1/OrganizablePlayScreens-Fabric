@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
@@ -125,23 +126,23 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
             int p = mouseY - y;
             if (renderOpenButton) {
                 if (o < 32 && o > 16) {
-                    context.drawGuiTexture(JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(JOIN_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, JOIN_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index > 0) {
                 if (o < 16 && p < 16) {
-                    context.drawGuiTexture(MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(MOVE_UP_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_UP_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index < listSize - 1) {
                 if (o < 16 && p > 16) {
-                    context.drawGuiTexture(MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(MOVE_DOWN_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_DOWN_TEXTURE, x, y, 32, 32);
                 }
             }
         }

@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
-	id "me.modmuss50.mod-publish-plugin" version "0.5.1"
+	id "me.modmuss50.mod-publish-plugin" version "0.7.4"
 }
 
 version = project.mod_version + '+' + project.minecraft_version
@@ -93,13 +93,19 @@ publishMods {
 		projectId = "687113"
 		projectSlug = "organizable-play-screens" // Required for discord webhook
 		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-		minecraftVersions.add("1.21")
+		minecraftVersionRange {
+			start = "1.21.2"
+			end = "1.21.3"
+		}
 		requires("fabric-api")
 	}
 	modrinth {
 		projectId = "zKrZtg3n"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add("1.21")
+		minecraftVersionRange {
+			start = "1.21.2"
+			end = "1.21.3"
+		}
 	}
 	github {
 		repository = "kevinthegreat1/OrganizablePlayScreens-Fabric"

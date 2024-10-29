@@ -1,3 +1,6 @@
+## Folders! 1.2.5 for 1.21.2 & 1.21.3
+Support for 1.21.2 and 1.21.3
+
 ## Folders! 1.2.4 for 1.21
 Fix crash when saving an edited world or deleting a world
 
