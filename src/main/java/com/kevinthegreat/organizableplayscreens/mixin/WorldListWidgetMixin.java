@@ -396,7 +396,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
         WorldListWidget.Entry selected = getSelectedOrNull();
         if (selected == null) {
-            setScrollAmount(0);
+            setScrollY(0);
         } else {
             ensureVisible(selected);
         }

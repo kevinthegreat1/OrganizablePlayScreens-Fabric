@@ -270,7 +270,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         children().add(scanningEntry);
         children().addAll(lanServers);
         if (getSelectedOrNull() == null) {
-            setScrollAmount(0);
+            setScrollY(0);
         }
         organizableplayscreens_updateCurrentPath();
         ci.cancel();

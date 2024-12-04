@@ -1,3 +1,6 @@
+## Folders! 1.2.6 for 1.21.4
+Support for 1.21.4
+
 ## Folders! 1.2.5 for 1.21.2 & 1.21.3
 Support for 1.21.2 and 1.21.3
 
