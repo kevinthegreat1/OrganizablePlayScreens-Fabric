@@ -208,16 +208,16 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      */
     @Unique
     private void organizableplayscreens_fromNbt(SingleplayerFolderEntry folder, NbtCompound nbtCompound, List<LevelSummary> levels) {
-        NbtList nbtList = nbtCompound.getList("entries", 10);
+        NbtList nbtList = nbtCompound.getListOrEmpty("entries");
         folder.getWorldEntries().clear();
         folder.getNonWorldEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
-            NbtCompound nbtEntry = nbtList.getCompound(i);
+            NbtCompound nbtEntry = nbtList.getCompoundOrEmpty(i);
             OrganizablePlayScreens.updateEntryNbt(nbtEntry, false);
-            String type = nbtEntry.getString("type");
+            String type = nbtEntry.getString("type", "");
             switch (type) {
                 case "minecraft:world" -> {
-                    int index = Collections.binarySearch(levels, new LevelSummary(null, SaveVersionInfoInvoker.create(0, nbtEntry.getLong("lastPlayed"), null, 0, null, false), nbtEntry.getString("name"), false, false, false, null));
+                    int index = Collections.binarySearch(levels, new LevelSummary(null, SaveVersionInfoInvoker.create(0, nbtEntry.getLong("lastPlayed", 0), null, 0, null, false), nbtEntry.getString("name", ""), false, false, false, null));
                     if (index >= 0) {
                         WorldListWidget.WorldEntry worldEntry = ((WorldListWidget) (Object) this).new WorldEntry((WorldListWidget) (Object) this, levels.get(index));
                         organizableplayscreens_worlds.put(worldEntry, folder);
@@ -226,14 +226,14 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     }
                 }
                 case OrganizablePlayScreens.MOD_ID + ":folder" -> {
-                    SingleplayerFolderEntry folderEntry = new SingleplayerFolderEntry(parent, folder, nbtEntry.getString("name"));
-                    if (nbtEntry.getBoolean("current")) {
+                    SingleplayerFolderEntry folderEntry = new SingleplayerFolderEntry(parent, folder, nbtEntry.getString("name", ""));
+                    if (nbtEntry.getBoolean("current", false)) {
                         organizableplayscreens_currentFolder = folderEntry;
                     }
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, levels);
                     folder.getNonWorldEntries().add(folderEntry);
                 }
-                default -> folder.getNonWorldEntries().add(EntryType.get(Identifier.of(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name")));
+                default -> folder.getNonWorldEntries().add(EntryType.get(Identifier.of(type)).singleplayerEntry(parent, folder, nbtEntry.getString("name", "")));
             }
         }
     }

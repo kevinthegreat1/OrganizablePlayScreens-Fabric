@@ -7,7 +7,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -50,8 +49,8 @@ public class OrganizablePlayScreens implements ModInitializer {
     }
 
     public static void updateEntryNbt(NbtCompound nbtEntry, boolean multiplayer) {
-        if (!nbtEntry.contains("type", NbtElement.STRING_TYPE)) {
-            nbtEntry.putString("type", nbtEntry.getBoolean("type") ? EntryType.FOLDER.id().toString() : multiplayer ? "minecraft:server" : "minecraft:world");
+        if (nbtEntry.getString("type").isEmpty()) {
+            nbtEntry.putString("type", nbtEntry.getBoolean("type", false) ? EntryType.FOLDER.id().toString() : multiplayer ? "minecraft:server" : "minecraft:world");
         }
     }
 }

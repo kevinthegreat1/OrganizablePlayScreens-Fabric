@@ -183,30 +183,30 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      */
     @Unique
     private void organizableplayscreens_fromNbt(MultiplayerFolderEntry folder, NbtCompound nbtCompound, List<MultiplayerServerListWidget.ServerEntry> serversSorted) {
-        NbtList nbtList = nbtCompound.getList("entries", 10);
+        NbtList nbtList = nbtCompound.getListOrEmpty("entries");
         folder.getEntries().clear();
         for (int i = 0; i < nbtList.size(); i++) {
-            NbtCompound nbtEntry = nbtList.getCompound(i);
+            NbtCompound nbtEntry = nbtList.getCompoundOrEmpty(i);
             OrganizablePlayScreens.updateEntryNbt(nbtEntry, true);
-            String type = nbtEntry.getString("type");
+            String type = nbtEntry.getString("type", "");
             switch (type) {
                 case "minecraft:server" -> {
-                    if (!nbtEntry.getBoolean("hidden")) {
-                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name"), nbtEntry.getString("ip"), null)), serverEntryComparator);
+                    if (!nbtEntry.getBoolean("hidden", false)) {
+                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name", ""), nbtEntry.getString("ip", ""), null)), serverEntryComparator);
                         if (index >= 0) {
                             folder.getEntries().add(serversSorted.remove(index));
                         }
                     }
                 }
                 case OrganizablePlayScreens.MOD_ID + ":folder" -> {
-                    MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name"));
-                    if (nbtEntry.getBoolean("current")) {
+                    MultiplayerFolderEntry folderEntry = new MultiplayerFolderEntry(screen, folder, nbtEntry.getString("name", ""));
+                    if (nbtEntry.getBoolean("current", false)) {
                         organizableplayscreens_currentFolder = folderEntry;
                     }
                     organizableplayscreens_fromNbt(folderEntry, nbtEntry, serversSorted);
                     folder.getEntries().add(folderEntry);
                 }
-                default -> folder.getEntries().add(EntryType.get(Identifier.of(type)).multiplayerEntry(screen, folder, nbtEntry.getString("name")));
+                default -> folder.getEntries().add(EntryType.get(Identifier.of(type)).multiplayerEntry(screen, folder, nbtEntry.getString("name", "")));
             }
         }
     }
