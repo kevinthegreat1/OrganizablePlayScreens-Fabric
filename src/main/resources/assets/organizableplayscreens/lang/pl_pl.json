@@ -1,0 +1,30 @@
+{
+    "organizableplayscreens:entry.edit": "Edytuj %s",
+    "organizableplayscreens:entry.enterName": "Nazwa %s",
+    "organizableplayscreens:entry.new": "Nowy %s",
+    "organizableplayscreens:entry.section": "Sekcja",
+    "organizableplayscreens:entry.separator": "Separator",
+    "organizableplayscreens:entry.deleteEntryQuestion": "Na pewno chcesz usunąć ten %s?",
+    "organizableplayscreens:entry.deleteEntryWarning": "'%s' zostanie utracony na zawsze! (Na bardzo długo!)",
+    "organizableplayscreens:folder.folder": "Folder",
+    "organizableplayscreens:folder.openFolder": "Otwórz folder",
+    "organizableplayscreens:folder.moveBack": "Przenieś wybrany element do poprzedniego folderu.",
+    "organizableplayscreens:folder.moveInto": "Przenieś wybrany element do tego folderu.",
+    "organizableplayscreens:folder.deleteMultiplayerFolderWarning": "'%s' i cała zawartość folderu zostaną utracone na zawsze! (Na bardzo długo!)",
+    "organizableplayscreens:folder.deleteSingleplayerFolderWarning": "'%s' zostanie utracony na zawsze! (Na bardzo długo!)\nFoldery i światy w środku zostaną przeniesione do bieżącego folderu.",
+    "organizableplayscreens:options.title": "Opcje Organizowalnych Ekranów Gry",
+    "organizableplayscreens:options.x": "X",
+    "organizableplayscreens:options.y": "Y",
+    "organizableplayscreens:options.backButton": "Przycisk Wstecz",
+    "organizableplayscreens:options.moveEntryBackButton": "Przycisk Przenieś Wpis Wstecz",
+    "organizableplayscreens:options.newFolderButton": "Przycisk Nowy Folder",
+    "organizableplayscreens:options.optionsButton": "Przycisk Opcji",
+    "organizableplayscreens:options.moveEntryIntoButton": "Przycisk Przenieś Wpis Do",
+    "organizableplayscreens:options.buttonType": "Typ Przycisku",
+    "organizableplayscreens:options.textField": "Pole Tekstowe",
+    "organizableplayscreens:options.slider": "Suwak",
+
+    "modmenu.summaryTranslation.organizableplayscreens": "Organizuj listy światów i serwerów za pomocą folderów.",
+    "modmenu.descriptionTranslation.organizableplayscreens": "Ogarnij porządek w swoich światach i serwerach, sortując je do różnych folderów."
+
+}
