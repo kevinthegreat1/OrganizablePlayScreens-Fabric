@@ -3,6 +3,7 @@ package com.kevinthegreat.organizableplayscreens;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonOptions;
 import net.fabricmc.fabric.mixin.client.gametest.ScreenAccessor;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -24,7 +25,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         // Create a new folder
         createNewFolder(context);
         // Assert the select world screen
-        context.assertScreenshotEquals("select-world-screen");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen").save());
 
         // Navigate back to the title screen
         clickScreenButton(context, "←");
@@ -40,7 +41,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         // Create a new folder
         createNewFolder(context);
         // Assert the multiplayer screen
-        context.assertScreenshotEquals("multiplayer-screen");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen").save());
 
         // Navigate back to the title screen
         clickScreenButton(context, "←");
@@ -51,7 +52,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         // Create a new folder
         clickScreenButton(context, "+");
         // Assert the new folder screen
-        context.assertScreenshotEquals("new-folder-screen");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("new-folder-screen").save());
         // Finish creating the new folder
         context.clickScreenButton("gui.done");
     }
