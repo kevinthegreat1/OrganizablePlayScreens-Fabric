@@ -73,7 +73,15 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Loads and displays folders and servers from {@code organizable_servers.dat} and adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
+     * Loads and displays folders and servers from {@code organizable_servers.dat}
+     */
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
+    private void organizableplayscreens_loadFile(CallbackInfo ci) {
+        serverListWidget.organizableplayscreens_loadFile();
+    }
+
+    /**
+     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
@@ -81,8 +89,6 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;updateButtonActivationStates()V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
-        serverListWidget.organizableplayscreens_loadFile();
-
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
             if (!serverListWidget.organizableplayscreens_setCurrentFolderToParent()) {
