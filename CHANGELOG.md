@@ -1,3 +1,8 @@
+## Folders! 1.2.8 for 1.21.5
+Fix mod name in Mod Menu
+Fix unable to edit multiplayer folders and entries
+Add client game test
+
 ## Folders! 1.2.7 for 1.21.5
 Support for 1.21.5
 
