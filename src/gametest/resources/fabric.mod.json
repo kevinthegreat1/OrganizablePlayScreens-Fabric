@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "organizableplayscreens-test",
+  "version": "${version}",
+  "name": "Folders! Client Game Test",
+  "icon": "assets/organizableplayscreens/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "com.kevinthegreat.organizableplayscreens.OrganizablePlayScreensClientGameTest"
+    ]
+  }
+}
