@@ -128,16 +128,16 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
         super.render(context, mouseX, mouseY, delta);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFF);
+            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFFFF);
             i += ROW_HEIGHT;
         }
         if (options.buttonType.getValue()) {
             for (i = 0; i < 5; i++) {
                 int y = MARGIN_TOP + i * ROW_HEIGHT;
                 int x = width / 2 - 155;
-                context.drawTextWithShadow(textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFF);
+                context.drawTextWithShadow(textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
                 x = width / 2 - 155 + 135;
-                context.drawTextWithShadow(textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFF);
+                context.drawTextWithShadow(textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
             }
         }
     }

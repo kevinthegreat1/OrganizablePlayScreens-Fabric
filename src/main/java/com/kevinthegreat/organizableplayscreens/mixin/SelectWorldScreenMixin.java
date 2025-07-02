@@ -246,7 +246,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      */
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawCenteredTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_renderPath(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.drawCenteredTextWithShadow(textRenderer, levelList.organizableplayscreens_getCurrentPath(), width / 2, 2, 0xa0a0a0);
+        context.drawCenteredTextWithShadow(textRenderer, levelList.organizableplayscreens_getCurrentPath(), width / 2, 2, 0xFFA0A0A0);
     }
 
     /**

@@ -4,10 +4,10 @@ import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
@@ -88,8 +88,8 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
     static void renderFolderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
-        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0x808080);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.getValue());
@@ -100,8 +100,8 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
      * Renders a section entry with the given parameters.
      */
     static void renderSectionEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
-        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0x808080);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
     }
 
@@ -109,8 +109,8 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
      * Renders a separator entry with the given parameters.
      */
     static void renderSeparatorEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
-        context.drawTextWithShadow(client.textRenderer, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFF);
-        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 23, 0x808080);
+        context.drawTextWithShadow(client.textRenderer, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFFFF);
+        context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 23, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
     }
 
@@ -126,23 +126,23 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
             int p = mouseY - y;
             if (renderOpenButton) {
                 if (o < 32 && o > 16) {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, JOIN_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, JOIN_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index > 0) {
                 if (o < 16 && p < 16) {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_UP_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, MOVE_UP_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index < listSize - 1) {
                 if (o < 16 && p > 16) {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
-                    context.drawGuiTexture(RenderLayer::getGuiTextured, MOVE_DOWN_TEXTURE, x, y, 32, 32);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, MOVE_DOWN_TEXTURE, x, y, 32, 32);
                 }
             }
         }

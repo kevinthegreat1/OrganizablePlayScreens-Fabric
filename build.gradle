@@ -104,8 +104,8 @@ publishMods {
 		projectSlug = "organizable-play-screens" // Required for discord webhook
 		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
 		minecraftVersionRange {
-			start = "1.21.5"
-			end = "1.21.5"
+			start = "1.21.6"
+			end = "1.21.7"
 		}
 		requires("fabric-api")
 	}
@@ -113,8 +113,8 @@ publishMods {
 		projectId = "zKrZtg3n"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersionRange {
-			start = "1.21.5"
-			end = "1.21.5"
+			start = "1.21.6"
+			end = "1.21.7"
 		}
 	}
 	github {

@@ -1,3 +1,6 @@
+## Folders! 1.2.9 for 1.21.6 & 1.21.7
+Support for 1.21.6 and 1.21.7
+
 ## Folders! 1.2.8 for 1.21.5
 Fix mod name in Mod Menu
 Fix unable to edit multiplayer folders and entries
