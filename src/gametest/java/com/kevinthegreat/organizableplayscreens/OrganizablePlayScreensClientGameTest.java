@@ -1,8 +1,6 @@
 package com.kevinthegreat.organizableplayscreens;
 
-import com.kevinthegreat.organizableplayscreens.gui.AbstractFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
-import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
+import com.kevinthegreat.organizableplayscreens.gui.*;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -34,16 +32,19 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root").save());
 
         // Move the world into the folder
-        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class);
+        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, -1);
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
         // Open the folder
-        clickListWidgetEntry(context, SingleplayerFolderEntry.class);
-        clickListWidgetEntry(context, SingleplayerFolderEntry.class);
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 24);
         // Create a new folder, section, and separator inside the folder and assert the select world screen folder
         createNewFolder(context);
         createNewEntry(context, "organizableplayscreens:entry.section");
         createNewEntry(context, "organizableplayscreens:entry.separator");
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder").save());
+
+        // Move the section above the folder and assert the select world screen folder reordered
+        clickListWidgetEntry(context, SingleplayerSectionEntry.class, 0);
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reordered").save());
 
         // Navigate back to the title screen
         clickScreenButton(context, "←");
@@ -60,16 +61,19 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root").save());
 
         // Move the server into the folder
-        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class);
+        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, -1);
         clickFolderMoveInto(context, MultiplayerFolderEntry.class);
         // Open the folder
-        clickListWidgetEntry(context, MultiplayerFolderEntry.class);
-        clickListWidgetEntry(context, MultiplayerFolderEntry.class);
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 24);
         // Create a new folder, section, and separator inside the folder and assert the multiplayer screen folder
         createNewFolder(context);
         createNewEntry(context, "organizableplayscreens:entry.section");
         createNewEntry(context, "organizableplayscreens:entry.separator");
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder").save());
+
+        // Move the section above the folder and assert the multiplayer screen folder reordered
+        clickListWidgetEntry(context, MultiplayerSectionEntry.class, 0);
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reordered").save());
 
         // Navigate back to the title screen
         clickScreenButton(context, "←");
@@ -108,15 +112,15 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         );
     }
 
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass) {
+    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int xOffset) {
         context.runOnClient(client -> {
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
             T entry = getListWidgetEntry(listWidget, entryClass);
             int i = listWidget.children().indexOf(this);
             int x = listWidget.getRowLeft();
             int y = ((EntryListWidgetInvoker) listWidget).rowTop(i);
-            int w = listWidget.getRowWidth();
-            entry.mouseClicked(x + w, y, 0);
+            x += xOffset >= 0 ? xOffset : listWidget.getRowWidth();
+            entry.mouseClicked(x, y, 0);
         });
     }
 
