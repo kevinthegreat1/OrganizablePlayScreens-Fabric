@@ -77,12 +77,11 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     @Unique
     private final SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_worlds = new TreeMap<>(Comparator.comparing(worldEntry -> ((WorldEntryAccessor) worldEntry).getLevel()));
     /**
-     * The path of {@link #organizableplayscreens_currentFolder currentFolder}.
-     * <p>
-     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     * @see com.kevinthegreat.organizableplayscreens.mixin.SelectWorldScreenMixin#organizableplayscreens_pathWidget
      */
+    @SuppressWarnings("JavadocReference")
     @Unique
-    private TextWidget organizableplayscreens_pathWidget = new TextWidget(Text.empty(), client.textRenderer).setTextColor(0xFFA0A0A0);
+    private TextWidget organizableplayscreens_pathWidget;
 
     public WorldListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l) {
         super(minecraftClient, i, j, k, l);
@@ -114,8 +113,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     }
 
     @Override
-    public TextWidget organizableplayscreens_getPathWidget() {
-        return organizableplayscreens_pathWidget;
+    public void organizableplayscreens_setPathWidget(TextWidget pathWidget) {
+        organizableplayscreens_pathWidget = pathWidget;
     }
 
     /**
@@ -374,8 +373,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                     ((SelectWorldScreen) parent).worldSelected(null);
                 }
             }
-            children().addAll(organizableplayscreens_currentFolder.getNonWorldEntries());
-            children().addAll(organizableplayscreens_currentFolder.getWorldEntries());
+            organizableplayscreens_currentFolder.getNonWorldEntries().forEach(this::addEntry);
+            organizableplayscreens_currentFolder.getWorldEntries().forEach(this::addEntry);
         } else {
             search = search.toLowerCase(Locale.ROOT);
             for (WorldListWidget.WorldEntry entry : organizableplayscreens_worlds.keySet()) {

@@ -9,12 +9,17 @@ import com.kevinthegreat.organizableplayscreens.gui.screen.MultiplayerEditEntryS
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ServerInfo;
@@ -39,9 +44,6 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Final
     private Screen parent;
     @Shadow
-    @Final
-    private ThreePartsLayoutWidget field_62178;
-    @Shadow
     protected MultiplayerServerListWidget serverListWidget;
     @Shadow
     private ButtonWidget buttonJoin;
@@ -63,6 +65,13 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Unique
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
     /**
+     * The path of the {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
+     * <p>
+     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     */
+    @Unique
+    private TextWidget organizableplayscreens_pathWidget;
+    /**
      * A folder entry to store the folder that is currently being created.
      */
     @Unique
@@ -74,14 +83,24 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Adds the path of the {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to the screen
-     * and loads and displays folders and servers from {@code organizable_servers.dat}.
+     * Adds the path of the {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to the header of the screen.
      *
-     * @see MultiplayerServerListWidgetMixin#organizableplayscreens_pathWidget pathWidget
+     * @see #organizableplayscreens_pathWidget pathWidget
+     */
+    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ThreePartsLayoutWidget;addHeader(Lnet/minecraft/text/Text;Lnet/minecraft/client/font/TextRenderer;)V"))
+    private void organizableplayscreens_modifyHeader(ThreePartsLayoutWidget layout, Text text, TextRenderer textRenderer, Operation<Void> original) {
+        DirectionalLayoutWidget headerLayout = layout.addHeader(DirectionalLayoutWidget.vertical().spacing(4));
+        headerLayout.getMainPositioner().alignHorizontalCenter();
+        organizableplayscreens_pathWidget = headerLayout.add(new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0));
+        headerLayout.add(new TextWidget(text, textRenderer));
+    }
+
+    /**
+     * Loads and displays folders and servers from {@code organizable_servers.dat}.
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_loadFile(CallbackInfo ci) {
-        field_62178.addHeader(serverListWidget.organizableplayscreens_getPathWidget());
+        serverListWidget.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
         serverListWidget.organizableplayscreens_loadFile();
     }
 

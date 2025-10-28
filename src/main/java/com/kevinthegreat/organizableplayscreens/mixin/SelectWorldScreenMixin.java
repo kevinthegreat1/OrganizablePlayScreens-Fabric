@@ -10,14 +10,13 @@ import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOpt
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -41,9 +40,6 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Final
     protected Screen parent;
     @Shadow
-    @Final
-    private ThreePartsLayoutWidget layout;
-    @Shadow
     private WorldListWidget levelList;
     @Shadow
     private ButtonWidget selectButton;
@@ -62,7 +58,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Unique
     private ButtonWidget organizableplayscreens_buttonCancel;
     /**
-     * This button sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
+     * This button sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      */
     @Unique
     private ButtonWidget organizableplayscreens_buttonBack;
@@ -77,6 +73,13 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Unique
     private ButtonWidget organizableplayscreens_buttonNewFolder;
     /**
+     * The path of the {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
+     * <p>
+     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     */
+    @Unique
+    private TextWidget organizableplayscreens_pathWidget;
+    /**
      * A folder entry to store the folder that is currently being created.
      */
     @Unique
@@ -88,19 +91,27 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Adds the path of the {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and the 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
+     * Adds the path of the {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to the header of the screen.
+     *
+     * @see #organizableplayscreens_pathWidget pathWidget
+     */
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;", ordinal = 0))
+    private void organizableplayscreens_modifyHeader(CallbackInfo ci, @Local(ordinal = 0) DirectionalLayoutWidget headerLayout) {
+        organizableplayscreens_pathWidget = headerLayout.add(new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0));
+    }
+
+    /**
+     * Adds the 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
-     * The 'back' button sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
+     * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
-     *
-     * @see WorldListWidgetMixin#organizableplayscreens_pathWidget pathWidget
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Lnet/minecraft/world/level/storage/LevelSummary;)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
-        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        levelList.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
 
-        layout.addHeader(levelList.organizableplayscreens_getPathWidget());
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
 
         organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
             if (!levelList.organizableplayscreens_setCurrentFolderToParent()) {
@@ -190,7 +201,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Modifies the 'cancel' button to set {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevent closing the screen.
+     * Modifies the 'cancel' button to set {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevent closing the screen.
      */
     @Definition(id = "builder", method = "Lnet/minecraft/client/gui/widget/ButtonWidget;builder(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;")
     @Definition(id = "BACK", field = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")
@@ -204,7 +215,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Adds the non-world entry stored in {@link #organizableplayscreens_newEntry newEntry} to {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
+     * Adds the non-world entry stored in {@link #organizableplayscreens_newEntry newEntry} to {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and sets the screen back to this.
      */
     @Unique
     private void organizableplayscreens_addEntry(boolean confirmedAction) {
@@ -225,7 +236,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Moves the entries inside the selected folder to {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}, deletes the selected non-world entry, updates the displayed entries, and sets the screen back to this.
+     * Moves the entries inside the selected folder to {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}, deletes the selected non-world entry, updates the displayed entries, and sets the screen back to this.
      */
     @Unique
     private void organizableplayscreens_deleteEntry(boolean confirmedAction) {
@@ -251,7 +262,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Handles escape key and the screen buttons.
      * <p>
-     * First, sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
+     * First, sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
      * Then, calls {@link Screen#keyPressed(int, int, int)}.
      */
     @Override
@@ -292,7 +303,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed and {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
+     * Prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
      *
      * @return whether the screen should close
      */

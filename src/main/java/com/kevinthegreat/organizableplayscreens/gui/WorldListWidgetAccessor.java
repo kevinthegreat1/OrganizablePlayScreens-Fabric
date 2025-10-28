@@ -28,7 +28,7 @@ public interface WorldListWidgetAccessor {
 
     default boolean organizableplayscreens_isRootFolder() {return false;}
 
-    default TextWidget organizableplayscreens_getPathWidget() {return null;}
+    default void organizableplayscreens_setPathWidget(TextWidget pathWidget) {}
 
     /**
      * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.

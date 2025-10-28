@@ -72,12 +72,11 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @NotNull
     private MultiplayerFolderEntry organizableplayscreens_currentFolder = organizableplayscreens_rootFolder;
     /**
-     * The path of {@link #organizableplayscreens_currentFolder currentFolder}.
-     * <p>
-     * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
+     * @see com.kevinthegreat.organizableplayscreens.mixin.MultiplayerScreenMixin#organizableplayscreens_pathWidget
      */
+    @SuppressWarnings("JavadocReference")
     @Unique
-    private final TextWidget organizableplayscreens_pathWidget = new TextWidget(Text.empty(), client.textRenderer).setTextColor(0xFFA0A0A0);
+    private TextWidget organizableplayscreens_pathWidget;
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l) {
         super(minecraftClient, i, j, k, l);
@@ -99,8 +98,8 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public TextWidget organizableplayscreens_getPathWidget() {
-        return organizableplayscreens_pathWidget;
+    public void organizableplayscreens_setPathWidget(TextWidget pathWidget) {
+        organizableplayscreens_pathWidget = pathWidget;
     }
 
     /**
@@ -268,9 +267,9 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             return;
         }
         clearEntries();
-        children().addAll(organizableplayscreens_currentFolder.getEntries());
-        children().add(scanningEntry);
-        children().addAll(lanServers);
+        organizableplayscreens_currentFolder.getEntries().forEach(this::addEntry);
+        addEntry(scanningEntry);
+        lanServers.forEach(this::addEntry);
         if (getSelectedOrNull() == null) {
             setScrollY(0);
         }
