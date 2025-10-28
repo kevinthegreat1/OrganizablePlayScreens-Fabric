@@ -23,6 +23,7 @@ import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.option.ServerList;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -91,16 +92,18 @@ public abstract class MultiplayerScreenMixin extends Screen {
     private void organizableplayscreens_modifyHeader(ThreePartsLayoutWidget layout, Text text, TextRenderer textRenderer, Operation<Void> original) {
         DirectionalLayoutWidget headerLayout = layout.addHeader(DirectionalLayoutWidget.vertical().spacing(4));
         headerLayout.getMainPositioner().alignHorizontalCenter();
-        organizableplayscreens_pathWidget = headerLayout.add(new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0));
+        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0);
+        headerLayout.add(organizableplayscreens_pathWidget);
         headerLayout.add(new TextWidget(text, textRenderer));
     }
 
     /**
      * Loads and displays folders and servers from {@code organizable_servers.dat}.
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
-    private void organizableplayscreens_loadFile(CallbackInfo ci) {
+    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
+    private void organizableplayscreens_loadFile(MultiplayerServerListWidget serverListWidget, ServerList servers, Operation<Void> original) {
         serverListWidget.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
+        original.call(serverListWidget, servers);
         serverListWidget.organizableplayscreens_loadFile();
     }
 

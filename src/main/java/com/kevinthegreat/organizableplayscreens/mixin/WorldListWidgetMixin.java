@@ -6,6 +6,7 @@ import com.kevinthegreat.organizableplayscreens.gui.AbstractSingleplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SaveVersionInfoInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
@@ -413,6 +414,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
         }
         Collections.reverse(path);
         organizableplayscreens_pathWidget.setMessage(Text.of(String.join(" > ", path)));
+        ((SelectWorldScreenAccessor) parent).invokeRefreshWidgetPositions();
     }
 
     @Mixin(WorldListWidget.WorldEntry.class)

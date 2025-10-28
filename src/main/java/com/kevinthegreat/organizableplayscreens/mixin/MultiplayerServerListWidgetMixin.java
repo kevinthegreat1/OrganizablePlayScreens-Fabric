@@ -6,6 +6,7 @@ import com.kevinthegreat.organizableplayscreens.compatibility.Compatibility;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -290,6 +291,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
         Collections.reverse(path);
         organizableplayscreens_pathWidget.setMessage(Text.of(String.join(" > ", path)));
+        ((MultiplayerScreenAccessor) screen).invokeRefreshWidgetPositions();
     }
 
     @Mixin(MultiplayerServerListWidget.ServerEntry.class)
