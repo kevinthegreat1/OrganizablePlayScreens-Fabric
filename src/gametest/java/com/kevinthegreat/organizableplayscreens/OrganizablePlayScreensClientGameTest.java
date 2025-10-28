@@ -8,11 +8,13 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonOptions;
 import net.fabricmc.fabric.mixin.client.gametest.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.util.Nullables;
 
 import java.util.List;
@@ -55,7 +57,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.clickScreenButton("menu.multiplayer");
         context.clickScreenButton("gui.proceed");
         context.clickScreenButton("selectServer.add");
-        context.clickScreenButton("addServer.add");
+        context.clickScreenButton("gui.done");
         // Create a new folder and assert the multiplayer screen root
         createNewFolder(context);
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root").save());
@@ -106,7 +108,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
                 .map(ClickableWidget.class::cast)
                 .filter(clickableWidget -> text.equals(clickableWidget.getMessage().getString()))
                 .findAny()
-                .ifPresentOrElse(clickableWidget -> clickableWidget.onClick(clickableWidget.getX(), clickableWidget.getY()), () -> {
+                .ifPresentOrElse(clickableWidget -> clickableWidget.onClick(new Click(clickableWidget.getX(), clickableWidget.getY(), new MouseInput(0, 0)), false), () -> {
                     throw new AssertionError("Could not find button '%s' in screen '%s'".formatted(text, Nullables.map(client.currentScreen, screen -> screen.getClass().getName())));
                 })
         );
@@ -116,11 +118,11 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.runOnClient(client -> {
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
             T entry = getListWidgetEntry(listWidget, entryClass);
-            int i = listWidget.children().indexOf(this);
+            int i = listWidget.children().indexOf(entry);
             int x = listWidget.getRowLeft();
             int y = ((EntryListWidgetInvoker) listWidget).rowTop(i);
             x += xOffset >= 0 ? xOffset : listWidget.getRowWidth();
-            entry.mouseClicked(x, y, 0);
+            entry.mouseClicked(new Click(x, y, new MouseInput(0, 0)), false);
         });
     }
 
@@ -128,7 +130,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.runOnClient(client -> {
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
             T folderEntry = getListWidgetEntry(listWidget, folderClass);
-            folderEntry.getButtonMoveInto().onClick(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY());
+            folderEntry.getButtonMoveInto().onClick(new Click(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseInput(0, 0)), false);
         });
     }
 
