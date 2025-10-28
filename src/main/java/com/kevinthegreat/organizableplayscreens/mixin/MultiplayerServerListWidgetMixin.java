@@ -10,10 +10,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +77,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
      * Only used for display. In the form of '{@code folder > child folder}'. Empty in the root folder.
      */
     @Unique
-    private String organizableplayscreens_currentPath;
+    private final TextWidget organizableplayscreens_pathWidget = new TextWidget(Text.empty(), client.textRenderer).setTextColor(0xFFA0A0A0);
 
     public MultiplayerServerListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l) {
         super(minecraftClient, i, j, k, l);
@@ -97,8 +99,8 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Override
-    public String organizableplayscreens_getCurrentPath() {
-        return organizableplayscreens_currentPath;
+    public TextWidget organizableplayscreens_getPathWidget() {
+        return organizableplayscreens_pathWidget;
     }
 
     /**
@@ -107,7 +109,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     @Override
     public void organizableplayscreens_setCurrentFolder(@NotNull MultiplayerFolderEntry folderEntry) {
         organizableplayscreens_currentFolder = folderEntry;
-        screen.select(null);
+        setSelected(null);
         updateEntries();
     }
 
@@ -119,7 +121,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         if (organizableplayscreens_currentFolder != organizableplayscreens_rootFolder) {
             MultiplayerFolderEntry oldCurrentFolder = organizableplayscreens_currentFolder;
             organizableplayscreens_setCurrentFolder(organizableplayscreens_currentFolder.getParent());
-            screen.select(oldCurrentFolder);
+            setSelected(oldCurrentFolder);
             return true;
         }
         return false;
@@ -254,7 +256,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         Collections.swap(organizableplayscreens_currentFolder.getEntries(), i, j);
         organizableplayscreens_updateAndSave();
         setSelected(children().get(j));
-        ensureVisible(getSelectedOrNull());
+        scrollTo(getSelectedOrNull());
     }
 
     /**
@@ -288,7 +290,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             folder = folder.getParent();
         }
         Collections.reverse(path);
-        organizableplayscreens_currentPath = String.join(" > ", path);
+        organizableplayscreens_pathWidget.setMessage(Text.of(String.join(" > ", path)));
     }
 
     @Mixin(MultiplayerServerListWidget.ServerEntry.class)

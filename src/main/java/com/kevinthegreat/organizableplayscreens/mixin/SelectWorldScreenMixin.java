@@ -7,15 +7,18 @@ import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.SingleplayerEditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -25,7 +28,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("JavadocReference")
@@ -35,13 +41,16 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Final
     protected Screen parent;
     @Shadow
+    @Final
+    private ThreePartsLayoutWidget layout;
+    @Shadow
+    private WorldListWidget levelList;
+    @Shadow
     private ButtonWidget selectButton;
     @Shadow
     private ButtonWidget recreateButton;
     @Shadow
     protected TextFieldWidget searchBox;
-    @Shadow
-    private WorldListWidget levelList;
     @Shadow
     private ButtonWidget editButton;
     @Shadow
@@ -79,15 +88,20 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
+     * Adds the path of the {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and the 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
+     *
+     * @see WorldListWidgetMixin#organizableplayscreens_pathWidget pathWidget
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Lnet/minecraft/world/level/storage/LevelSummary;)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+
+        layout.addHeader(levelList.organizableplayscreens_getPathWidget());
+
         organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
             if (!levelList.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
@@ -124,41 +138,53 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Modifies the 'select' button to be able to open folders.
      */
-    @Inject(method = "method_19945", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_modifySelectButton(ButtonWidget button, CallbackInfo ci) {
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/widget/ButtonWidget;builder(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;")
+    @Definition(id = "SELECT_WORLD_TEXT", field = "Lnet/minecraft/world/level/storage/LevelSummary;SELECT_WORLD_TEXT:Lnet/minecraft/text/Text;")
+    @Expression("builder(SELECT_WORLD_TEXT, ?)")
+    @ModifyArg(method = "addButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private ButtonWidget.PressAction organizableplayscreens_modifySelectButton(ButtonWidget.PressAction selectAction) {
         if (levelList.getSelectedOrNull() instanceof SingleplayerFolderEntry folderEntry) {
             levelList.organizableplayscreens_setCurrentFolder(folderEntry);
-            ci.cancel();
+            return button -> {};
         }
+        return selectAction;
     }
 
     /**
      * Modifies the 'edit' button to work with folders.
      */
-    @Inject(method = "method_19943", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_modifyEditButton(ButtonWidget buttonWidget, CallbackInfo ci) {
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/widget/ButtonWidget;builder(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;")
+    @Definition(id = "translatable", method = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;)Lnet/minecraft/text/MutableText;")
+    @Expression("builder(translatable('selectWorld.edit'), ?)")
+    @ModifyArg(method = "addButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private ButtonWidget.PressAction organizableplayscreens_modifyEditButton(ButtonWidget.PressAction editAction) {
         if (levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry entry) {
             client.setScreen(new SingleplayerEditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
-            ci.cancel();
+            return button -> {};
         }
+        return editAction;
     }
 
     /**
      * Modifies the 'delete' button to work with folders.
      */
-    @Inject(method = "method_19942", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_modifyDeleteButton(ButtonWidget buttonWidget, CallbackInfo ci) {
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/widget/ButtonWidget;builder(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;")
+    @Definition(id = "translatable", method = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;)Lnet/minecraft/text/MutableText;")
+    @Expression("builder(translatable('selectWorld.delete'), ?)")
+    @ModifyArg(method = "addButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private ButtonWidget.PressAction organizableplayscreens_modifyDeleteButton(ButtonWidget.PressAction deleteAction) {
         if (levelList.getSelectedOrNull() instanceof AbstractSingleplayerEntry entry) {
             boolean isFolder = entry instanceof SingleplayerFolderEntry;
             client.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Text.translatable("organizableplayscreens:entry.deleteEntryQuestion", entry.getType().text().getString()), Text.translatable(isFolder ? "organizableplayscreens:folder.deleteSingleplayerFolderWarning" : "organizableplayscreens:entry.deleteEntryWarning", entry.getName()), Text.translatable("selectWorld.deleteButton"), ScreenTexts.CANCEL));
-            ci.cancel();
+            return button -> {};
         }
+        return deleteAction;
     }
 
     /**
      * Saves the 'cancel' button instance in a field so its text can be changed.
      */
-    @ModifyExpressionValue(method = "init", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;build()Lnet/minecraft/client/gui/widget/ButtonWidget;", ordinal = 0))
+    @ModifyExpressionValue(method = "addButtons", slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;build()Lnet/minecraft/client/gui/widget/ButtonWidget;", ordinal = 0))
     private ButtonWidget organizableplayscreens_setCancelButton(ButtonWidget buttonCancel) {
         return organizableplayscreens_buttonCancel = buttonCancel;
     }
@@ -166,11 +192,15 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Modifies the 'cancel' button to set {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevent closing the screen.
      */
-    @Inject(method = "method_19939", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_modifyCancelButton(ButtonWidget buttonWidget, CallbackInfo ci) {
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/widget/ButtonWidget;builder(Lnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;")
+    @Definition(id = "BACK", field = "Lnet/minecraft/screen/ScreenTexts;BACK:Lnet/minecraft/text/Text;")
+    @Expression("builder(BACK, ?)")
+    @ModifyArg(method = "addButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private ButtonWidget.PressAction organizableplayscreens_modifyCancelButton(ButtonWidget.PressAction cancelAction) {
         if (levelList.organizableplayscreens_setCurrentFolderToParent()) {
-            ci.cancel();
+            return button -> {};
         }
+        return cancelAction;
     }
 
     /**
@@ -223,30 +253,10 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * <p>
      * First, sets {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
      * Then, calls {@link Screen#keyPressed(int, int, int)}.
-     *
-     * @param keyCode the key code that was pressed
      */
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return keyCode == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && levelList.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    /**
-     * Modifies the y coordinate of the title to fit the current path above it.
-     */
-    @ModifyConstant(method = "render", constant = @Constant(intValue = 8))
-    private int organizableplayscreens_modifyTitleY(int original) {
-        return levelList.organizableplayscreens_getCurrentPath().isEmpty() ? 8 : 12;
-    }
-
-    /**
-     * Renders the path of {@link WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
-     *
-     * @see WorldListWidgetMixin#organizableplayscreens_currentPath currentPath
-     */
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawCenteredTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V", shift = At.Shift.AFTER))
-    private void organizableplayscreens_renderPath(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.drawCenteredTextWithShadow(textRenderer, levelList.organizableplayscreens_getCurrentPath(), width / 2, 2, 0xFFA0A0A0);
+    public boolean keyPressed(KeyInput input) {
+        return input.key() == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && levelList.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(input);
     }
 
     /**
@@ -262,7 +272,6 @@ public abstract class SelectWorldScreenMixin extends Screen {
         }
         boolean notSearching = searchBox.getText().isEmpty();
         levelList.organizableplayscreens_updateCurrentPath();
-        searchBox.setY(levelList.organizableplayscreens_getCurrentPath().isEmpty() ? 22 : 24);
         organizableplayscreens_buttonBack.active = notSearching;
         organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !levelList.organizableplayscreens_isRootFolder() && notSearching;
         organizableplayscreens_buttonNewFolder.active = notSearching;

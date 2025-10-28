@@ -3,13 +3,13 @@ package com.kevinthegreat.organizableplayscreens.gui;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -26,10 +26,6 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     protected final EntryType type;
     @NotNull
     protected String name;
-    /**
-     * Used to detect double-clicking.
-     */
-    private long time;
 
     /**
      * Creates a new entry with the default name.
@@ -71,6 +67,16 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     }
 
     @Override
+    public boolean isOfSameType(MultiplayerServerListWidget.Entry entry) {
+        return entry instanceof AbstractMultiplayerEntry other && other.getType() == getType();
+    }
+
+    @Override
+    public void connect() {
+        entrySelectionConfirmed(((MultiplayerScreenAccessor) screen).getServerListWidget());
+    }
+
+    @Override
     public @NotNull String getName() {
         return name;
     }
@@ -81,8 +87,8 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     }
 
     @Override
-    public final void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerScreenAccessor) screen).getServerListWidget().organizableplayscreens_getCurrentEntries().size());
+    public final void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        render(context, ((MultiplayerScreenAccessor) screen).getServerListWidget().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerScreenAccessor) screen).getServerListWidget().organizableplayscreens_getCurrentEntries().size());
     }
 
     /**
@@ -90,23 +96,22 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * <p>
      * The folder is shifted down or up if {@link org.lwjgl.glfw.GLFW#GLFW_KEY_LEFT_SHIFT} and {@link GLFW#GLFW_KEY_DOWN} or {@link GLFW#GLFW_KEY_UP} are pressed, and it is valid to shift.
      *
-     * @param keyCode the key code of the key that was pressed
      * @return whether the key press has been consumed (prevents further processing or not)
      */
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (Screen.hasShiftDown()) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.hasShift()) {
             MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
             int i = serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(this);
             if (i == -1) {
                 return true;
             }
-            if (keyCode == GLFW.GLFW_KEY_DOWN && i < serverListWidget.organizableplayscreens_getCurrentEntries().size() - 1 || keyCode == GLFW.GLFW_KEY_UP && i > 0) {
-                swapEntries(i, keyCode == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
+            if (input.key() == GLFW.GLFW_KEY_DOWN && i < serverListWidget.organizableplayscreens_getCurrentEntries().size() - 1 || input.key() == GLFW.GLFW_KEY_UP && i > 0) {
+                swapEntries(i, input.key() == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
                 return true;
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     /**
@@ -115,15 +120,15 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * Checks for click on the open and swap buttons, and handles double-clicking.
      */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
         int i = serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(this);
-        double d = mouseX - (double) serverListWidget.getRowLeft();
-        double e = mouseY - (double) ((EntryListWidgetInvoker) serverListWidget).rowTop(i);
+        double d = click.x() - (double) serverListWidget.getRowLeft();
+        double e = click.y() - (double) ((EntryListWidgetInvoker) serverListWidget).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
-                screen.select(this);
-                screen.connect();
+                serverListWidget.setSelected(this);
+                connect();
                 return true;
             }
             if (d < 16 && e < 16 && i > 0) {
@@ -136,11 +141,10 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
             }
         }
 
-        screen.select(this);
-        if (Util.getMeasuringTimeMs() - time < 250) {
-            screen.connect();
+        serverListWidget.setSelected(this);
+        if (doubled) {
+            connect();
         }
-        time = Util.getMeasuringTimeMs();
         return false;
     }
 

@@ -2,6 +2,9 @@ accessWidener v1 named
 # Singleplayer
 extendable  class   net/minecraft/client/gui/screen/world/WorldListWidget$WorldEntry
 
+# Mutiplayer
+extendable  method  net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$Entry   isOfSameType    (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$Entry;)Z
+
 # Options
 accessible  class   net/minecraft/client/option/SimpleOption$SliderCallbacks
 extendable  class   net/minecraft/client/option/SimpleOption$IntSliderCallbacks

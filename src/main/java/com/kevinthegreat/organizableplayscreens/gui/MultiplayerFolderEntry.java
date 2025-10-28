@@ -3,6 +3,7 @@ package com.kevinthegreat.organizableplayscreens.gui;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -71,13 +72,13 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     /**
      * Handles mouse clicks for this folder.
      * <p>
-     * Calls mouse click on {@link #buttonMoveInto} and {@link AbstractMultiplayerEntry#mouseClicked(double, double, int)}.
+     * Calls mouse click on {@link #buttonMoveInto} and {@link AbstractMultiplayerEntry#mouseClicked(Click, boolean)}.
      */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (buttonMoveInto.mouseClicked(mouseX, mouseY, button)) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (buttonMoveInto.mouseClicked(click, doubled)) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 }

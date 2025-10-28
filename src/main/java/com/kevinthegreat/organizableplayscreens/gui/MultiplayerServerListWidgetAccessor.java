@@ -1,6 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface MultiplayerServerListWidgetAccessor {
 
     default boolean organizableplayscreens_isRootFolder() {return false;}
 
-    default String organizableplayscreens_getCurrentPath() {return null;}
+    default TextWidget organizableplayscreens_getPathWidget() {return null;}
 
     /**
      * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
