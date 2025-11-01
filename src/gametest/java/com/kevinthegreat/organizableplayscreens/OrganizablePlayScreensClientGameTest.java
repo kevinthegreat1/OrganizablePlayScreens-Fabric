@@ -34,7 +34,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root").save());
 
         // Move the world into the folder
-        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, -1);
+        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
         // Open the folder
         clickListWidgetEntry(context, SingleplayerFolderEntry.class, 24);
@@ -63,7 +63,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root").save());
 
         // Move the server into the folder
-        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, -1);
+        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
         clickFolderMoveInto(context, MultiplayerFolderEntry.class);
         // Open the folder
         clickListWidgetEntry(context, MultiplayerFolderEntry.class, 24);
@@ -119,10 +119,9 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
             T entry = getListWidgetEntry(listWidget, entryClass);
             int i = listWidget.children().indexOf(entry);
-            int x = listWidget.getRowLeft();
+            int x = listWidget.getRowLeft() + xOffset;
             int y = ((EntryListWidgetInvoker) listWidget).rowTop(i);
-            x += xOffset >= 0 ? xOffset : listWidget.getRowWidth();
-            entry.mouseClicked(new Click(x, y, new MouseInput(0, 0)), false);
+            listWidget.mouseClicked(new Click(x, y, new MouseInput(0, 0)), false);
         });
     }
 
