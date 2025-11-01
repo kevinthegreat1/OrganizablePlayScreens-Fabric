@@ -142,7 +142,6 @@ public abstract class MultiplayerScreenMixin extends Screen {
                 MultiplayerFolderEntry folder = serverListWidget.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.multiplayerEntry((MultiplayerScreen) (Object) this, folder);
             }));
-            serverListWidget.setSelected(organizableplayscreens_newEntry);
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
         addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
     }
@@ -194,6 +193,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         if (confirmedAction) {
             serverListWidget.organizableplayscreens_getCurrentEntries().add(organizableplayscreens_newEntry);
             serverListWidget.organizableplayscreens_updateAndSave();
+            serverListWidget.setSelected(organizableplayscreens_newEntry);
             organizableplayscreens_newEntry = null;
         }
         client.setScreen(this);
