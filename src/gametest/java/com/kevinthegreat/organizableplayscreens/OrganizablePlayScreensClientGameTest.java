@@ -24,6 +24,7 @@ import java.util.Optional;
 public class OrganizablePlayScreensClientGameTest implements FabricClientGameTest {
     @Override
     public void runTest(ClientGameTestContext context) {
+        // Singleplayer
         // Create a new world and navigate to the select world screen
         //noinspection EmptyTryBlock, unused
         try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {}
@@ -48,11 +49,20 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickListWidgetEntry(context, SingleplayerSectionEntry.class, 0);
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reordered").save());
 
+        // Navigate back to the title screen and back to the folder
+        context.clickScreenButton("gui.back");
+        context.clickScreenButton("gui.cancel");
+        context.clickScreenButton("menu.singleplayer");
+        context.waitTick();
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 33);
+        context.clickScreenButton("organizableplayscreens:folder.openFolder");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reopened").save());
         // Navigate back to the title screen
         clickScreenButton(context, "←");
         clickScreenButton(context, "←");
         context.waitForScreen(TitleScreen.class);
 
+        // Multiplayer
         // Navigate to the multiplayer screen, skip the multiplayer warning screen, and add a new server
         context.clickScreenButton("menu.multiplayer");
         context.clickScreenButton("gui.proceed");
@@ -77,6 +87,15 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickListWidgetEntry(context, MultiplayerSectionEntry.class, 0);
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reordered").save());
 
+        // Navigate back to the title screen and back to the folder
+        context.clickScreenButton("gui.back");
+        context.clickScreenButton("gui.cancel");
+        context.clickScreenButton("menu.multiplayer");
+        context.clickScreenButton("gui.proceed");
+        context.waitTick();
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 33);
+        context.clickScreenButton("organizableplayscreens:folder.openFolder");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reopened").save());
         // Navigate back to the title screen
         clickScreenButton(context, "←");
         clickScreenButton(context, "←");
@@ -150,6 +169,6 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         return (T) listWidget.children().stream()
                 .filter(entryClass::isInstance)
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not find entry of type '%s' in list widget '%s'".formatted(entryClass.getName(), listWidget.getClass().getName())));
+                .orElseThrow(() -> new AssertionError("Could not find entry of type '%s' in list widget '%s' with entries '%s'".formatted(entryClass.getName(), listWidget.getClass().getName(), listWidget.children())));
     }
 }
