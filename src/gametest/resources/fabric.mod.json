@@ -9,5 +9,8 @@
     "fabric-client-gametest": [
       "com.kevinthegreat.organizableplayscreens.OrganizablePlayScreensClientGameTest"
     ]
-  }
+  },
+  "mixins": [
+    "organizableplayscreens-test.mixins.json"
+  ]
 }
