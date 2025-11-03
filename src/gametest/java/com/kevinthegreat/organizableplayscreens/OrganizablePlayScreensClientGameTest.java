@@ -57,8 +57,39 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickListWidgetEntry(context, SingleplayerFolderEntry.class, 33);
         context.clickScreenButton("organizableplayscreens:folder.openFolder");
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reopened").save());
+
+        // Move entries out of the current folder and assert the select world screen root again
+        clickListWidgetEntry(context, SingleplayerSectionEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, SingleplayerSeparatorEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
+        clickScreenButton(context, "←+");
+        context.clickScreenButton("gui.back");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root-move-entries-back").save());
+
+        // Move entries back into the folder and assert the select world screen folder reopened again
+        clickListWidgetEntry(context, SingleplayerSectionEntry.class, 33);
+        clickFolderMoveInto(context, SingleplayerFolderEntry.class);
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 1, 33);
+        clickFolderMoveInto(context, SingleplayerFolderEntry.class);
+        clickListWidgetEntry(context, SingleplayerSeparatorEntry.class, 33);
+        clickFolderMoveInto(context, SingleplayerFolderEntry.class);
+        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
+        clickFolderMoveInto(context, SingleplayerFolderEntry.class);
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 24);
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reopened").save());
+
+        // Delete the folder and assert the select world screen root again
+        context.clickScreenButton("gui.back");
+        clickListWidgetEntry(context, SingleplayerFolderEntry.class, 33);
+        context.clickScreenButton("selectWorld.delete");
+        context.clickScreenButton("selectWorld.deleteButton");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root-delete-folder").save());
+
         // Navigate back to the title screen
-        clickScreenButton(context, "←");
         clickScreenButton(context, "←");
         context.waitForScreen(TitleScreen.class);
 
@@ -96,8 +127,39 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickListWidgetEntry(context, MultiplayerFolderEntry.class, 33);
         context.clickScreenButton("organizableplayscreens:folder.openFolder");
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reopened").save());
+
+        // Move entries out of the current folder and assert the multiplayer screen root again
+        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, MultiplayerSectionEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 33);
+        clickScreenButton(context, "←+");
+        clickListWidgetEntry(context, MultiplayerSeparatorEntry.class, 33);
+        clickScreenButton(context, "←+");
+        context.clickScreenButton("gui.back");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root-move-entries-back").save());
+
+        // Move entries back into the folder and assert the multiplayer screen folder reopened again
+        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
+        clickFolderMoveInto(context, MultiplayerFolderEntry.class);
+        clickListWidgetEntry(context, MultiplayerSectionEntry.class, 33);
+        clickFolderMoveInto(context, MultiplayerFolderEntry.class);
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 1, 33);
+        clickFolderMoveInto(context, MultiplayerFolderEntry.class);
+        clickListWidgetEntry(context, MultiplayerSeparatorEntry.class, 33);
+        clickFolderMoveInto(context, MultiplayerFolderEntry.class);
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 24);
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reopened").save());
+
+        // Delete the folder and assert the multiplayer screen root again
+        context.clickScreenButton("gui.back");
+        clickListWidgetEntry(context, MultiplayerFolderEntry.class, 33);
+        context.clickScreenButton("selectServer.delete");
+        context.clickScreenButton("selectServer.deleteButton");
+        context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root-delete-folder").save());
+
         // Navigate back to the title screen
-        clickScreenButton(context, "←");
         clickScreenButton(context, "←");
         context.waitForScreen(TitleScreen.class);
     }
@@ -134,9 +196,13 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     }
 
     private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int xOffset) {
+        clickListWidgetEntry(context, entryClass, 0, xOffset);
+    }
+
+    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int ordinal, int xOffset) {
         context.runOnClient(client -> {
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
-            T entry = getListWidgetEntry(listWidget, entryClass);
+            T entry = getListWidgetEntry(listWidget, entryClass, ordinal);
             int i = listWidget.children().indexOf(entry);
             int x = listWidget.getRowLeft() + xOffset;
             int y = ((EntryListWidgetInvoker) listWidget).rowTop(i);
@@ -147,7 +213,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     private <T extends AlwaysSelectedEntryListWidget.Entry<? super T> & AbstractFolderEntry<?, ? super T>> void clickFolderMoveInto(ClientGameTestContext context, Class<T> folderClass) {
         context.runOnClient(client -> {
             AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
-            T folderEntry = getListWidgetEntry(listWidget, folderClass);
+            T folderEntry = getListWidgetEntry(listWidget, folderClass, 0);
             folderEntry.getButtonMoveInto().onClick(new Click(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseInput(0, 0)), false);
         });
     }
@@ -165,10 +231,11 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> T getListWidgetEntry(AlwaysSelectedEntryListWidget<?> listWidget, Class<T> entryClass) {
+    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> T getListWidgetEntry(AlwaysSelectedEntryListWidget<?> listWidget, Class<T> entryClass, int ordinal) {
         return (T) listWidget.children().stream()
                 .filter(entryClass::isInstance)
-                .findAny()
-                .orElseThrow(() -> new AssertionError("Could not find entry of type '%s' in list widget '%s' with entries '%s'".formatted(entryClass.getName(), listWidget.getClass().getName(), listWidget.children())));
+                .skip(ordinal)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Could not find entry of type '%s' with ordinal '%s' in list widget '%s' with entries '%s'".formatted(entryClass.getName(), ordinal, listWidget.getClass().getName(), listWidget.children())));
     }
 }
