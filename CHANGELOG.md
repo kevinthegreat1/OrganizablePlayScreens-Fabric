@@ -1,4 +1,4 @@
-## Folders! 1.2.9 for 1.21.9 & 1.21.10
+## Folders! 1.2.10 for 1.21.9 & 1.21.10
 Support for 1.21.9 and 1.21.10
 
 ## Folders! 1.2.9 for 1.21.6 & 1.21.7
