@@ -1,3 +1,6 @@
+## Folders! 1.2.11 for 1.21.9 & 1.21.10
+Fix unable to edit configs
+
 ## Folders! 1.2.10 for 1.21.9 & 1.21.10
 Support for 1.21.9 and 1.21.10
 

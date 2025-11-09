@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -13,6 +14,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
 import java.util.List;
@@ -21,6 +23,8 @@ import java.util.List;
  * The options screen for Organizable Play Screens.
  */
 public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
+    private static final Identifier MENU_LIST_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
+    private static final Identifier INWORLD_MENU_LIST_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
     private static final int MARGIN_TOP = 46;
     private static final int ROW_HEIGHT = 34;
     /**
@@ -63,8 +67,7 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
      * Adds the reset buttons to {@link #resetButtons}.
      */
     @Override
-    protected void init() {
-        super.init();
+    protected void initBody() {
         int i = 0;
         ImmutableList.Builder<ButtonWidget> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
         for (List<Pair<String, SimpleOption<?>>> optionRow : options.optionsArray) {
@@ -125,6 +128,11 @@ public class OrganizablePlayScreensOptionsScreen extends GameOptionsScreen {
      */
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        assert client != null;
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE, 0, layout.getHeaderHeight(), width, height - layout.getFooterHeight(), width, height - layout.getFooterHeight(), 32, 32);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE, 0, layout.getHeaderHeight() - 2, 0, 0, width, 2, 32, 2);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight(), 0, 0, width, 2, 32, 2);
+
         super.render(context, mouseX, mouseY, delta);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
