@@ -71,10 +71,15 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Unique
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
     /**
-     * This button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
+     * This button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newEntry}.
      */
     @Unique
-    private ButtonWidget organizableplayscreens_buttonNewFolder;
+    private ButtonWidget organizableplayscreens_buttonNewEntry;
+    /**
+     * This button opens the options screen.
+     */
+    @Unique
+    private ButtonWidget organizableplayscreens_buttonOptions;
     /**
      * The path of the {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
      * <p>
@@ -111,7 +116,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;worldSelected(Lnet/minecraft/world/level/storage/LevelSummary;)V"))
+    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/world/SelectWorldScreen;addButtons(Ljava/util/function/Consumer;Lnet/minecraft/client/gui/screen/world/WorldListWidget;)V"))
     private void organizableplayscreens_addButtons(CallbackInfo ci) {
         levelList.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
 
@@ -140,13 +145,25 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 levelList.organizableplayscreens_updateAndSave();
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
-        organizableplayscreens_buttonNewFolder = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
+        organizableplayscreens_buttonNewEntry = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             client.setScreen(new SingleplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
                 SingleplayerFolderEntry folder = levelList.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.singleplayerEntry((SelectWorldScreen) (Object) this, folder);
             }));
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
-        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
+        organizableplayscreens_buttonOptions = addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
+    }
+
+    /**
+     * Updates the positions of the added buttons according to the options. Called when the screen is reinitialized or resized.
+     */
+    @Inject(method = "refreshWidgetPositions", at = @At("RETURN"))
+    private void organizableplayscreens_refreshWidgetPositions(CallbackInfo ci) {
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        organizableplayscreens_buttonBack.setPosition(options.backButtonX.getValue(), options.backButtonY.getValue());
+        organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue());
+        organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue());
+        organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue());
     }
 
     /**
@@ -281,7 +298,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
         levelList.organizableplayscreens_updateCurrentPath();
         organizableplayscreens_buttonBack.active = notSearching;
         organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !levelList.organizableplayscreens_isRootFolder() && notSearching;
-        organizableplayscreens_buttonNewFolder.active = notSearching;
+        organizableplayscreens_buttonNewEntry.active = notSearching;
         organizableplayscreens_buttonCancel.setMessage(levelList.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
         for (AbstractSingleplayerEntry nonWorldEntry : levelList.organizableplayscreens_getCurrentNonWorldEntries()) {
             nonWorldEntry.updateButtonStates(selectedEntry);

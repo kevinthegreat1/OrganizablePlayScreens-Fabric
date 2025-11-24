@@ -61,10 +61,25 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Unique
     private ButtonWidget organizableplayscreens_buttonCancel;
     /**
+     * This button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent folder if there is one, otherwise to the parent screen.
+     */
+    @Unique
+    private ButtonWidget organizableplayscreens_buttonBack;
+    /**
      * This button moves the selected entry to the parent folder.
      */
     @Unique
     private ButtonWidget organizableplayscreens_buttonMoveEntryBack;
+    /**
+     * This button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newEntry}.
+     */
+    @Unique
+    private ButtonWidget organizableplayscreens_buttonNewEntry;
+    /**
+     * This button opens the options screen.
+     */
+    @Unique
+    private ButtonWidget organizableplayscreens_buttonOptions;
     /**
      * The path of the {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
      * <p>
@@ -98,27 +113,21 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Loads and displays folders and servers from {@code organizable_servers.dat}.
-     */
-    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
-    private void organizableplayscreens_loadFile(MultiplayerServerListWidget serverListWidget, ServerList servers, Operation<Void> original) {
-        serverListWidget.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
-        original.call(serverListWidget, servers);
-        serverListWidget.organizableplayscreens_loadFile();
-    }
-
-    /**
-     * Adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
+     * Loads and displays folders and servers from {@code organizable_servers.dat} and adds 'back', 'move entry back', 'new folder', and 'options' buttons to the screen.
      * <p>
      * The 'back' button sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one, otherwise to the parent screen.
      * The 'move entry back' button moves the selected entry to the parent folder.
      * The 'new folder' button opens a screen to create a new folder and stores it in {@link #organizableplayscreens_newEntry newFolder}.
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;updateButtonActivationStates()V"))
-    private void organizableplayscreens_addButtons(CallbackInfo ci) {
+    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
+    private void organizableplayscreens_loadFileAndAddButtons(MultiplayerServerListWidget serverListWidget, ServerList servers, Operation<Void> original) {
+        serverListWidget.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
+        original.call(serverListWidget, servers);
+        serverListWidget.organizableplayscreens_loadFile();
+
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
 
-        addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
+        organizableplayscreens_buttonBack = addDrawableChild(ButtonWidget.builder(Text.of("←"), buttonWidget -> {
             if (!serverListWidget.organizableplayscreens_setCurrentFolderToParent()) {
                 client.setScreen(parent);
             }
@@ -137,13 +146,25 @@ public abstract class MultiplayerScreenMixin extends Screen {
                 }
             }
         }).dimensions(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
-        addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
+        organizableplayscreens_buttonNewEntry = addDrawableChild(ButtonWidget.builder(Text.of("+"), buttonWidget -> {
             client.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
                 MultiplayerFolderEntry folder = serverListWidget.organizableplayscreens_getCurrentFolder();
                 return organizableplayscreens_newEntry = type.multiplayerEntry((MultiplayerScreen) (Object) this, folder);
             }));
         }).dimensions(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue(), 20, 20).build());
-        addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
+        organizableplayscreens_buttonOptions = addDrawableChild(new LegacyTexturedButtonWidget(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue(), 20, 20, 0, 0, 20, OrganizablePlayScreens.OPTIONS_BUTTON_TEXTURE, 32, 64, buttonWidget -> client.setScreen(new OrganizablePlayScreensOptionsScreen(this)), Text.translatable("organizableplayscreens:options.optionsButton")));
+    }
+
+    /**
+     * Updates the positions of the added buttons according to the options. Called when the screen is reinitialized or resized.
+     */
+    @Inject(method = "refreshWidgetPositions", at = @At(value = "RETURN"))
+    private void organizableplayscreens_refreshWidgetPositions(CallbackInfo ci) {
+        OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        organizableplayscreens_buttonBack.setPosition(options.backButtonX.getValue(), options.backButtonY.getValue());
+        organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue());
+        organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue());
+        organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue());
     }
 
     /**
