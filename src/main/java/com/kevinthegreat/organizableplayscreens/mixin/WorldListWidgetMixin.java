@@ -365,9 +365,12 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
      */
     @Unique
     private void organizableplayscreens_updateEntries(String search) {
+        // Save the selected entry because clear entries sets selected to null
+        WorldListWidget.Entry selected = getSelectedOrNull();
         super.clearEntries();
+
         if (search.isEmpty()) {
-            if (getSelectedOrNull() instanceof WorldListWidget.WorldEntry worldEntry) {
+            if (selected instanceof WorldListWidget.WorldEntry worldEntry) {
                 SingleplayerFolderEntry folderEntry = organizableplayscreens_worlds.get(worldEntry);
                 if (folderEntry != null) {
                     organizableplayscreens_currentFolder = folderEntry;
@@ -384,30 +387,31 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
                 }
             }
         }
-        WorldListWidget.Entry selected = getSelectedOrNull();
+
         if (selected == null) {
             setScrollY(0);
-        } else {
+        } else if (children().contains(selected)) {
+            setSelected(selected);
             scrollTo(selected);
         }
+        organizableplayscreens_updateCurrentPath(search);
         narrateScreenIfNarrationEnabled();
     }
 
     /**
-     * {@inheritDoc}
+     * Updates the path of {@link #organizableplayscreens_currentFolder currentFolder}.
      */
-    @Override
-    public void organizableplayscreens_updateCurrentPath() {
-        List<String> path = new ArrayList<>();
-        SingleplayerFolderEntry folder;
-        if (search.isEmpty()) {
-            folder = organizableplayscreens_currentFolder;
-        } else if (getSelectedOrNull() instanceof WorldListWidget.WorldEntry worldEntry) {
-            folder = organizableplayscreens_worlds.get(worldEntry);
-        } else {
-            organizableplayscreens_pathWidget.setMessage(Text.empty());
+    @Unique
+    public void organizableplayscreens_updateCurrentPath(String search) {
+        // Update the path widget to search results if searching
+        if (!search.isEmpty()) {
+            organizableplayscreens_pathWidget.setMessage(Text.translatable("debug.options.search"));
+            ((SelectWorldScreenAccessor) parent).invokeRefreshWidgetPositions();
             return;
         }
+        // Update the path widget to the full path if not searching
+        List<String> path = new ArrayList<>();
+        SingleplayerFolderEntry folder = organizableplayscreens_currentFolder;
         while (folder.getParent() != null) {
             path.add(folder.getName());
             folder = folder.getParent();

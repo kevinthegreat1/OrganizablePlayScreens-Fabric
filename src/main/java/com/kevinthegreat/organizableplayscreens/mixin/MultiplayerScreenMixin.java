@@ -161,10 +161,10 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Inject(method = "refreshWidgetPositions", at = @At(value = "RETURN"))
     private void organizableplayscreens_refreshWidgetPositions(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        organizableplayscreens_buttonBack.setPosition(options.backButtonX.getValue(), options.backButtonY.getValue());
-        organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue());
-        organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue());
-        organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue());
+        if (organizableplayscreens_buttonBack != null) organizableplayscreens_buttonBack.setPosition(options.backButtonX.getValue(), options.backButtonY.getValue());
+        if (organizableplayscreens_buttonMoveEntryBack != null) organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.getValue(), options.moveEntryBackButtonY.getValue());
+        if (organizableplayscreens_buttonNewEntry != null) organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.getValue());
+        if (organizableplayscreens_buttonOptions != null) organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.getValue());
     }
 
     /**

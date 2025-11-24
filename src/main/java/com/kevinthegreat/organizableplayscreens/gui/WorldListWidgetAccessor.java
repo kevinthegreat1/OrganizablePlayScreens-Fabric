@@ -51,11 +51,4 @@ public interface WorldListWidgetAccessor {
      * @param j the index of the entry to swap with
      */
     default void organizableplayscreens_swapEntries(int i, int j) {}
-
-    /**
-     * Updates the path of {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder}.
-     *
-     * @see com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentPath currentPath
-     */
-    default void organizableplayscreens_updateCurrentPath() {}
 }

@@ -295,7 +295,6 @@ public abstract class SelectWorldScreenMixin extends Screen {
             abstractEntry.updateScreenButtonStates(selectButton, editButton, deleteButton, recreateButton);
         }
         boolean notSearching = searchBox.getText().isEmpty();
-        levelList.organizableplayscreens_updateCurrentPath();
         organizableplayscreens_buttonBack.active = notSearching;
         organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !levelList.organizableplayscreens_isRootFolder() && notSearching;
         organizableplayscreens_buttonNewEntry.active = notSearching;
