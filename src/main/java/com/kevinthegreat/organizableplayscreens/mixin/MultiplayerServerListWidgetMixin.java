@@ -10,6 +10,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreen
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.gui.screen.world.WorldIcon;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.network.ServerInfo;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -194,7 +196,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
             switch (type) {
                 case "minecraft:server" -> {
                     if (!nbtEntry.getBoolean("hidden", false)) {
-                        int index = Collections.binarySearch(serversSorted, ServerEntryInvoker.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name", ""), nbtEntry.getString("ip", ""), null)), serverEntryComparator);
+                        int index = Collections.binarySearch(serversSorted, ServerEntryAccessor.create((MultiplayerServerListWidget) (Object) this, screen, new ServerInfo(nbtEntry.getString("name", ""), nbtEntry.getString("ip", ""), null)), serverEntryComparator);
                         if (index >= 0) {
                             folder.getEntries().add(serversSorted.remove(index));
                         }
@@ -295,11 +297,26 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
     }
 
     @Mixin(MultiplayerServerListWidget.ServerEntry.class)
-    public interface ServerEntryInvoker {
+    public interface ServerEntryAccessor {
+        @Accessor
+        WorldIcon getIcon();
+
+        @Accessor
+        byte[] getFavicon();
+
+        @Accessor
+        void setFavicon(byte[] favicon);
+
         @SuppressWarnings("unused")
         @Invoker("<init>")
         static MultiplayerServerListWidget.ServerEntry create(MultiplayerServerListWidget serverListWidget, MultiplayerScreen screen, ServerInfo server) {
             throw new IllegalStateException("Mixin invoker failed to apply");
         }
+
+        @Invoker
+        void invokeUpdate();
+
+        @Invoker
+        boolean invokeUploadFavicon(byte[] favicon);
     }
 }

@@ -2,17 +2,27 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
+import com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerServerListWidgetAccessor;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
+import net.minecraft.client.gui.screen.world.WorldIcon;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> {
@@ -59,6 +69,19 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
      * {@inheritDoc}
      */
     @Override
+    public List<Identifier> getIcons() {
+        return entries.stream()
+                .filter(MultiplayerServerListWidget.ServerEntry.class::isInstance)
+                .map(MultiplayerServerListWidgetMixin.ServerEntryAccessor.class::cast)
+                .map(MultiplayerServerListWidgetMixin.ServerEntryAccessor::getIcon)
+                .map(WorldIcon::getTextureId)
+                .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ButtonWidget getButtonMoveInto() {
         return buttonMoveInto;
     }
@@ -67,6 +90,49 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     public void entrySelectionConfirmed(MultiplayerServerListWidget serverListWidget) {
         super.entrySelectionConfirmed(serverListWidget);
         serverListWidget.organizableplayscreens_setCurrentFolder(this);
+    }
+
+    @Override
+    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+        AbstractFolderEntry.super.render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize);
+
+        // Ping servers inside folders similar to MultiplayerServerListWidget.ServerEntry#render
+        for (MultiplayerServerListWidget.Entry entry : entries) {
+            if (!(entry instanceof MultiplayerServerListWidget.ServerEntry serverEntry)) continue;
+            ServerInfo server = serverEntry.getServer();
+
+            if (server.getStatus() == ServerInfo.Status.INITIAL) {
+                server.setStatus(ServerInfo.Status.PINGING);
+                server.label = ScreenTexts.EMPTY;
+                server.playerCountLabel = ScreenTexts.EMPTY;
+                MultiplayerServerListWidgetAccessor.getSERVER_PINGER_THREAD_POOL().submit(() -> {
+                    try {
+                        screen.getServerListPinger().add(server, () -> client.execute(serverEntry::saveFile), () -> {
+                            server.setStatus(server.protocolVersion == SharedConstants.getGameVersion().protocolVersion() ? ServerInfo.Status.SUCCESSFUL : ServerInfo.Status.INCOMPATIBLE);
+                            client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
+                        });
+                    } catch (UnknownHostException e) {
+                        server.setStatus(ServerInfo.Status.UNREACHABLE);
+                        server.label = MultiplayerServerListWidgetAccessor.getCANNOT_RESOLVE_TEXT();
+                        client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
+                    } catch (Exception e) {
+                        server.setStatus(ServerInfo.Status.UNREACHABLE);
+                        server.label = MultiplayerServerListWidgetAccessor.getCANNOT_CONNECT_TEXT();
+                        client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
+                    }
+                });
+            }
+
+            byte[] bs = server.getFavicon();
+            if (!Arrays.equals(bs, ((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).getFavicon())) {
+                if (((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).invokeUploadFavicon(bs)) {
+                    ((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).setFavicon(bs);
+                } else {
+                    server.setFavicon(null);
+                    serverEntry.saveFile();
+                }
+            }
+        }
     }
 
     /**

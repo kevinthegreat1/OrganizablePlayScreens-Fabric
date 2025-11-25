@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -87,7 +88,27 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
      * @param listSize       The size of the entry list that the folder is in.
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
-    static void renderFolderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, ButtonWidget buttonMoveInto) {
+    static void renderFolderEntry(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, List<Identifier> icons, ButtonWidget buttonMoveInto) {
+        switch (icons.size()) {
+            case 0 -> {}
+            case 1 -> context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.getFirst(), x + 8, y + 8, 0, 0, 16, 16, 32, 32, 32, 32);
+            case 2 -> {
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.getFirst(), x, y + 8, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.getLast(), x + 16, y + 8, 0, 0, 16, 16, 32, 32, 32, 32);
+            }
+            case 3 -> {
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(0), x + 8, y, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(1), x, y + 16, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(2), x + 16, y + 16, 0, 0, 16, 16, 32, 32, 32, 32);
+            }
+            default -> {
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(0), x, y, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(1), x + 16, y, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(2), x, y + 16, 0, 0, 16, 16, 32, 32, 32, 32);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, icons.get(3), x + 16, y + 16, 0, 0, 16, 16, 32, 32, 32, 32);
+            }
+        }
+
         context.drawTextWithShadow(client.textRenderer, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
         context.drawTextWithShadow(client.textRenderer, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);

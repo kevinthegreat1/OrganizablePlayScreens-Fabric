@@ -10,6 +10,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreen
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.gui.screen.world.WorldIcon;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.TextWidget;
@@ -367,7 +368,7 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     private void organizableplayscreens_updateEntries(String search) {
         // Save the selected entry because clear entries sets selected to null
         WorldListWidget.Entry selected = getSelectedOrNull();
-        super.clearEntries();
+        super.clearEntries(); // Call clear entries on super to prevent closing entries
 
         if (search.isEmpty()) {
             if (selected instanceof WorldListWidget.WorldEntry worldEntry) {
@@ -425,5 +426,8 @@ public abstract class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget
     public interface WorldEntryAccessor {
         @Accessor
         LevelSummary getLevel();
+
+        @Accessor
+        WorldIcon getIcon();
     }
 }

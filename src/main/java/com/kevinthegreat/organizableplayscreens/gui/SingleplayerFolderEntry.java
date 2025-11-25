@@ -2,13 +2,16 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
+import com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.gui.screen.world.WorldIcon;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,6 +70,18 @@ public class SingleplayerFolderEntry extends AbstractSingleplayerEntry implement
 
     public @NotNull List<WorldListWidget.WorldEntry> getWorldEntries() {
         return worldEntries;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Identifier> getIcons() {
+        return worldEntries.stream()
+                .map(WorldListWidgetMixin.WorldEntryAccessor.class::cast)
+                .map(WorldListWidgetMixin.WorldEntryAccessor::getIcon)
+                .map(WorldIcon::getTextureId)
+                .toList();
     }
 
     /**

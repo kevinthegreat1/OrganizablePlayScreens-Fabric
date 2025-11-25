@@ -245,7 +245,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "addEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V", shift = At.Shift.AFTER))
     private void organizableplayscreens_addServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidget.organizableplayscreens_getCurrentEntries().add(MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidget.organizableplayscreens_getCurrentEntries().add(MultiplayerServerListWidgetMixin.ServerEntryAccessor.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
         serverListWidget.organizableplayscreens_updateAndSave();
     }
 
@@ -254,7 +254,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "editEntry", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
     private void organizableplayscreens_editServer(boolean confirmedAction, CallbackInfo ci) {
-        serverListWidget.organizableplayscreens_getCurrentEntries().set(serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryInvoker.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
+        serverListWidget.organizableplayscreens_getCurrentEntries().set(serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(serverListWidget.getSelectedOrNull()), MultiplayerServerListWidgetMixin.ServerEntryAccessor.create(serverListWidget, (MultiplayerScreen) (Object) this, selectedEntry));
         serverListWidget.organizableplayscreens_updateAndSave();
     }
 
