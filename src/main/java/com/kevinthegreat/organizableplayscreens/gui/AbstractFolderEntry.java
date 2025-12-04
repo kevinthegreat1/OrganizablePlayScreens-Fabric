@@ -1,6 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -37,7 +38,7 @@ public interface AbstractFolderEntry<T extends AlwaysSelectedEntryListWidget<E>,
      */
     @Override
     default void updateButtonStates(E selectedEntry) {
-        getButtonMoveInto().active = selectedEntry != null && selectedEntry != this;
+        getButtonMoveInto().active = selectedEntry != null && !(selectedEntry instanceof MultiplayerServerListWidget.ScanningEntry) && selectedEntry != this;
     }
 
     @Override

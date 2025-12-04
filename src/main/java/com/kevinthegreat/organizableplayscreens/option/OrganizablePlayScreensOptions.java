@@ -2,6 +2,8 @@ package com.kevinthegreat.organizableplayscreens.option;
 
 import com.google.gson.*;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
+import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensButtonDragScreen;
+import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensButtonOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
@@ -38,8 +40,8 @@ public class OrganizablePlayScreensOptions {
     public static final String[] KEYS = new String[]{"organizableplayscreens:options.backButton", "organizableplayscreens:options.moveEntryBackButton", "organizableplayscreens:options.newFolderButton", "organizableplayscreens:options.optionsButton", "organizableplayscreens:options.moveEntryIntoButton"};
     private final Path optionsFile = FabricLoader.getInstance().getConfigDir().resolve(OrganizablePlayScreens.MOD_ID + ".json");
     public final SimpleOption<Boolean> buttonType = new SimpleOption<>("organizableplayscreens:options.buttonType", SimpleOption.emptyTooltip(), (optionText, value) -> Text.translatable(value ? "organizableplayscreens:options.textField" : "organizableplayscreens:options.slider"), SimpleOption.BOOLEAN, false, value -> {
-        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen organizablePlayScreensOptionsScreen) {
-            MinecraftClient.getInstance().setScreen(new OrganizablePlayScreensOptionsScreen(organizablePlayScreensOptionsScreen.getParent()));
+        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensButtonOptionsScreen organizablePlayScreensButtonOptionsScreen) {
+            MinecraftClient.getInstance().setScreen(new OrganizablePlayScreensButtonOptionsScreen(organizablePlayScreensButtonOptionsScreen.getParent()));
         }
     });
     public final SimpleOption<Integer> backButtonX = new SimpleOption<>(KEYS[0] + ".x", SimpleOption.emptyTooltip(), ScreenRelativeCallbacks.LEFT.displayValueTextGetter, new BothSuppliableIntSliderCallbacks(ScreenRelativeCallbacks.LEFT, buttonType), 8, value -> updateResetButton(0));
@@ -89,8 +91,16 @@ public class OrganizablePlayScreensOptions {
      */
     private static int getListWidgetRight() {
         Screen screen = MinecraftClient.getInstance().currentScreen;
-        if (screen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
-            screen = optionsScreen.getParent();
+        while (screen != null) {
+            if (screen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
+                screen = optionsScreen.getParent();
+            } else if (screen instanceof OrganizablePlayScreensButtonOptionsScreen optionsScreen) {
+                screen = optionsScreen.getParent();
+            } else if (screen instanceof OrganizablePlayScreensButtonDragScreen optionsScreen) {
+                screen = optionsScreen.getParent();
+            } else {
+                break;
+            }
         }
         if (screen instanceof MultiplayerScreen multiplayerScreen) {
             return ((MultiplayerScreenAccessor) multiplayerScreen).getServerListWidget().getRowRight();
@@ -206,7 +216,7 @@ public class OrganizablePlayScreensOptions {
      * @param row the row to update
      */
     public void updateResetButton(int row) {
-        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensOptionsScreen optionsScreen) {
+        if (MinecraftClient.getInstance().currentScreen instanceof OrganizablePlayScreensButtonOptionsScreen optionsScreen) {
             optionsScreen.updateResetButton(row, optionsArray.get(row).stream().map(Pair::getRight).anyMatch(OrganizablePlayScreensOptions::notDefault));
         }
     }

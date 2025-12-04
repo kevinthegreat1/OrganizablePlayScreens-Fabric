@@ -320,7 +320,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
             abstractEntry.updateScreenButtonStates(buttonJoin, buttonEdit, buttonDelete, null);
         }
         organizableplayscreens_buttonCancel.setMessage(serverListWidget.organizableplayscreens_isRootFolder() ? ScreenTexts.CANCEL : ScreenTexts.BACK);
-        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !serverListWidget.organizableplayscreens_isRootFolder();
+        organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !(selectedEntry instanceof MultiplayerServerListWidget.ScanningEntry) && !serverListWidget.organizableplayscreens_isRootFolder();
         for (MultiplayerServerListWidget.Entry entry : serverListWidget.organizableplayscreens_getCurrentEntries()) {
             if (entry instanceof MultiplayerFolderEntry folderEntry) {
                 folderEntry.updateButtonStates(selectedEntry);
