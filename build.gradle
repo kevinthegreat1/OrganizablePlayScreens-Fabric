@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version '1.13-SNAPSHOT'
 	id 'maven-publish'
-	id "me.modmuss50.mod-publish-plugin" version "0.7.4"
+	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 version = project.mod_version + '+' + project.minecraft_version
@@ -12,8 +12,8 @@ base {
 }
 
 repositories {
-	maven { url "https://maven.terraformersmc.com/releases/" }
-    maven { url "https://repo.essential.gg/repository/maven-public/" }
+	maven { url = "https://maven.terraformersmc.com/releases/" }
+    maven { url = "https://repo.essential.gg/repository/maven-public/" }
 }
 
 loom {

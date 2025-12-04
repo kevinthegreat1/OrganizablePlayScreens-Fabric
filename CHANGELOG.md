@@ -1,3 +1,9 @@
+## Folders! 1.3.0 for 1.21.19 & 1.21.10
+Add world and server collages for folder icons
+Add button dragging configs
+Fix bugs with world search
+Fix essential compatibility
+
 ## Folders! 1.2.11 for 1.21.9 & 1.21.10
 Fix unable to edit configs
 
