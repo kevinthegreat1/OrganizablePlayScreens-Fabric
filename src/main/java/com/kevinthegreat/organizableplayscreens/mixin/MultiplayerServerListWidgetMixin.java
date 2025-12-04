@@ -293,7 +293,7 @@ public abstract class MultiplayerServerListWidgetMixin extends AlwaysSelectedEnt
         }
         Collections.reverse(path);
         organizableplayscreens_pathWidget.setMessage(Text.of(String.join(" > ", path)));
-        ((MultiplayerScreenAccessor) screen).invokeRefreshWidgetPositions();
+        ((MultiplayerScreenAccessor) screen).getLayout().refreshPositions(); // Only refresh the layout positions instead of calling MultiplayerScreen#refreshWidgetPositions to avoid activating other mixins to prevent NPEs as this can run before all buttons are initialized.
     }
 
     @Mixin(MultiplayerServerListWidget.ServerEntry.class)

@@ -94,6 +94,14 @@ public abstract class MultiplayerScreenMixin extends Screen {
     @Unique
     @Nullable
     private AbstractMultiplayerEntry organizableplayscreens_newEntry;
+    /**
+     * A field to mark whether multiplayer features should be prevented in this instance.
+     * We mark the instance instead of check at the beginning of methods
+     * because {@link #removed()} runs after essential sets the multiplayer tab to the new value,
+     * and checking the tab would yield an incorrect result.
+     */
+    @Unique
+    private boolean preventMultiplayerFeatures;
 
     protected MultiplayerScreenMixin(Text title) {
         super(title);
@@ -106,6 +114,11 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ThreePartsLayoutWidget;addHeader(Lnet/minecraft/text/Text;Lnet/minecraft/client/font/TextRenderer;)V"))
     private void organizableplayscreens_modifyHeader(ThreePartsLayoutWidget layout, Text text, TextRenderer textRenderer, Operation<Void> original) {
+        if (Compatibility.essential_preventMultiplayerFeatures()) {
+            preventMultiplayerFeatures = true;
+            return;
+        }
+
         DirectionalLayoutWidget headerLayout = layout.addHeader(DirectionalLayoutWidget.vertical().spacing(4));
         headerLayout.getMainPositioner().alignHorizontalCenter();
         if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0);
@@ -122,6 +135,11 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;setServers(Lnet/minecraft/client/option/ServerList;)V"))
     private void organizableplayscreens_loadFileAndAddButtons(MultiplayerServerListWidget serverListWidget, ServerList servers, Operation<Void> original) {
+        if (Compatibility.essential_preventMultiplayerFeatures()) {
+            preventMultiplayerFeatures = true;
+            return;
+        }
+
         serverListWidget.organizableplayscreens_setPathWidget(organizableplayscreens_pathWidget);
         original.call(serverListWidget, servers);
         serverListWidget.organizableplayscreens_loadFile();
@@ -292,7 +310,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "updateButtonActivationStates", at = @At(value = "RETURN"))
     private void organizableplayscreens_updateButtonActivationStates(CallbackInfo ci) {
-        if (Compatibility.essential_preventMultiplayerFeatures()) {
+        if (preventMultiplayerFeatures) {
             return;
         }
         MultiplayerServerListWidget.Entry selectedEntry = serverListWidget.getSelectedOrNull();
@@ -315,6 +333,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
      */
     @Inject(method = "removed", at = @At(value = "RETURN"))
     private void organizableplayscreens_removed(CallbackInfo ci) {
+        if (preventMultiplayerFeatures) {
+            return;
+        }
         serverListWidget.organizableplayscreens_saveFile();
     }
 
