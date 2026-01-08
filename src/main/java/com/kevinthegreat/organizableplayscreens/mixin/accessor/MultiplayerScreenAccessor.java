@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(MultiplayerScreen.class)
 public interface MultiplayerScreenAccessor {
-    @Accessor("field_62178")
+    @Accessor
     ThreePartsLayoutWidget getLayout();
 
     @Accessor
