@@ -117,7 +117,6 @@ publishMods {
 			start = "1.21.11"
 			end = "1.21.11"
 		}
-		requires("fabric-api")
 	}
 	modrinth {
 		projectId = "zKrZtg3n"
