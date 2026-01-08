@@ -3,7 +3,6 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
@@ -132,9 +131,9 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
      * Saves the name in the text field when reinitializing the screen.
      */
     @Override
-    public void resize(MinecraftClient client, int width, int height) {
+    public void resize(int width, int height) {
         String folderName = nameField.getText();
-        init(client, width, height);
+        init(width, height);
         nameField.setText(folderName);
     }
 

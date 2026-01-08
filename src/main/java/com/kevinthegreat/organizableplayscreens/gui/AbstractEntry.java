@@ -15,12 +15,11 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * An abstract entry with a name and type.
  */
-public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Supplier<EntryType>, Mutable<String> {
+public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Mutable<String> {
     MinecraftClient client = MinecraftClient.getInstance();
     Identifier JOIN_TEXTURE = Identifier.of("server_list/join");
     Identifier JOIN_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/join_highlighted");
@@ -28,11 +27,6 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
     Identifier MOVE_UP_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/move_up_highlighted");
     Identifier MOVE_DOWN_TEXTURE = Identifier.of("server_list/move_down");
     Identifier MOVE_DOWN_HIGHLIGHTED_TEXTURE = Identifier.of("server_list/move_down_highlighted");
-
-    @Override
-    default EntryType get() {
-        return getType();
-    }
 
     EntryType getType();
 
@@ -51,7 +45,7 @@ public interface AbstractEntry<T extends AlwaysSelectedEntryListWidget<E>, E ext
     void setName(String name);
 
     default void entrySelectionConfirmed(T listWidget) {
-        client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        client.getSoundManager().play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
     /**

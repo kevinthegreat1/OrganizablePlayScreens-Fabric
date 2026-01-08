@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.world.WorldIcon;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.network.NetworkingBackend;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -110,7 +111,7 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
                         screen.getServerListPinger().add(server, () -> client.execute(serverEntry::saveFile), () -> {
                             server.setStatus(server.protocolVersion == SharedConstants.getGameVersion().protocolVersion() ? ServerInfo.Status.SUCCESSFUL : ServerInfo.Status.INCOMPATIBLE);
                             client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
-                        });
+                        }, NetworkingBackend.remote(client.options.shouldUseNativeTransport()));
                     } catch (UnknownHostException e) {
                         server.setStatus(ServerInfo.Status.UNREACHABLE);
                         server.label = MultiplayerServerListWidgetAccessor.getCANNOT_RESOLVE_TEXT();

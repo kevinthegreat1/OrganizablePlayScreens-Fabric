@@ -121,7 +121,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
 
         DirectionalLayoutWidget headerLayout = layout.addHeader(DirectionalLayoutWidget.vertical().spacing(4));
         headerLayout.getMainPositioner().alignHorizontalCenter();
-        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0);
+        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer);
         headerLayout.add(organizableplayscreens_pathWidget);
         headerLayout.add(new TextWidget(text, textRenderer));
     }

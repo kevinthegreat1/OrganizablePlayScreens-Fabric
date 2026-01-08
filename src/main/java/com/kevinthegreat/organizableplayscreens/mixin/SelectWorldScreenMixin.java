@@ -106,7 +106,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
      */
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;", ordinal = 0))
     private void organizableplayscreens_modifyHeader(CallbackInfo ci, @Local(ordinal = 0) DirectionalLayoutWidget headerLayout) {
-        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer).setTextColor(0xFFA0A0A0);
+        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new TextWidget(Text.empty(), textRenderer);
         headerLayout.add(organizableplayscreens_pathWidget);
     }
 
