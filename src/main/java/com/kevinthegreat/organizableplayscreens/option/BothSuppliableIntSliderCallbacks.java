@@ -1,10 +1,10 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.Options;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.util.Mth;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -13,7 +13,7 @@ import java.util.function.IntSupplier;
 import java.util.function.UnaryOperator;
 
 /**
- * A {@link SimpleOption.IntSliderCallbacks} implementation with suppliable min and max (both inclusive) bounds,
+ * A {@link OptionInstance.IntRangeBase} implementation with suppliable min and max (both inclusive) bounds,
  * custom value parser and value getter, and the button type to use.
  *
  * <p>This can be used to have dynamic lower and upper bounds for an option.
@@ -29,12 +29,12 @@ import java.util.function.UnaryOperator;
  *                           If the option value is {@code false}, the button will be a slider, and
  *                           if the option value is {@code true}, the button will be a text field.
  */
-public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, UnaryOperator<Integer> displayValueGetter, SimpleOption<Boolean> buttonType) implements SimpleOption.IntSliderCallbacks {
-    public BothSuppliableIntSliderCallbacks(int minInclusive, int maxInclusive, SimpleOption<Boolean> buttonType) {
+public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSupplier maxSupplier, Function<String, Integer> displayValueParser, UnaryOperator<Integer> displayValueGetter, OptionInstance<Boolean> buttonType) implements OptionInstance.IntRangeBase {
+    public BothSuppliableIntSliderCallbacks(int minInclusive, int maxInclusive, OptionInstance<Boolean> buttonType) {
         this(() -> minInclusive, () -> maxInclusive, Integer::parseInt, UnaryOperator.identity(), buttonType);
     }
 
-    public BothSuppliableIntSliderCallbacks(OrganizablePlayScreensOptions.ScreenRelativeCallbacks screenRelativeCallbacks, SimpleOption<Boolean> buttonType) {
+    public BothSuppliableIntSliderCallbacks(OrganizablePlayScreensOptions.ScreenRelativeCallbacks screenRelativeCallbacks, OptionInstance<Boolean> buttonType) {
         this(screenRelativeCallbacks.minSupplier, screenRelativeCallbacks.maxSupplier, screenRelativeCallbacks.displayValueParser, screenRelativeCallbacks.displayValueGetter, buttonType);
     }
 
@@ -49,17 +49,17 @@ public record BothSuppliableIntSliderCallbacks(IntSupplier minSupplier, IntSuppl
     }
 
     @Override
-    public Function<SimpleOption<Integer>, ClickableWidget> getWidgetCreator(SimpleOption.TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
-        if (buttonType.getValue()) {
+    public Function<OptionInstance<Integer>, AbstractWidget> createButton(OptionInstance.TooltipSupplier<Integer> tooltipFactory, Options gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
+        if (buttonType.get()) {
             return option -> new OptionIntTextFieldWidgetImpl(x + 20, y, width - 20, 20, option, this, tooltipFactory);
         } else {
-            return SimpleOption.IntSliderCallbacks.super.getWidgetCreator(tooltipFactory, gameOptions, x, y, width, changeCallback);
+            return OptionInstance.IntRangeBase.super.createButton(tooltipFactory, gameOptions, x, y, width, changeCallback);
         }
     }
 
     @Override
-    public Optional<Integer> validate(Integer integer) {
-        return Optional.of(MathHelper.clamp(integer, minInclusive(), maxInclusive()));
+    public Optional<Integer> validateValue(Integer integer) {
+        return Optional.of(Mth.clamp(integer, minInclusive(), maxInclusive()));
     }
 
     @Override

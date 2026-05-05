@@ -1,21 +1,21 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
-import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.OptionInstance;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A {@link OptionTextFieldWidgetImpl} implementation for use with integer {@link SimpleOption} and
- * {@link BothSuppliableIntSliderCallbacks} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
+ * A {@link OptionTextFieldWidgetImpl} implementation for use with integer {@link OptionInstance} and
+ * {@link BothSuppliableIntSliderCallbacks} similar to {@link OptionInstance.OptionInstanceSliderButton}.
  */
 @SuppressWarnings("JavadocReference")
 public class OptionIntTextFieldWidgetImpl extends OptionTextFieldWidgetImpl<Integer> {
-    public OptionIntTextFieldWidgetImpl(int x, int y, int width, int height, SimpleOption<Integer> option, BothSuppliableIntSliderCallbacks callbacks, SimpleOption.TooltipFactory<Integer> tooltipFactory) {
+    public OptionIntTextFieldWidgetImpl(int x, int y, int width, int height, OptionInstance<Integer> option, BothSuppliableIntSliderCallbacks callbacks, OptionInstance.TooltipSupplier<Integer> tooltipFactory) {
         super(x, y, width, height, option, callbacks, tooltipFactory);
     }
 
     @Override
     public @NotNull String getDisplayValueString() {
-        return String.valueOf(((BothSuppliableIntSliderCallbacks) callbacks).displayValueGetter().apply(option.getValue()));
+        return String.valueOf(((BothSuppliableIntSliderCallbacks) callbacks).displayValueGetter().apply(option.get()));
     }
 
     @Override

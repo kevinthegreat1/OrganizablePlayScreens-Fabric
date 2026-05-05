@@ -3,59 +3,59 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 import com.google.common.collect.ImmutableList;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.GridWidget;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsSubScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.Options;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Tuple;
 
 import java.util.List;
 
-public class OrganizablePlayScreensButtonOptionsScreen extends GameOptionsScreen {
-    private static final Identifier MENU_LIST_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
-    private static final Identifier INWORLD_MENU_LIST_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
+public class OrganizablePlayScreensButtonOptionsScreen extends OptionsSubScreen {
+    private static final Identifier MENU_LIST_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
+    private static final Identifier INWORLD_MENU_LIST_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
     private static final int MARGIN_TOP = 46;
     private static final int ROW_HEIGHT = 34;
     /**
      * {@code 'X:'} text used in front of text field options.
      */
-    private static final Text X_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.X, Text.of(""));
+    private static final Component X_COLON = Options.genericValueLabel(OrganizablePlayScreensOptions.X, Component.nullToEmpty(""));
     /**
      * {@code 'Y:'} text used in front of text field options.
      */
-    private static final Text Y_COLON = GameOptions.getGenericValueText(OrganizablePlayScreensOptions.Y, Text.of(""));
+    private static final Component Y_COLON = Options.genericValueLabel(OrganizablePlayScreensOptions.Y, Component.nullToEmpty(""));
     /**
      * The {@link OrganizablePlayScreensOptions} instance used for loading, storing, and saving the options.
      */
-    private final OrganizablePlayScreensOptions options;
+    private final OrganizablePlayScreensOptions modOptions;
     /**
      * The reset buttons ordered by row.
      */
-    private List<ButtonWidget> resetButtons;
+    private List<Button> resetButtons;
 
     public OrganizablePlayScreensButtonOptionsScreen(Screen parent) {
-        super(parent, MinecraftClient.getInstance().options, Text.translatable("organizableplayscreens:options.buttonOptions"));
-        options = OrganizablePlayScreens.getInstance().options;
+        super(parent, Minecraft.getInstance().options, Component.translatable("organizableplayscreens:options.buttonOptions"));
+        modOptions = OrganizablePlayScreens.getInstance().options;
     }
 
     /**
      * Gets the parent screen.
      * Public for {@link OrganizablePlayScreensOptions} to access potential
-     * {@link net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen MultiplayerScreen} and
-     * {@link net.minecraft.client.gui.screen.world.SelectWorldScreen SelectWorldScreen} instances.
+     * {@link net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen MultiplayerScreen} and
+     * {@link net.minecraft.client.gui.screens.worldselection.SelectWorldScreen SelectWorldScreen} instances.
      *
      * @return the parent screen
      */
     public Screen getParent() {
-        return parent;
+        return lastScreen;
     }
 
     /**
@@ -64,29 +64,29 @@ public class OrganizablePlayScreensButtonOptionsScreen extends GameOptionsScreen
      * Adds the reset buttons to {@link #resetButtons}.
      */
     @Override
-    protected void initBody() {
+    protected void addContents() {
         int i = 0;
-        ImmutableList.Builder<ButtonWidget> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
-        for (List<Pair<String, SimpleOption<?>>> optionRow : options.optionsArray) {
+        ImmutableList.Builder<Button> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
+        for (List<Tuple<String, OptionInstance<?>>> optionRow : modOptions.optionsArray) {
             int j = 0;
             int y = MARGIN_TOP + i * ROW_HEIGHT;
-            for (Pair<String, SimpleOption<?>> namedOption : optionRow) {
+            for (Tuple<String, OptionInstance<?>> namedOption : optionRow) {
                 int x = width / 2 - 155 + j * 135;
-                addDrawableChild(namedOption.getRight().createWidget(gameOptions, x, y, 125));
+                addRenderableWidget(namedOption.getB().createButton(options, x, y, 125));
                 j++;
             }
-            ButtonWidget resetButton = ButtonWidget.builder(Text.translatable("controls.reset"), (buttonWidget) -> {
+            Button resetButton = Button.builder(Component.translatable("controls.reset"), (buttonWidget) -> {
                 OrganizablePlayScreensOptions.reset(optionRow);
-                MinecraftClient.getInstance().setScreen(new OrganizablePlayScreensButtonOptionsScreen(parent));
-            }).dimensions(width / 2 - 155 + j * 135, y, 40, 20).build();
+                Minecraft.getInstance().setScreen(new OrganizablePlayScreensButtonOptionsScreen(lastScreen));
+            }).bounds(width / 2 - 155 + j * 135, y, 40, 20).build();
             resetButtonsBuilder.add(resetButton);
-            addDrawableChild(resetButton);
+            addRenderableWidget(resetButton);
             if (i++ == 4) {
                 break;
             }
         }
         resetButtons = resetButtonsBuilder.build();
-        options.updateResetButtons();
+        modOptions.updateResetButtons();
     }
 
     /**
@@ -101,22 +101,22 @@ public class OrganizablePlayScreensButtonOptionsScreen extends GameOptionsScreen
      * Creates button type button and done button in the footer.
      */
     @Override
-    protected void initFooter() {
-        GridWidget gridWidget = new GridWidget().setColumnSpacing(10);
-        GridWidget.Adder adder = gridWidget.createAdder(2);
-        adder.add(options.buttonType.createWidget(gameOptions));
-        adder.add(ButtonWidget.builder(ScreenTexts.DONE, (buttonWidget) -> {
-            options.save();
-            client.setScreen(parent);
+    protected void addFooter() {
+        GridLayout gridWidget = new GridLayout().columnSpacing(10);
+        GridLayout.RowHelper adder = gridWidget.createRowHelper(2);
+        adder.addChild(modOptions.buttonType.createButton(options));
+        adder.addChild(Button.builder(CommonComponents.GUI_DONE, (buttonWidget) -> {
+            modOptions.save();
+            minecraft.setScreen(lastScreen);
         }).build());
-        gridWidget.refreshPositions();
-        layout.addFooter(gridWidget);
+        gridWidget.arrangeElements();
+        layout.addToFooter(gridWidget);
     }
 
     /**
      * Renders the screen.
      * Draws the title and option titles. Then, draws the {@code 'X:'} and {@code 'Y:'} text if text fields are being used.
-     * Finally, draws the buttons with {@link Screen#render(DrawContext, int, int, float) super.render(MatrixStack, int, int, float)}.
+     * Finally, draws the buttons with {@link Screen#render(GuiGraphics, int, int, float) super.render(MatrixStack, int, int, float)}.
      *
      * @param context the draw context
      * @param mouseX  the x position of the mouse
@@ -124,25 +124,25 @@ public class OrganizablePlayScreensButtonOptionsScreen extends GameOptionsScreen
      * @param delta   the time between ticks
      */
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        assert client != null;
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE, 0, layout.getHeaderHeight(), width, height - layout.getFooterHeight(), width, height - layout.getHeaderHeight() - layout.getFooterHeight(), 32, 32);
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE, 0, layout.getHeaderHeight() - 2, 0, 0, width, 2, 32, 2);
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, 0, height - layout.getFooterHeight(), 0, 0, width, 2, 32, 2);
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        assert minecraft != null;
+        context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE, 0, layout.getHeaderHeight(), width, height - layout.getFooterHeight(), width, height - layout.getHeaderHeight() - layout.getFooterHeight(), 32, 32);
+        context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR, 0, layout.getHeaderHeight() - 2, 0, 0, width, 2, 32, 2);
+        context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, 0, height - layout.getFooterHeight(), 0, 0, width, 2, 32, 2);
 
         super.render(context, mouseX, mouseY, delta);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFFFF);
+            context.drawCenteredString(font, Component.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFFFF);
             i += ROW_HEIGHT;
         }
-        if (options.buttonType.getValue()) {
+        if (modOptions.buttonType.get()) {
             for (i = 0; i < 5; i++) {
                 int y = MARGIN_TOP + i * ROW_HEIGHT;
                 int x = width / 2 - 155;
-                context.drawTextWithShadow(textRenderer, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
+                context.drawString(font, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
                 x = width / 2 - 155 + 135;
-                context.drawTextWithShadow(textRenderer, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
+                context.drawString(font, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
             }
         }
     }
@@ -152,7 +152,7 @@ public class OrganizablePlayScreensButtonOptionsScreen extends GameOptionsScreen
      */
     @Override
     public void removed() {
-        options.save();
+        modOptions.save();
     }
 
     /**

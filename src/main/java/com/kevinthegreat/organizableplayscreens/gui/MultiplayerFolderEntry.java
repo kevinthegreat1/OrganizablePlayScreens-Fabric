@@ -2,22 +2,22 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
-import com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerServerListWidgetAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.ServerSelectionListAccessor;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.screen.world.WorldIcon;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.network.NetworkingBackend;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.gui.screens.FaviconTexture;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.server.network.EventLoopGroupHolder;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,31 +26,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> {
+public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements AbstractFolderEntry<ServerSelectionList, ServerSelectionList.Entry> {
     /**
      * All entries in this folder.
      */
     @NotNull
-    private final List<MultiplayerServerListWidget.Entry> entries;
+    private final List<ServerSelectionList.Entry> entries;
     /**
      * This button moves the selected entry into this folder.
      */
-    private final ButtonWidget buttonMoveInto;
+    private final Button buttonMoveInto;
 
-    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
-        this(screen, parent, I18n.translate("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>());
+    public MultiplayerFolderEntry(@NotNull JoinMultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent) {
+        this(screen, parent, I18n.get("organizableplayscreens:entry.new", EntryType.FOLDER.text().getString()), new ArrayList<>());
     }
 
-    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
+    public MultiplayerFolderEntry(@NotNull JoinMultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name) {
         this(screen, parent, name, new ArrayList<>());
     }
 
-    public MultiplayerFolderEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<MultiplayerServerListWidget.Entry> entries) {
+    public MultiplayerFolderEntry(@NotNull JoinMultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull String name, @NotNull List<ServerSelectionList.Entry> entries) {
         super(screen, parent, EntryType.FOLDER, name);
         this.entries = entries;
-        buttonMoveInto = ButtonWidget.builder(Text.of("+"), button -> {
-            MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
-            MultiplayerServerListWidget.Entry entry = serverListWidget.getSelectedOrNull();
+        buttonMoveInto = Button.builder(Component.nullToEmpty("+"), button -> {
+            ServerSelectionList serverListWidget = ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList();
+            ServerSelectionList.Entry entry = serverListWidget.getSelected();
             if (entry != null) {
                 if (entry instanceof AbstractMultiplayerEntry nonServerEntry) {
                     nonServerEntry.parent = this;
@@ -62,7 +62,7 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
         }).width(20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_INTO_TOOLTIP).build();
     }
 
-    public @NotNull List<MultiplayerServerListWidget.Entry> getEntries() {
+    public @NotNull List<ServerSelectionList.Entry> getEntries() {
         return entries;
     }
 
@@ -72,10 +72,10 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     @Override
     public List<Identifier> getIcons() {
         return entries.stream()
-                .filter(MultiplayerServerListWidget.ServerEntry.class::isInstance)
-                .map(MultiplayerServerListWidgetMixin.ServerEntryAccessor.class::cast)
-                .map(MultiplayerServerListWidgetMixin.ServerEntryAccessor::getIcon)
-                .map(WorldIcon::getTextureId)
+                .filter(ServerSelectionList.OnlineServerEntry.class::isInstance)
+                .map(ServerSelectionListMixin.ServerEntryAccessor.class::cast)
+                .map(ServerSelectionListMixin.ServerEntryAccessor::getIcon)
+                .map(FaviconTexture::textureLocation)
                 .toList();
     }
 
@@ -83,54 +83,54 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
      * {@inheritDoc}
      */
     @Override
-    public ButtonWidget getButtonMoveInto() {
+    public Button getButtonMoveInto() {
         return buttonMoveInto;
     }
 
     @Override
-    public void entrySelectionConfirmed(MultiplayerServerListWidget serverListWidget) {
+    public void entrySelectionConfirmed(ServerSelectionList serverListWidget) {
         super.entrySelectionConfirmed(serverListWidget);
         serverListWidget.organizableplayscreens_setCurrentFolder(this);
     }
 
     @Override
-    public void render(DrawContext context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+    public void render(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
         AbstractFolderEntry.super.render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize);
 
         // Ping servers inside folders similar to MultiplayerServerListWidget.ServerEntry#render
-        for (MultiplayerServerListWidget.Entry entry : entries) {
-            if (!(entry instanceof MultiplayerServerListWidget.ServerEntry serverEntry)) continue;
-            ServerInfo server = serverEntry.getServer();
+        for (ServerSelectionList.Entry entry : entries) {
+            if (!(entry instanceof ServerSelectionList.OnlineServerEntry serverEntry)) continue;
+            ServerData server = serverEntry.getServerData();
 
-            if (server.getStatus() == ServerInfo.Status.INITIAL) {
-                server.setStatus(ServerInfo.Status.PINGING);
-                server.label = ScreenTexts.EMPTY;
-                server.playerCountLabel = ScreenTexts.EMPTY;
-                MultiplayerServerListWidgetAccessor.getSERVER_PINGER_THREAD_POOL().submit(() -> {
+            if (server.state() == ServerData.State.INITIAL) {
+                server.setState(ServerData.State.PINGING);
+                server.motd = CommonComponents.EMPTY;
+                server.status = CommonComponents.EMPTY;
+                ServerSelectionListAccessor.getTHREAD_POOL().submit(() -> {
                     try {
-                        screen.getServerListPinger().add(server, () -> client.execute(serverEntry::saveFile), () -> {
-                            server.setStatus(server.protocolVersion == SharedConstants.getGameVersion().protocolVersion() ? ServerInfo.Status.SUCCESSFUL : ServerInfo.Status.INCOMPATIBLE);
-                            client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
-                        }, NetworkingBackend.remote(client.options.shouldUseNativeTransport()));
+                        screen.getPinger().pingServer(server, () -> client.execute(serverEntry::updateServerList), () -> {
+                            server.setState(server.protocol == SharedConstants.getCurrentVersion().protocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
+                            client.execute(((ServerSelectionListMixin.ServerEntryAccessor) serverEntry)::invokeRefreshStatus);
+                        }, EventLoopGroupHolder.remote(client.options.useNativeTransport()));
                     } catch (UnknownHostException e) {
-                        server.setStatus(ServerInfo.Status.UNREACHABLE);
-                        server.label = MultiplayerServerListWidgetAccessor.getCANNOT_RESOLVE_TEXT();
-                        client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
+                        server.setState(ServerData.State.UNREACHABLE);
+                        server.motd = ServerSelectionListAccessor.getCANT_RESOLVE_TEXT();
+                        client.execute(((ServerSelectionListMixin.ServerEntryAccessor) serverEntry)::invokeRefreshStatus);
                     } catch (Exception e) {
-                        server.setStatus(ServerInfo.Status.UNREACHABLE);
-                        server.label = MultiplayerServerListWidgetAccessor.getCANNOT_CONNECT_TEXT();
-                        client.execute(((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry)::invokeUpdate);
+                        server.setState(ServerData.State.UNREACHABLE);
+                        server.motd = ServerSelectionListAccessor.getCANT_CONNECT_TEXT();
+                        client.execute(((ServerSelectionListMixin.ServerEntryAccessor) serverEntry)::invokeRefreshStatus);
                     }
                 });
             }
 
-            byte[] bs = server.getFavicon();
-            if (!Arrays.equals(bs, ((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).getFavicon())) {
-                if (((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).invokeUploadFavicon(bs)) {
-                    ((MultiplayerServerListWidgetMixin.ServerEntryAccessor) serverEntry).setFavicon(bs);
+            byte[] bs = server.getIconBytes();
+            if (!Arrays.equals(bs, ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).getLastIconBytes())) {
+                if (((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).invokeUploadServerIcon(bs)) {
+                    ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).setLastIconBytes(bs);
                 } else {
-                    server.setFavicon(null);
-                    serverEntry.saveFile();
+                    server.setIconBytes(null);
+                    serverEntry.updateServerList();
                 }
             }
         }
@@ -139,10 +139,10 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     /**
      * Handles mouse clicks for this folder.
      * <p>
-     * Calls mouse click on {@link #buttonMoveInto} and {@link AbstractMultiplayerEntry#mouseClicked(Click, boolean)}.
+     * Calls mouse click on {@link #buttonMoveInto} and {@link AbstractMultiplayerEntry#mouseClicked(MouseButtonEvent, boolean)}.
      */
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (buttonMoveInto.mouseClicked(click, doubled)) {
             return true;
         }

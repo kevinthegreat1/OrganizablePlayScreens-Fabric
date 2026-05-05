@@ -1,43 +1,43 @@
 package com.kevinthegreat.organizableplayscreens.option;
 
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.SimpleOptionAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.option.SimpleOption;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.OptionInstanceAccessor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.OptionInstance;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A text field widget for use with {@link SimpleOption} similar to {@link SimpleOption.OptionSliderWidgetImpl}.
+ * A text field widget for use with {@link OptionInstance} similar to {@link OptionInstance.OptionInstanceSliderButton}.
  *
  * @param <N> the type of number for the option
  */
 @SuppressWarnings("JavadocReference")
-public abstract class OptionTextFieldWidgetImpl<N extends Number> extends TextFieldWidget {
-    protected final SimpleOption<N> option;
-    protected final SimpleOption.SliderCallbacks<N> callbacks;
-    protected final SimpleOption.TooltipFactory<N> tooltipFactory;
+public abstract class OptionTextFieldWidgetImpl<N extends Number> extends EditBox {
+    protected final OptionInstance<N> option;
+    protected final OptionInstance.SliderableValueSet<N> callbacks;
+    protected final OptionInstance.TooltipSupplier<N> tooltipFactory;
 
-    public OptionTextFieldWidgetImpl(int x, int y, int width, int height, SimpleOption<N> option, SimpleOption.SliderCallbacks<N> callbacks, SimpleOption.TooltipFactory<N> tooltipFactory) {
-        super(MinecraftClient.getInstance().textRenderer, x, y, width, height, ((SimpleOptionAccessor) (Object) option).getTextGetter().apply(option.getValue()));
+    public OptionTextFieldWidgetImpl(int x, int y, int width, int height, OptionInstance<N> option, OptionInstance.SliderableValueSet<N> callbacks, OptionInstance.TooltipSupplier<N> tooltipFactory) {
+        super(Minecraft.getInstance().font, x, y, width, height, ((OptionInstanceAccessor) (Object) option).getToString().apply(option.get()));
         this.option = option;
         this.callbacks = callbacks;
         this.tooltipFactory = tooltipFactory;
-        setTextPredicate(this::isValid);
-        setChangedListener(string -> {
+        setFilter(this::isValid);
+        setResponder(string -> {
             if (string.isEmpty()) {
                 string = "0";
-                setText(getDisplayValueString());
+                setValue(getDisplayValueString());
             }
             N value = parseValue(string);
-            if (value.equals(option.getValue())) {
+            if (value.equals(option.get())) {
                 return;
             }
-            option.setValue(value);
-            setText(getDisplayValueString());
-            setMessage(((SimpleOptionAccessor) (Object) option).getTextGetter().apply(option.getValue()));
-            setTooltip(tooltipFactory.apply(option.getValue()));
+            option.set(value);
+            setValue(getDisplayValueString());
+            setMessage(((OptionInstanceAccessor) (Object) option).getToString().apply(option.get()));
+            setTooltip(tooltipFactory.apply(option.get()));
         });
-        setText(getDisplayValueString());
+        setValue(getDisplayValueString());
     }
 
     public abstract @NotNull String getDisplayValueString();

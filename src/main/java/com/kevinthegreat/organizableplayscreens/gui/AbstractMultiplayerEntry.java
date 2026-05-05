@@ -1,22 +1,22 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerScreenAccessor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidget.Entry implements AbstractEntry<MultiplayerServerListWidget, MultiplayerServerListWidget.Entry> {
+public abstract class AbstractMultiplayerEntry extends ServerSelectionList.Entry implements AbstractEntry<ServerSelectionList, ServerSelectionList.Entry> {
     @NotNull
-    protected final MultiplayerScreen screen;
+    protected final JoinMultiplayerScreen screen;
     /**
      * The parent of this folder.
      */
@@ -34,8 +34,8 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * @param parent the parent folder of this entry
      * @param type   the type of this entry
      */
-    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type) {
-        this(screen, parent, type, I18n.translate("organizableplayscreens:entry.new", type.text().getString()));
+    public AbstractMultiplayerEntry(@NotNull JoinMultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type) {
+        this(screen, parent, type, I18n.get("organizableplayscreens:entry.new", type.text().getString()));
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * @param type   the type of this entry
      * @param name   the name of this entry
      */
-    public AbstractMultiplayerEntry(@NotNull MultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type, @NotNull String name) {
+    public AbstractMultiplayerEntry(@NotNull JoinMultiplayerScreen screen, @Nullable MultiplayerFolderEntry parent, @NotNull EntryType type, @NotNull String name) {
         this.screen = screen;
         this.parent = parent;
         this.type = type;
@@ -67,13 +67,13 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     }
 
     @Override
-    public boolean isOfSameType(MultiplayerServerListWidget.Entry entry) {
+    public boolean matches(ServerSelectionList.Entry entry) {
         return entry instanceof AbstractMultiplayerEntry other && other.getType() == getType();
     }
 
     @Override
-    public void connect() {
-        entrySelectionConfirmed(((MultiplayerScreenAccessor) screen).getServerListWidget());
+    public void join() {
+        entrySelectionConfirmed(((JoinMultiplayerScreenAccessor) screen).getServerSelectionList());
     }
 
     @Override
@@ -87,8 +87,8 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
     }
 
     @Override
-    public final void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        render(context, ((MultiplayerScreenAccessor) screen).getServerListWidget().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((MultiplayerScreenAccessor) screen).getServerListWidget().organizableplayscreens_getCurrentEntries().size());
+    public final void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        render(context, ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList().organizableplayscreens_getCurrentEntries().size());
     }
 
     /**
@@ -99,9 +99,9 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * @return whether the key press has been consumed (prevents further processing or not)
      */
     @Override
-    public boolean keyPressed(KeyInput input) {
-        if (input.hasShift()) {
-            MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
+    public boolean keyPressed(KeyEvent input) {
+        if (input.hasShiftDown()) {
+            ServerSelectionList serverListWidget = ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList();
             int i = serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(this);
             if (i == -1) {
                 return true;
@@ -120,15 +120,15 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * Checks for click on the open and swap buttons, and handles double-clicking.
      */
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
-        MultiplayerServerListWidget serverListWidget = ((MultiplayerScreenAccessor) screen).getServerListWidget();
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+        ServerSelectionList serverListWidget = ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList();
         int i = serverListWidget.organizableplayscreens_getCurrentEntries().indexOf(this);
         double d = click.x() - (double) serverListWidget.getRowLeft();
-        double e = click.y() - (double) ((EntryListWidgetInvoker) serverListWidget).rowTop(i);
+        double e = click.y() - (double) ((AbstractSelectionListInvoker) serverListWidget).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
                 serverListWidget.setSelected(this);
-                connect();
+                join();
                 return true;
             }
             if (d < 16 && e < 16 && i > 0) {
@@ -143,7 +143,7 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
 
         serverListWidget.setSelected(this);
         if (doubled) {
-            connect();
+            join();
         }
         return false;
     }
@@ -156,11 +156,11 @@ public abstract class AbstractMultiplayerEntry extends MultiplayerServerListWidg
      * @see com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
      */
     private void swapEntries(int i, int j) {
-        ((MultiplayerScreenAccessor) screen).getServerListWidget().organizableplayscreens_swapEntries(i, j);
+        ((JoinMultiplayerScreenAccessor) screen).getServerSelectionList().organizableplayscreens_swapEntries(i, j);
     }
 
     @Override
-    public Text getNarration() {
-        return Text.translatable("narrator.select", name);
+    public Component getNarration() {
+        return Component.translatable("narrator.select", name);
     }
 }

@@ -1,21 +1,21 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.MultiplayerScreenAccessor;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerScreenAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry implements AbstractEntry<WorldListWidget, WorldListWidget.Entry> {
+public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry implements AbstractEntry<WorldSelectionList, WorldSelectionList.Entry> {
     @NotNull
     protected final SelectWorldScreen screen;
     /**
@@ -36,7 +36,7 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      * @param type   the type of this entry
      */
     public AbstractSingleplayerEntry(@NotNull SelectWorldScreen screen, @Nullable SingleplayerFolderEntry parent, @NotNull EntryType type) {
-        this(screen, parent, type, I18n.translate("organizableplayscreens:entry.new", type.text().getString()));
+        this(screen, parent, type, I18n.get("organizableplayscreens:entry.new", type.text().getString()));
     }
 
     /**
@@ -78,8 +78,8 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
     }
 
     @Override
-    public final void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        render(context, ((SelectWorldScreenAccessor) screen).getLevelList().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((SelectWorldScreenAccessor) screen).getLevelList().organizableplayscreens_getCurrentNonWorldEntries().size());
+    public final void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        render(context, ((SelectWorldScreenAccessor) screen).getList().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((SelectWorldScreenAccessor) screen).getList().organizableplayscreens_getCurrentNonWorldEntries().size());
     }
 
     /**
@@ -90,13 +90,13 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      * @return whether the key press has been consumed (prevents further processing or not)
      */
     @Override
-    public boolean keyPressed(KeyInput input) {
-        WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
-        if (input.isEnterOrSpace()) {
+    public boolean keyPressed(KeyEvent input) {
+        WorldSelectionList levelList = ((SelectWorldScreenAccessor) screen).getList();
+        if (input.isSelection()) {
             levelList.setSelected(this);
             entrySelectionConfirmed(levelList);
             return true;
-        } else if (input.hasShift()) {
+        } else if (input.hasShiftDown()) {
             int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
             if (i != -1 && (input.key() == GLFW.GLFW_KEY_DOWN && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || input.key() == GLFW.GLFW_KEY_UP && i > 0)) {
                 swapEntries(i, input.key() == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
@@ -112,11 +112,11 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      * Checks for click on the open and swap buttons, and handles double-clicking.
      */
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
-        WorldListWidget levelList = ((SelectWorldScreenAccessor) screen).getLevelList();
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+        WorldSelectionList levelList = ((SelectWorldScreenAccessor) screen).getList();
         int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
         double d = click.x() - (double) levelList.getRowLeft();
-        double e = click.y() - (double) ((EntryListWidgetInvoker) levelList).rowTop(i);
+        double e = click.y() - (double) ((AbstractSelectionListInvoker) levelList).rowTop(i);
         if (d <= 32) {
             if (d < 32 && d > 16) {
                 levelList.setSelected(this);
@@ -148,11 +148,11 @@ public abstract class AbstractSingleplayerEntry extends WorldListWidget.Entry im
      * @see WorldListWidgetAccessor#organizableplayscreens_swapEntries(int, int) swapEntries(int, int)
      */
     private void swapEntries(int i, int j) {
-        ((SelectWorldScreenAccessor) screen).getLevelList().organizableplayscreens_swapEntries(i, j);
+        ((SelectWorldScreenAccessor) screen).getList().organizableplayscreens_swapEntries(i, j);
     }
 
     @Override
-    public Text getNarration() {
-        return Text.translatable("narrator.select", name);
+    public Component getNarration() {
+        return Component.translatable("narrator.select", name);
     }
 }

@@ -1,18 +1,18 @@
 package com.kevinthegreat.organizableplayscreens.gui.screen;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.GridWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
 public class OrganizablePlayScreensOptionsScreen extends Screen {
     private final Screen parent;
-    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
     public OrganizablePlayScreensOptionsScreen(Screen parent) {
-        super(Text.translatable("organizableplayscreens:options.title"));
+        super(Component.translatable("organizableplayscreens:options.title"));
         this.parent = parent;
     }
 
@@ -22,20 +22,20 @@ public class OrganizablePlayScreensOptionsScreen extends Screen {
 
     @Override
     protected void init() {
-        GridWidget gridWidget = new GridWidget().setSpacing(8);
-        GridWidget.Adder adder = gridWidget.createAdder(2);
-        adder.add(ButtonWidget.builder(Text.translatable("organizableplayscreens:options.buttonDrag"), button -> client.setScreen(new OrganizablePlayScreensButtonDragScreen(this))).width(96).build());
-        adder.add(ButtonWidget.builder(Text.translatable("organizableplayscreens:options.buttonOptions"), button -> client.setScreen(new OrganizablePlayScreensButtonOptionsScreen(this))).width(96).build());
-        layout.addBody(gridWidget);
+        GridLayout gridWidget = new GridLayout().spacing(8);
+        GridLayout.RowHelper adder = gridWidget.createRowHelper(2);
+        adder.addChild(Button.builder(Component.translatable("organizableplayscreens:options.buttonDrag"), button -> minecraft.setScreen(new OrganizablePlayScreensButtonDragScreen(this))).width(96).build());
+        adder.addChild(Button.builder(Component.translatable("organizableplayscreens:options.buttonOptions"), button -> minecraft.setScreen(new OrganizablePlayScreensButtonOptionsScreen(this))).width(96).build());
+        layout.addToContents(gridWidget);
 
-        layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE,button -> close()).width(200).build());
+        layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> onClose()).width(200).build());
 
-        layout.forEachChild(this::addDrawableChild);
-        layout.refreshPositions();
+        layout.visitWidgets(this::addRenderableWidget);
+        layout.arrangeElements();
     }
 
     @Override
-    public void close() {
-        client.setScreen(parent);
+    public void onClose() {
+        minecraft.setScreen(parent);
     }
 }

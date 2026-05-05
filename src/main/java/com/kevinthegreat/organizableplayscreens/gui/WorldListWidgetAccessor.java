@@ -1,7 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.minecraft.client.gui.components.StringWidget;
 
 import java.util.List;
 import java.util.SortedMap;
@@ -22,25 +22,25 @@ public interface WorldListWidgetAccessor {
 
     default List<AbstractSingleplayerEntry> organizableplayscreens_getCurrentNonWorldEntries() {return null;}
 
-    default List<WorldListWidget.WorldEntry> organizableplayscreens_getCurrentWorldEntries() {return null;}
+    default List<WorldSelectionList.WorldListEntry> organizableplayscreens_getCurrentWorldEntries() {return null;}
 
-    default SortedMap<WorldListWidget.WorldEntry, SingleplayerFolderEntry> organizableplayscreens_getWorlds() {return null;}
+    default SortedMap<WorldSelectionList.WorldListEntry, SingleplayerFolderEntry> organizableplayscreens_getWorlds() {return null;}
 
     default boolean organizableplayscreens_isRootFolder() {return false;}
 
-    default void organizableplayscreens_setPathWidget(TextWidget pathWidget) {}
+    default void organizableplayscreens_setPathWidget(StringWidget pathWidget) {}
 
     /**
-     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
+     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
      *
      * @param folderEntry the new folder.
      */
     default void organizableplayscreens_setCurrentFolder(SingleplayerFolderEntry folderEntry) {}
 
     /**
-     * Trys to set {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent and update the displayed entries.
+     * Trys to set {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent and update the displayed entries.
      *
-     * @return {@code true} if the folder has a parent and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldListWidgetMixin#organizableplayscreens_currentFolder currentFolder} was changed.
+     * @return {@code true} if the folder has a parent and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} was changed.
      */
     default boolean organizableplayscreens_setCurrentFolderToParent() {return false;}
 

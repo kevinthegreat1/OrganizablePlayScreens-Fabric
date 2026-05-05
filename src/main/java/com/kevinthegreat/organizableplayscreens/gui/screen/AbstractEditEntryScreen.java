@@ -3,12 +3,16 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
@@ -16,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListWidget<E>, E extends AlwaysSelectedEntryListWidget.Entry<E>> extends Screen {
+public abstract class AbstractEditEntryScreen<T extends ObjectSelectionList<E>, E extends ObjectSelectionList.Entry<E>> extends Screen {
     private final Screen parent;
 
     /**
@@ -38,11 +42,11 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
      * Whether a new folder is being created. Allows the done button to be pressed without changing the name if this is true.
      */
     private final boolean newEntry;
-    private Text typeTitle;
-    private Text typeEnterName;
-    private TextFieldWidget nameField;
-    private final Map<EntryType, ButtonWidget> entryTypeButtons = new HashMap<>();
-    private ButtonWidget buttonDone;
+    private Component typeTitle;
+    private Component typeEnterName;
+    private EditBox nameField;
+    private final Map<EntryType, Button> entryTypeButtons = new HashMap<>();
+    private Button buttonDone;
 
     /**
      * Creates an edit entry screen for a new entry.
@@ -65,7 +69,7 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
     }
 
     private AbstractEditEntryScreen(Screen parent, BooleanConsumer callback, Function<EntryType, AbstractEntry<T, E>> factory, AbstractEntry<T, E> entry, boolean newEntry) {
-        super(Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
+        super(Component.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit"));
         this.parent = parent;
         this.callback = callback;
         this.factory = factory;
@@ -78,25 +82,25 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
     @Override
     protected void init() {
         if (newEntry) {
-            GridWidget gridWidget = new GridWidget();
+            GridLayout gridWidget = new GridLayout();
             List<EntryType> entryTypes = getEntryTypes();
-            GridWidget.Adder adder = gridWidget.createAdder(entryTypes.size());
+            GridLayout.RowHelper adder = gridWidget.createRowHelper(entryTypes.size());
             for (EntryType entryType : entryTypes) {
-                entryTypeButtons.put(entryType, adder.add(addDrawableChild(ButtonWidget.builder(entryType.text(), buttonWidget_ -> setType(entryType)).width(50).build())));
+                entryTypeButtons.put(entryType, adder.addChild(addRenderableWidget(Button.builder(entryType.text(), buttonWidget_ -> setType(entryType)).width(50).build())));
             }
-            gridWidget.refreshPositions();
-            SimplePositioningWidget.setPos(gridWidget, 0, 40, width, 40);
+            gridWidget.arrangeElements();
+            FrameLayout.centerInRectangle(gridWidget, 0, 40, width, 40);
         }
-        typeTitle = Text.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entry.getType().text().getString());
-        typeEnterName = Text.translatable("organizableplayscreens:entry.enterName", entry.getType().text().getString());
-        nameField = new TextFieldWidget(textRenderer, width / 2 - 100, 90, 200, 20, typeEnterName);
+        typeTitle = Component.translatable(newEntry ? "organizableplayscreens:entry.new" : "organizableplayscreens:entry.edit", entry.getType().text().getString());
+        typeEnterName = Component.translatable("organizableplayscreens:entry.enterName", entry.getType().text().getString());
+        nameField = new EditBox(font, width / 2 - 100, 90, 200, 20, typeEnterName);
         nameField.setMaxLength(128);
         nameField.setFocused(true);
-        nameField.setText(entry.getValue());
-        nameField.setChangedListener(this::updateDoneButton);
-        addDrawableChild(nameField);
-        buttonDone = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, buttonWidget -> saveAndClose()).dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, buttonWidget -> callback.accept(false)).dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
+        nameField.setValue(entry.getValue());
+        nameField.setResponder(this::updateDoneButton);
+        addRenderableWidget(nameField);
+        buttonDone = addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, buttonWidget -> saveAndClose()).bounds(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
+        addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, buttonWidget -> callback.accept(false)).bounds(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
         updateButtons();
     }
 
@@ -107,8 +111,8 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
      */
     private void setType(EntryType entryType) {
         entry = factory.apply(entryType);
-        nameField.setText(entry.getValue());
-        clearAndInit();
+        nameField.setValue(entry.getValue());
+        rebuildWidgets();
     }
 
     /**
@@ -118,7 +122,7 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
      * @see #saveAndClose()
      */
     @Override
-    public boolean keyPressed(KeyInput input) {
+    public boolean keyPressed(KeyEvent input) {
         if (!buttonDone.active || getFocused() != nameField || input.key() != GLFW.GLFW_KEY_ENTER && input.key() != GLFW.GLFW_KEY_KP_ENTER) {
             return super.keyPressed(input);
         } else {
@@ -132,21 +136,21 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
      */
     @Override
     public void resize(int width, int height) {
-        String folderName = nameField.getText();
+        String folderName = nameField.getValue();
         init(width, height);
-        nameField.setText(folderName);
+        nameField.setValue(folderName);
     }
 
     @Override
-    public void close() {
-        client.setScreen(parent);
+    public void onClose() {
+        minecraft.setScreen(parent);
     }
 
     /**
      * Sets the name to the folder and calls the callback with true.
      */
     private void saveAndClose() {
-        entry.setValue(nameField.getText());
+        entry.setValue(nameField.getValue());
         callback.accept(true);
     }
 
@@ -156,11 +160,11 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
     private void updateButtons() {
         if (newEntry) {
             EntryType currentType = entry.getType();
-            for (Map.Entry<EntryType, ButtonWidget> entry : entryTypeButtons.entrySet()) {
+            for (Map.Entry<EntryType, Button> entry : entryTypeButtons.entrySet()) {
                 entry.getValue().active = entry.getKey() != currentType;
             }
         }
-        updateDoneButton(nameField.getText());
+        updateDoneButton(nameField.getValue());
     }
 
     /**
@@ -173,10 +177,10 @@ public abstract class AbstractEditEntryScreen<T extends AlwaysSelectedEntryListW
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, typeTitle, width / 2, 20, 0xFFFFFFFF);
-        context.drawTextWithShadow(textRenderer, typeEnterName, width / 2 - 100, 80, 0xFFA0A0A0);
+        context.drawCenteredString(font, typeTitle, width / 2, 20, 0xFFFFFFFF);
+        context.drawString(font, typeEnterName, width / 2 - 100, 80, 0xFFA0A0A0);
         nameField.render(context, mouseX, mouseY, delta);
     }
 }

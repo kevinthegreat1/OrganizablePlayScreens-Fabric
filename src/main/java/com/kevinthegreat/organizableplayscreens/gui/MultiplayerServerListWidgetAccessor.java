@@ -1,7 +1,7 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.gui.components.StringWidget;
 
 import java.util.List;
 
@@ -24,23 +24,23 @@ public interface MultiplayerServerListWidgetAccessor {
 
     default MultiplayerFolderEntry organizableplayscreens_getCurrentFolder() {return null;}
 
-    default List<MultiplayerServerListWidget.Entry> organizableplayscreens_getCurrentEntries() {return null;}
+    default List<ServerSelectionList.Entry> organizableplayscreens_getCurrentEntries() {return null;}
 
     default boolean organizableplayscreens_isRootFolder() {return false;}
 
-    default void organizableplayscreens_setPathWidget(TextWidget pathWidget) {}
+    default void organizableplayscreens_setPathWidget(StringWidget pathWidget) {}
 
     /**
-     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
+     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} and updates the displayed entries.
      *
      * @param folderEntry the new folder.
      */
     default void organizableplayscreens_setCurrentFolder(MultiplayerFolderEntry folderEntry) {}
 
     /**
-     * Trys to set {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} to its parent and update the displayed entries.
+     * Trys to set {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent and update the displayed entries.
      *
-     * @return {@code true} if the folder has a parent and {@link com.kevinthegreat.organizableplayscreens.mixin.MultiplayerServerListWidgetMixin#organizableplayscreens_currentFolder currentFolder} was changed.
+     * @return {@code true} if the folder has a parent and {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} was changed.
      */
     default boolean organizableplayscreens_setCurrentFolderToParent() {return false;}
 

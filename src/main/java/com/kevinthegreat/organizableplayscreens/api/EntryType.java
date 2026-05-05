@@ -3,10 +3,10 @@ package com.kevinthegreat.organizableplayscreens.api;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.gui.*;
 import com.mojang.datafixers.util.Function3;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -28,9 +28,9 @@ public class EntryType {
      * A list of all singleplayer entry types.
      */
     private static final List<EntryType> SINGLEPLAYER_ENTRY_TYPES = new ArrayList<>();
-    public static final EntryType FOLDER = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "folder"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
-    public static final EntryType SECTION = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "section"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
-    public static final EntryType SEPARATOR = register(Identifier.of(OrganizablePlayScreens.MOD_ID, "separator"), Text.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
+    public static final EntryType FOLDER = register(Identifier.fromNamespaceAndPath(OrganizablePlayScreens.MOD_ID, "folder"), Component.translatable(OrganizablePlayScreens.MOD_ID + ":folder.folder"), MultiplayerFolderEntry::new, MultiplayerFolderEntry::new, SingleplayerFolderEntry::new, SingleplayerFolderEntry::new);
+    public static final EntryType SECTION = register(Identifier.fromNamespaceAndPath(OrganizablePlayScreens.MOD_ID, "section"), Component.translatable(OrganizablePlayScreens.MOD_ID + ":entry.section"), MultiplayerSectionEntry::new, MultiplayerSectionEntry::new, SingleplayerSectionEntry::new, SingleplayerSectionEntry::new);
+    public static final EntryType SEPARATOR = register(Identifier.fromNamespaceAndPath(OrganizablePlayScreens.MOD_ID, "separator"), Component.translatable(OrganizablePlayScreens.MOD_ID + ":entry.separator"), MultiplayerSeparatorEntry::new, MultiplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new, SingleplayerSeparatorEntry::new);
     /**
      * Identifier of the entry type.
      */
@@ -38,15 +38,15 @@ public class EntryType {
     /**
      * The text name of the entry type.
      */
-    private final Text text;
+    private final Component text;
     /**
      * Used to create a new multiplayer entry of the specific type with a default name.
      */
-    private final BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory;
+    private final BiFunction<JoinMultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory;
     /**
      * Used to create a multiplayer entry of the specific type with a given name.
      */
-    private final Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory;
+    private final Function3<JoinMultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory;
     /**
      * Used to create a new singleplayer entry of the specific type with a default name.
      */
@@ -56,7 +56,7 @@ public class EntryType {
      */
     private final Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory;
 
-    private EntryType(Identifier id, Text text, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+    private EntryType(Identifier id, Component text, BiFunction<JoinMultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<JoinMultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
         this.id = id;
         this.text = text;
         this.multiplayerNewEntryFactory = multiplayerNewEntryFactory;
@@ -75,7 +75,7 @@ public class EntryType {
      * @param singleplayerNewEntryFactory the factory used to create a new singleplayer entry of the specific type with a default name
      * @param singleplayerEntryFactory    the factory used to create a singleplayer entry of the specific type with a given name
      */
-    public static EntryType register(@NotNull Identifier id, @NotNull Text text, BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+    public static EntryType register(@NotNull Identifier id, @NotNull Component text, BiFunction<JoinMultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, Function3<JoinMultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory, BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
         EntryType entryType = new EntryType(id, text, multiplayerNewEntryFactory, multiplayerEntryFactory, singleplayerNewEntryFactory, singleplayerEntryFactory);
         ENTRY_TYPE_MAP.put(id, entryType);
         if (multiplayerNewEntryFactory != null && multiplayerEntryFactory != null) {
@@ -96,7 +96,7 @@ public class EntryType {
      * @param multiplayerEntryFactory    the factory used to create a multiplayer entry of the specific type with a given name
      * @return the entry type
      */
-    public static EntryType registerMultiplayer(@NotNull Identifier id, @NotNull Text text, @NotNull BiFunction<MultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, @NotNull Function3<MultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory) {
+    public static EntryType registerMultiplayer(@NotNull Identifier id, @NotNull Component text, @NotNull BiFunction<JoinMultiplayerScreen, MultiplayerFolderEntry, AbstractMultiplayerEntry> multiplayerNewEntryFactory, @NotNull Function3<JoinMultiplayerScreen, MultiplayerFolderEntry, String, AbstractMultiplayerEntry> multiplayerEntryFactory) {
         return register(id, text, multiplayerNewEntryFactory, multiplayerEntryFactory, null, null);
     }
 
@@ -109,7 +109,7 @@ public class EntryType {
      * @param singleplayerEntryFactory    the factory used to create a singleplayer entry of the specific type with a given name
      * @return the entry type
      */
-    public static EntryType registerSingleplayer(@NotNull Identifier id, @NotNull Text text, @NotNull BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, @NotNull Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
+    public static EntryType registerSingleplayer(@NotNull Identifier id, @NotNull Component text, @NotNull BiFunction<SelectWorldScreen, SingleplayerFolderEntry, AbstractSingleplayerEntry> singleplayerNewEntryFactory, @NotNull Function3<SelectWorldScreen, SingleplayerFolderEntry, String, AbstractSingleplayerEntry> singleplayerEntryFactory) {
         return register(id, text, null, null, singleplayerNewEntryFactory, singleplayerEntryFactory);
     }
 
@@ -129,7 +129,7 @@ public class EntryType {
         return id;
     }
 
-    public Text text() {
+    public Component text() {
         return text;
     }
 
@@ -140,7 +140,7 @@ public class EntryType {
      * @param folder the folder the entry is in
      * @return the entry
      */
-    public AbstractMultiplayerEntry multiplayerEntry(MultiplayerScreen screen, MultiplayerFolderEntry folder) {
+    public AbstractMultiplayerEntry multiplayerEntry(JoinMultiplayerScreen screen, MultiplayerFolderEntry folder) {
         return multiplayerNewEntryFactory.apply(screen, folder);
     }
 
@@ -152,7 +152,7 @@ public class EntryType {
      * @param name   the name of the entry
      * @return the entry
      */
-    public AbstractMultiplayerEntry multiplayerEntry(MultiplayerScreen screen, MultiplayerFolderEntry folder, String name) {
+    public AbstractMultiplayerEntry multiplayerEntry(JoinMultiplayerScreen screen, MultiplayerFolderEntry folder, String name) {
         return multiplayerEntryFactory.apply(screen, folder, name);
     }
 

@@ -1,21 +1,21 @@
 package com.kevinthegreat.organizableplayscreens;
 
 import com.kevinthegreat.organizableplayscreens.gui.*;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.EntryListWidgetInvoker;
+import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonOptions;
 import net.fabricmc.fabric.mixin.client.gametest.gui.ScreenAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.screen.world.WorldListWidget;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.util.Nullables;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.Optionull;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root").save());
 
         // Move the world into the folder
-        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
+        clickListWidgetEntry(context, WorldSelectionList.WorldListEntry.class, 33);
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
         // Open the folder
         clickListWidgetEntry(context, SingleplayerFolderEntry.class, 24);
@@ -65,7 +65,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickScreenButton(context, "←+");
         clickListWidgetEntry(context, SingleplayerSeparatorEntry.class, 33);
         clickScreenButton(context, "←+");
-        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
+        clickListWidgetEntry(context, WorldSelectionList.WorldListEntry.class, 33);
         clickScreenButton(context, "←+");
         context.clickScreenButton("gui.back");
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-root-move-entries-back").save());
@@ -77,7 +77,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
         clickListWidgetEntry(context, SingleplayerSeparatorEntry.class, 33);
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
-        clickListWidgetEntry(context, WorldListWidget.WorldEntry.class, 33);
+        clickListWidgetEntry(context, WorldSelectionList.WorldListEntry.class, 33);
         clickFolderMoveInto(context, SingleplayerFolderEntry.class);
         clickListWidgetEntry(context, SingleplayerFolderEntry.class, 24);
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("select-world-screen-folder-reopened").save());
@@ -104,7 +104,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root").save());
 
         // Move the server into the folder
-        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
+        clickListWidgetEntry(context, ServerSelectionList.OnlineServerEntry.class, 33);
         clickFolderMoveInto(context, MultiplayerFolderEntry.class);
         // Open the folder
         clickListWidgetEntry(context, MultiplayerFolderEntry.class, 24);
@@ -129,7 +129,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-folder-reopened").save());
 
         // Move entries out of the current folder and assert the multiplayer screen root again
-        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
+        clickListWidgetEntry(context, ServerSelectionList.OnlineServerEntry.class, 33);
         clickScreenButton(context, "←+");
         clickListWidgetEntry(context, MultiplayerSectionEntry.class, 33);
         clickScreenButton(context, "←+");
@@ -141,7 +141,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
         context.assertScreenshotEquals(TestScreenshotComparisonOptions.of("multiplayer-screen-root-move-entries-back").save());
 
         // Move entries back into the folder and assert the multiplayer screen folder reopened again
-        clickListWidgetEntry(context, MultiplayerServerListWidget.ServerEntry.class, 33);
+        clickListWidgetEntry(context, ServerSelectionList.OnlineServerEntry.class, 33);
         clickFolderMoveInto(context, MultiplayerFolderEntry.class);
         clickListWidgetEntry(context, MultiplayerSectionEntry.class, 33);
         clickFolderMoveInto(context, MultiplayerFolderEntry.class);
@@ -180,58 +180,58 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     }
 
     private void clickScreenButton(ClientGameTestContext context, String text) {
-        context.runOnClient(client -> Optional.ofNullable(client.currentScreen)
+        context.runOnClient(client -> Optional.ofNullable(client.screen)
                 .map(ScreenAccessor.class::cast)
                 .map(ScreenAccessor::getDrawables)
                 .orElse(List.of())
                 .stream()
-                .filter(ClickableWidget.class::isInstance)
-                .map(ClickableWidget.class::cast)
+                .filter(AbstractWidget.class::isInstance)
+                .map(AbstractWidget.class::cast)
                 .filter(clickableWidget -> text.equals(clickableWidget.getMessage().getString()))
                 .findAny()
-                .ifPresentOrElse(clickableWidget -> clickableWidget.onClick(new Click(clickableWidget.getX(), clickableWidget.getY(), new MouseInput(0, 0)), false), () -> {
-                    throw new AssertionError("Could not find button '%s' in screen '%s'".formatted(text, Nullables.map(client.currentScreen, screen -> screen.getClass().getName())));
+                .ifPresentOrElse(clickableWidget -> clickableWidget.onClick(new MouseButtonEvent(clickableWidget.getX(), clickableWidget.getY(), new MouseButtonInfo(0, 0)), false), () -> {
+                    throw new AssertionError("Could not find button '%s' in screen '%s'".formatted(text, Optionull.map(client.screen, screen -> screen.getClass().getName())));
                 })
         );
     }
 
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int xOffset) {
+    private <T extends ObjectSelectionList.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int xOffset) {
         clickListWidgetEntry(context, entryClass, 0, xOffset);
     }
 
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int ordinal, int xOffset) {
+    private <T extends ObjectSelectionList.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int ordinal, int xOffset) {
         context.runOnClient(client -> {
-            AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
+            ObjectSelectionList<?> listWidget = getListWidget(client);
             T entry = getListWidgetEntry(listWidget, entryClass, ordinal);
             int i = listWidget.children().indexOf(entry);
             int x = listWidget.getRowLeft() + xOffset;
-            int y = ((EntryListWidgetInvoker) listWidget).rowTop(i);
-            listWidget.mouseClicked(new Click(x, y, new MouseInput(0, 0)), false);
+            int y = ((AbstractSelectionListInvoker) listWidget).rowTop(i);
+            listWidget.mouseClicked(new MouseButtonEvent(x, y, new MouseButtonInfo(0, 0)), false);
         });
     }
 
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T> & AbstractFolderEntry<?, ? super T>> void clickFolderMoveInto(ClientGameTestContext context, Class<T> folderClass) {
+    private <T extends ObjectSelectionList.Entry<? super T> & AbstractFolderEntry<?, ? super T>> void clickFolderMoveInto(ClientGameTestContext context, Class<T> folderClass) {
         context.runOnClient(client -> {
-            AlwaysSelectedEntryListWidget<?> listWidget = getListWidget(client);
+            ObjectSelectionList<?> listWidget = getListWidget(client);
             T folderEntry = getListWidgetEntry(listWidget, folderClass, 0);
-            folderEntry.getButtonMoveInto().onClick(new Click(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseInput(0, 0)), false);
+            folderEntry.getButtonMoveInto().onClick(new MouseButtonEvent(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseButtonInfo(0, 0)), false);
         });
     }
 
-    private AlwaysSelectedEntryListWidget<?> getListWidget(MinecraftClient client) {
-        return Optional.ofNullable(client.currentScreen)
+    private ObjectSelectionList<?> getListWidget(Minecraft client) {
+        return Optional.ofNullable(client.screen)
                 .map(ScreenAccessor.class::cast)
                 .map(ScreenAccessor::getDrawables)
                 .orElse(List.of())
                 .stream()
-                .filter(AlwaysSelectedEntryListWidget.class::isInstance)
-                .map(AlwaysSelectedEntryListWidget.class::cast)
+                .filter(ObjectSelectionList.class::isInstance)
+                .map(ObjectSelectionList.class::cast)
                 .findAny()
-                .orElseThrow(() -> new AssertionError("Could not find list widget in screen '%s'".formatted((Object) Nullables.map(client.currentScreen, screen -> screen.getClass().getName()))));
+                .orElseThrow(() -> new AssertionError("Could not find list widget in screen '%s'".formatted((Object) Optionull.map(client.screen, screen -> screen.getClass().getName()))));
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AlwaysSelectedEntryListWidget.Entry<? super T>> T getListWidgetEntry(AlwaysSelectedEntryListWidget<?> listWidget, Class<T> entryClass, int ordinal) {
+    private <T extends ObjectSelectionList.Entry<? super T>> T getListWidgetEntry(ObjectSelectionList<?> listWidget, Class<T> entryClass, int ordinal) {
         return (T) listWidget.children().stream()
                 .filter(entryClass::isInstance)
                 .skip(ordinal)
