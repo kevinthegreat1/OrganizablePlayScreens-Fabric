@@ -2,13 +2,12 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerScreenAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +77,7 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
     }
 
     @Override
-    public final void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    public final void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
         render(context, ((SelectWorldScreenAccessor) screen).getList().children().indexOf(this), getContentY(), getContentX(), mouseX, mouseY, hovered, tickDelta, name, ((SelectWorldScreenAccessor) screen).getList().organizableplayscreens_getCurrentNonWorldEntries().size());
     }
 

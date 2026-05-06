@@ -7,21 +7,22 @@ import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.screen.MultiplayerEditEntryScreen;
 import com.kevinthegreat.organizableplayscreens.gui.screen.OrganizablePlayScreensOptionsScreen;
-import com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -36,6 +37,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -188,22 +190,34 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     /**
      * Modifies the 'edit' button to work with folders.
      */
-    @Inject(method = "method_19915", at = @At(value = "RETURN"))
-    private void organizableplayscreens_modifyEditButton(Button buttonWidget, CallbackInfo ci) {
-        if (serverSelectionList.getSelected() instanceof AbstractMultiplayerEntry entry) {
-            minecraft.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
-        }
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/components/Button;builder(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;)Lnet/minecraft/client/gui/components/Button$Builder;")
+    @Definition(id = "translatable", method = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;")
+    @Expression("builder(translatable('selectServer.edit'), ?)")
+    @ModifyArg(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+    private Button.OnPress organizableplayscreens_modifyEditButton(Button.OnPress editAction) {
+        return button -> {
+            editAction.onPress(button);
+            if (serverSelectionList.getSelected() instanceof AbstractMultiplayerEntry entry) {
+                minecraft.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_editEntry, entry));
+            }
+        };
     }
 
     /**
      * Modifies the 'delete' button to work with folders.
      */
-    @Inject(method = "method_19914", at = @At(value = "RETURN"))
-    private void organizableplayscreens_modifyDeleteButton(Button buttonWidget, CallbackInfo ci) {
-        if (serverSelectionList.getSelected() instanceof AbstractMultiplayerEntry entry) {
-            boolean isFolder = entry instanceof MultiplayerFolderEntry;
-            minecraft.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Component.translatable("organizableplayscreens:entry.deleteEntryQuestion", entry.getType().text().getString()), Component.translatable(isFolder ? "organizableplayscreens:folder.deleteMultiplayerFolderWarning" : "organizableplayscreens:entry.deleteEntryWarning", entry.getName()), Component.translatable("selectServer.deleteButton"), CommonComponents.GUI_CANCEL));
-        }
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/components/Button;builder(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;)Lnet/minecraft/client/gui/components/Button$Builder;")
+    @Definition(id = "translatable", method = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;")
+    @Expression("builder(translatable('selectServer.delete'), ?)")
+    @ModifyArg(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+    private Button.OnPress organizableplayscreens_modifyDeleteButton(Button.OnPress deleteAction) {
+        return button -> {
+            deleteAction.onPress(button);
+            if (serverSelectionList.getSelected() instanceof AbstractMultiplayerEntry entry) {
+                boolean isFolder = entry instanceof MultiplayerFolderEntry;
+                minecraft.setScreen(new ConfirmScreen(this::organizableplayscreens_deleteEntry, Component.translatable("organizableplayscreens:entry.deleteEntryQuestion", entry.getType().text().getString()), Component.translatable(isFolder ? "organizableplayscreens:folder.deleteMultiplayerFolderWarning" : "organizableplayscreens:entry.deleteEntryWarning", entry.getName()), Component.translatable("selectServer.deleteButton"), CommonComponents.GUI_CANCEL));
+            }
+        };
     }
 
     /**
@@ -217,11 +231,14 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     /**
      * Modifies the 'cancel' button to set {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevent closing the screen.
      */
-    @Inject(method = "method_19912", at = @At(value = "HEAD"), cancellable = true)
-    private void organizableplayscreens_modifyCancelButton(Button buttonWidget, CallbackInfo ci) {
-        if (serverSelectionList.organizableplayscreens_setCurrentFolderToParent()) {
-            ci.cancel();
-        }
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/components/Button;builder(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;)Lnet/minecraft/client/gui/components/Button$Builder;")
+    @Definition(id = "GUI_BACK", field = "Lnet/minecraft/network/chat/CommonComponents;GUI_BACK:Lnet/minecraft/network/chat/Component;")
+    @Expression("builder(GUI_BACK, ?)")
+    @ModifyArg(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+    private Button.OnPress organizableplayscreens_modifyCancelButton(Button.OnPress cancelAction) {
+        return button -> {
+            if (!serverSelectionList.organizableplayscreens_setCurrentFolderToParent()) cancelAction.onPress(button);
+        };
     }
 
     /**

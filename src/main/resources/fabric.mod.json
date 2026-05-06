@@ -32,14 +32,14 @@
   "accessWidener": "organizableplayscreens.accesswidener",
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_528": ["com/kevinthegreat/organizableplayscreens/gui/WorldListWidgetAccessor"],
-      "net/minecraft/class_4267": ["com/kevinthegreat/organizableplayscreens/gui/MultiplayerServerListWidgetAccessor"]
+      "net/minecraft/client/gui/screens/worldselection/WorldSelectionList": ["com/kevinthegreat/organizableplayscreens/gui/WorldListWidgetAccessor"],
+      "net/minecraft/client/gui/screens/multiplayer/ServerSelectionList": ["com/kevinthegreat/organizableplayscreens/gui/MultiplayerServerListWidgetAccessor"]
     }
   },
 
   "depends": {
-    "fabricloader": ">=0.17",
-    "minecraft": ">=1.21.9",
-    "java": ">=21"
+    "fabricloader": ">=0.18",
+    "minecraft": ">=26.1",
+    "java": ">=25"
   }
 }

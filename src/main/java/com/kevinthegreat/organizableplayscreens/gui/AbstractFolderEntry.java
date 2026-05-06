@@ -1,6 +1,6 @@
 package com.kevinthegreat.organizableplayscreens.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Button;
@@ -42,7 +42,7 @@ public interface AbstractFolderEntry<T extends ObjectSelectionList<E>, E extends
     }
 
     @Override
-    default void render(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+    default void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
         AbstractEntry.renderFolderEntry(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize, getIcons(), getButtonMoveInto());
     }
 }

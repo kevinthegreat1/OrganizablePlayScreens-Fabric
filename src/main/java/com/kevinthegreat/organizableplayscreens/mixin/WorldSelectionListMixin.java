@@ -222,7 +222,7 @@ public abstract class WorldSelectionListMixin extends ObjectSelectionList<WorldS
             String type = nbtEntry.getStringOr("type", "");
             switch (type) {
                 case "minecraft:world" -> {
-                    int index = Collections.binarySearch(levels, new LevelSummary(null, LevelVersionInvoker.create(0, nbtEntry.getLongOr("lastPlayed", 0), null, 0, null, false), nbtEntry.getStringOr("name", ""), false, false, false, null));
+                    int index = Collections.binarySearch(levels, new LevelSummary(null, LevelVersionInvoker.create(0, nbtEntry.getLongOr("lastPlayed", 0), null, 0, null, false), nbtEntry.getStringOr("name", ""), false, false, false, false, null));
                     if (index >= 0) {
                         WorldSelectionList.WorldListEntry worldEntry = ((WorldSelectionList) (Object) this).new WorldListEntry((WorldSelectionList) (Object) this, levels.get(index));
                         organizableplayscreens_worlds.put(worldEntry, folder);

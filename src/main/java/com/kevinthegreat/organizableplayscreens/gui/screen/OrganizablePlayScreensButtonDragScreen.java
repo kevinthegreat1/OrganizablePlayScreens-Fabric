@@ -6,7 +6,7 @@ import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOpt
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
@@ -59,13 +59,12 @@ public class OrganizablePlayScreensButtonDragScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-        assert minecraft != null;
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks) {
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE, 0, layout.getHeaderHeight(), width, height - layout.getFooterHeight(), width, height - layout.getHeaderHeight() - layout.getFooterHeight(), 32, 32);
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR, 0, layout.getHeaderHeight() - 2, 0, 0, width, 2, 32, 2);
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, 0, height - layout.getFooterHeight(), 0, 0, width, 2, 32, 2);
 
-        super.render(context, mouseX, mouseY, deltaTicks);
+        super.extractRenderState(context, mouseX, mouseY, deltaTicks);
     }
 
     @Override

@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerEntryMixin {
     @Shadow
     @Final
-    ServerSelectionList field_19117;
+    ServerSelectionList this$0;
 
     /**
      * Gets the size of our entry list instead of the vanilla one.
      */
-    @Redirect(method = {"renderContent", "keyPressed", "mouseClicked"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ServerList;size()I"))
+    @Redirect(method = {"extractContent", "keyPressed", "mouseClicked"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ServerList;size()I"))
     private int organizableplayscreens_size(ServerList instance) {
-        return field_19117.organizableplayscreens_getCurrentEntries().size();
+        return this$0.organizableplayscreens_getCurrentEntries().size();
     }
 
     /**
@@ -29,7 +29,7 @@ public abstract class ServerEntryMixin {
      */
     @Inject(method = "swap", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_swapEntries(int i, int j, CallbackInfo ci) {
-        field_19117.organizableplayscreens_swapEntries(i, j);
+        this$0.organizableplayscreens_swapEntries(i, j);
         ci.cancel();
     }
 }

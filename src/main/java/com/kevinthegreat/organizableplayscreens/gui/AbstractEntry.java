@@ -5,7 +5,7 @@ import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -73,7 +73,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
     default void updateButtonStates(E entry) {
     }
 
-    void render(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
+    void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize);
 
     /**
      * Renders a folder entry with the given parameters.
@@ -82,7 +82,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
      * @param listSize       The size of the entry list that the folder is in.
      * @param buttonMoveInto The button to move the selected entry into the folder.
      */
-    static void renderFolderEntry(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, List<Identifier> icons, Button buttonMoveInto) {
+    static void renderFolderEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize, List<Identifier> icons, Button buttonMoveInto) {
         switch (icons.size()) {
             case 0 -> {}
             case 1 -> context.blit(RenderPipelines.GUI_TEXTURED, icons.getFirst(), x + 8, y + 8, 0, 0, 16, 16, 32, 32, 32, 32);
@@ -103,29 +103,29 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
             }
         }
 
-        context.drawString(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
-        context.drawString(client.font, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0xFF808080);
+        context.text(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
+        context.text(client.font, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.get());
-        buttonMoveInto.render(context, mouseX, mouseY, tickDelta);
+        buttonMoveInto.extractRenderState(context, mouseX, mouseY, tickDelta);
     }
 
     /**
      * Renders a section entry with the given parameters.
      */
-    static void renderSectionEntry(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
-        context.drawString(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
-        context.drawString(client.font, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0xFF808080);
+    static void renderSectionEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+        context.text(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
+        context.text(client.font, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
     }
 
     /**
      * Renders a separator entry with the given parameters.
      */
-    static void renderSeparatorEntry(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
-        context.drawString(client.font, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFFFF);
-        context.drawString(client.font, name, x + 32 + 3, y + 23, 0xFF808080);
+    static void renderSeparatorEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+        context.text(client.font, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFFFF);
+        context.text(client.font, name, x + 32 + 3, y + 23, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
     }
 
@@ -134,7 +134,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
      *
      * @param renderOpenButton whether to render the open entry button.
      */
-    static void renderEntry(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, int listSize, boolean renderOpenButton) {
+    static void renderEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, int listSize, boolean renderOpenButton) {
         if (client.options.touchscreen().get() || hovered) {
             context.fill(x, y, x + 32, y + 32, 0xa0909090);
             int o = mouseX - x;

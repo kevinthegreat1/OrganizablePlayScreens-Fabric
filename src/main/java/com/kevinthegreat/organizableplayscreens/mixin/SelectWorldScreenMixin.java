@@ -12,14 +12,14 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.terraformersmc.modmenu.gui.widget.LegacyTexturedButtonWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -46,13 +46,13 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Shadow
     private WorldSelectionList list;
     @Shadow
-    private Button selectButton;
+    private Button playWorldButton;
     @Shadow
-    private Button copyButton;
+    private Button recreateButton;
     @Shadow
     protected EditBox searchBox;
     @Shadow
-    private Button renameButton;
+    private Button editButton;
     @Shadow
     private Button deleteButton;
 
@@ -168,12 +168,16 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Modifies the 'select' button to be able to open folders.
      */
-    @Inject(method = "method_74220", at = @At("HEAD"), cancellable = true)
-    private static void organizableplayscreens_modifySelectButton(CallbackInfo ci, @Local(argsOnly = true) WorldSelectionList levelList) {
-        if (levelList.getSelected() instanceof SingleplayerFolderEntry folderEntry) {
-            levelList.organizableplayscreens_setCurrentFolder(folderEntry);
-            ci.cancel();
-        }
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/components/Button;builder(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;)Lnet/minecraft/client/gui/components/Button$Builder;")
+    @Definition(id = "PLAY_WORLD", field = "Lnet/minecraft/world/level/storage/LevelSummary;PLAY_WORLD:Lnet/minecraft/network/chat/Component;")
+    @Expression("builder(PLAY_WORLD, ?)")
+    @ModifyArg(method = "createFooterButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private Button.OnPress organizableplayscreens_modifySelectButton(Button.OnPress selectAction) {
+        return button -> {
+            if (list.getSelected() instanceof SingleplayerFolderEntry folderEntry) {
+                list.organizableplayscreens_setCurrentFolder(folderEntry);
+            } else selectAction.onPress(button);
+        };
     }
 
     /**
@@ -218,11 +222,14 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Modifies the 'cancel' button to set {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevent closing the screen.
      */
-    @Inject(method = "method_74222", at = @At("HEAD"), cancellable = true)
-    private void organizableplayscreens_modifyCancelButton(CallbackInfo ci) {
-        if (list.organizableplayscreens_setCurrentFolderToParent()) {
-            ci.cancel();
-        }
+    @Definition(id = "builder", method = "Lnet/minecraft/client/gui/components/Button;builder(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;)Lnet/minecraft/client/gui/components/Button$Builder;")
+    @Definition(id = "GUI_BACK", field = "Lnet/minecraft/network/chat/CommonComponents;GUI_BACK:Lnet/minecraft/network/chat/Component;")
+    @Expression("builder(GUI_BACK, ?)")
+    @ModifyArg(method = "createFooterButtons", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private Button.OnPress organizableplayscreens_modifyCancelButton(Button.OnPress cancelAction) {
+        return button -> {
+            if (!list.organizableplayscreens_setCurrentFolderToParent()) cancelAction.onPress(button);
+        };
     }
 
     /**
@@ -289,9 +296,9 @@ public abstract class SelectWorldScreenMixin extends Screen {
     private void organizableplayscreens_updateButtonStates(LevelSummary levelSummary, CallbackInfo ci) {
         WorldSelectionList.Entry selectedEntry = list.getSelected();
         if (selectedEntry instanceof WorldSelectionList.WorldListEntry) {
-            selectButton.setMessage(Component.translatable("selectWorld.select"));
+            playWorldButton.setMessage(Component.translatable("selectWorld.select"));
         } else if (selectedEntry instanceof AbstractEntry<?, ?> abstractEntry) {
-            abstractEntry.updateScreenButtonStates(selectButton, renameButton, deleteButton, copyButton);
+            abstractEntry.updateScreenButtonStates(playWorldButton, editButton, deleteButton, recreateButton);
         }
         boolean notSearching = searchBox.getValue().isEmpty();
         organizableplayscreens_buttonBack.active = notSearching;

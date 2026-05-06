@@ -182,7 +182,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     private void clickScreenButton(ClientGameTestContext context, String text) {
         context.runOnClient(client -> Optional.ofNullable(client.screen)
                 .map(ScreenAccessor.class::cast)
-                .map(ScreenAccessor::getDrawables)
+                .map(ScreenAccessor::getRenderables)
                 .orElse(List.of())
                 .stream()
                 .filter(AbstractWidget.class::isInstance)
@@ -221,7 +221,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     private ObjectSelectionList<?> getListWidget(Minecraft client) {
         return Optional.ofNullable(client.screen)
                 .map(ScreenAccessor.class::cast)
-                .map(ScreenAccessor::getDrawables)
+                .map(ScreenAccessor::getRenderables)
                 .orElse(List.of())
                 .stream()
                 .filter(ObjectSelectionList.class::isInstance)

@@ -3,7 +3,7 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -177,10 +177,10 @@ public abstract class AbstractEditEntryScreen<T extends ObjectSelectionList<E>, 
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(font, typeTitle, width / 2, 20, 0xFFFFFFFF);
-        context.drawString(font, typeEnterName, width / 2 - 100, 80, 0xFFA0A0A0);
-        nameField.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        context.centeredText(font, typeTitle, width / 2, 20, 0xFFFFFFFF);
+        context.text(font, typeEnterName, width / 2 - 100, 80, 0xFFA0A0A0);
+        nameField.extractRenderState(context, mouseX, mouseY, delta);
     }
 }

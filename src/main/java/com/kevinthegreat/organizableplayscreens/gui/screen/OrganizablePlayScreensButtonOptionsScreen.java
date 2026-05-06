@@ -5,7 +5,7 @@ import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.option.OrganizablePlayScreensOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.client.gui.components.Button;
@@ -116,7 +116,7 @@ public class OrganizablePlayScreensButtonOptionsScreen extends OptionsSubScreen 
     /**
      * Renders the screen.
      * Draws the title and option titles. Then, draws the {@code 'X:'} and {@code 'Y:'} text if text fields are being used.
-     * Finally, draws the buttons with {@link Screen#render(GuiGraphics, int, int, float) super.render(MatrixStack, int, int, float)}.
+     * Finally, draws the buttons with {@link Screen#extractRenderState(GuiGraphicsExtractor, int, int, float) super.render(MatrixStack, int, int, float)}.
      *
      * @param context the draw context
      * @param mouseX  the x position of the mouse
@@ -124,25 +124,24 @@ public class OrganizablePlayScreensButtonOptionsScreen extends OptionsSubScreen 
      * @param delta   the time between ticks
      */
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        assert minecraft != null;
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE, 0, layout.getHeaderHeight(), width, height - layout.getFooterHeight(), width, height - layout.getHeaderHeight() - layout.getFooterHeight(), 32, 32);
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR, 0, layout.getHeaderHeight() - 2, 0, 0, width, 2, 32, 2);
         context.blit(RenderPipelines.GUI_TEXTURED, minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, 0, height - layout.getFooterHeight(), 0, 0, width, 2, 32, 2);
 
-        super.render(context, mouseX, mouseY, delta);
+        super.extractRenderState(context, mouseX, mouseY, delta);
         int i = 0;
         for (String key : OrganizablePlayScreensOptions.KEYS) {
-            context.drawCenteredString(font, Component.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFFFF);
+            context.centeredText(font, Component.translatable(key), width / 2, MARGIN_TOP - 10 + i, 0xFFFFFFFF);
             i += ROW_HEIGHT;
         }
         if (modOptions.buttonType.get()) {
             for (i = 0; i < 5; i++) {
                 int y = MARGIN_TOP + i * ROW_HEIGHT;
                 int x = width / 2 - 155;
-                context.drawString(font, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
+                context.text(font, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
                 x = width / 2 - 155 + 135;
-                context.drawString(font, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
+                context.text(font, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
             }
         }
     }

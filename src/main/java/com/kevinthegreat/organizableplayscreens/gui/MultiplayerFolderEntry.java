@@ -7,7 +7,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerSc
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.ServerSelectionListAccessor;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.gui.screens.FaviconTexture;
@@ -94,7 +94,7 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     }
 
     @Override
-    public void render(GuiGraphics context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
+    public void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
         AbstractFolderEntry.super.render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize);
 
         // Ping servers inside folders similar to MultiplayerServerListWidget.ServerEntry#render

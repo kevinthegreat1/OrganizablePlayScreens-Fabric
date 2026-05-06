@@ -4,6 +4,7 @@ import com.kevinthegreat.organizableplayscreens.mixin.accessor.OptionInstanceAcc
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.OptionInstance;
+import net.minecraft.client.input.CharacterEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <N> the type of number for the option
  */
-@SuppressWarnings("JavadocReference")
 public abstract class OptionTextFieldWidgetImpl<N extends Number> extends EditBox {
     protected final OptionInstance<N> option;
     protected final OptionInstance.SliderableValueSet<N> callbacks;
@@ -22,7 +22,6 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends EditBo
         this.option = option;
         this.callbacks = callbacks;
         this.tooltipFactory = tooltipFactory;
-        setFilter(this::isValid);
         setResponder(string -> {
             if (string.isEmpty()) {
                 string = "0";
@@ -38,6 +37,11 @@ public abstract class OptionTextFieldWidgetImpl<N extends Number> extends EditBo
             setTooltip(tooltipFactory.apply(option.get()));
         });
         setValue(getDisplayValueString());
+    }
+
+    @Override
+    public boolean charTyped(CharacterEvent event) {
+        return isValid(event.codepointAsString()) && super.charTyped(event);
     }
 
     public abstract @NotNull String getDisplayValueString();

@@ -1,3 +1,6 @@
+## Folders! 1.3.1 for 26.1
+Support for 26.1
+
 ## Folders! 1.3.0 for 1.21.11
 Support for 1.21.11  
 Add world and server collages for folder icons  
