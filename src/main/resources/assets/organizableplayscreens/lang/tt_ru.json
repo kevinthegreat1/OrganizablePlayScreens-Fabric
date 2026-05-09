@@ -1,4 +1,6 @@
 {
+    "modmenu.summaryTranslation.organizableplayscreens": "Дөнья исемлеген һәм серверларны папкалар ярдәмендә оештырыгыз.",
+    "modmenu.descriptionTranslation.organizableplayscreens": "Аларны төрле папкалар буенча сортлап, Сезнең дөньяларда һәм серверларда тәртип урнаштырыгыз.",
     "organizableplayscreens:entry.edit": "%s үзгәртү",
     "organizableplayscreens:entry.enterName": "%s исеме",
     "organizableplayscreens:entry.new": "Яңа %s",
@@ -8,11 +10,14 @@
     "organizableplayscreens:entry.deleteEntryWarning": "«%s» бөтенләйгә бетәчәк! (Мәңгегә!)",
     "organizableplayscreens:folder.folder": "Папка",
     "organizableplayscreens:folder.openFolder": "Папканы ачу",
+    "organizableplayscreens:folder.entries": "%s файл",
     "organizableplayscreens:folder.moveBack": "Сайланган элементны элекке папкага кире күчерегез.",
     "organizableplayscreens:folder.moveInto": "Сайланган элементны бу папкага күчерегез.",
     "organizableplayscreens:folder.deleteMultiplayerFolderWarning": "«%s» һәм аның барлык эчендәгесен бөтенләйгә бетәчәк! (Мәңгегә!)",
     "organizableplayscreens:folder.deleteSingleplayerFolderWarning": "«%s» бөтенләйгә бетәчәк! (Мәңгегә!)\nПапкалар һәм аларның эчендәге дөньяларны хәзерге папкага салачак.",
-    "organizableplayscreens:options.title": "Organizable Play Screens көйләүләре",
+    "organizableplayscreens:options.title": "Folders! көйләүләре",
+    "organizableplayscreens:options.buttonOptions": "Төймә көйләүләре",
+    "organizableplayscreens:options.buttonDrag": "Төймәләрне күчерү",
     "organizableplayscreens:options.x": "X",
     "organizableplayscreens:options.y": "Y",
     "organizableplayscreens:options.backButton": "Кайтару төймәсе",
@@ -22,8 +27,5 @@
     "organizableplayscreens:options.moveEntryIntoButton": "Элементны аңа күчерү төймәсе",
     "organizableplayscreens:options.buttonType": "Төймә төре",
     "organizableplayscreens:options.textField": "Текст кыры",
-    "organizableplayscreens:options.slider": "Шудыргыч",
-
-    "modmenu.summaryTranslation.organizableplayscreens": "Дөнья исемлеген һәм серверларны папкалар ярдәмендә оештырыгыз.",
-    "modmenu.descriptionTranslation.organizableplayscreens": "Аларны төрле папкалар буенча сортлап, Сезнең дөньяларда һәм серверларда тәртип урнаштырыгыз."
+    "organizableplayscreens:options.slider": "Шудыргыч"
 }
