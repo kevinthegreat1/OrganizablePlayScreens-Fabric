@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -104,7 +105,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
         }
 
         context.text(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
-        context.text(client.font, EntryType.FOLDER.text(), x + 32 + 3, y + 12, 0xFF808080);
+        context.text(client.font, Component.translatable("organizableplayscreens:folder.entries", icons.size()), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
         buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.get());

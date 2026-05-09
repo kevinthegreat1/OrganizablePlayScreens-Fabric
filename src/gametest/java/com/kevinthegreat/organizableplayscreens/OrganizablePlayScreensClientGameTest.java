@@ -26,8 +26,8 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     public void runTest(ClientGameTestContext context) {
         // Singleplayer
         // Create a new world and navigate to the select world screen
-        //noinspection EmptyTryBlock, unused
-        try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {}
+        //noinspection EmptyTryBlock
+        try (TestSingleplayerContext _ = context.worldBuilder().create()) {}
         context.waitForScreen(TitleScreen.class);
         context.clickScreenButton("menu.singleplayer");
         // Create a new folder and assert the select world screen root

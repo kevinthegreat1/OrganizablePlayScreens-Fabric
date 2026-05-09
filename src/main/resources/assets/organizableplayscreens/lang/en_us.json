@@ -8,6 +8,7 @@
     "organizableplayscreens:entry.deleteEntryWarning": "'%s' will be lost forever! (A long time!)",
     "organizableplayscreens:folder.folder": "Folder",
     "organizableplayscreens:folder.openFolder": "Open Folder",
+    "organizableplayscreens:folder.entries": "%s entries",
     "organizableplayscreens:folder.moveBack": "Move the selected entry back to the previous folder.",
     "organizableplayscreens:folder.moveInto": "Move the selected entry into this folder.",
     "organizableplayscreens:folder.deleteMultiplayerFolderWarning": "'%s' and all contents of the folder will be lost forever! (A long time!)",
