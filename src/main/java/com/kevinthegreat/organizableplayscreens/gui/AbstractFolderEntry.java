@@ -80,8 +80,10 @@ public interface AbstractFolderEntry<T extends ObjectSelectionList<E>, E extends
         renderIcon(context, x, y, 32, 32, mouseX, mouseY, hovered, tickDelta, name, 0);
         AbstractEntry.renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, true);
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.get());
-        buttonMoveInto.extractRenderState(context, mouseX, mouseY, tickDelta);
+        if (options.showMoveEntryIntoButton.get()) {
+            buttonMoveInto.setPosition(options.getValue(options.moveEntryIntoButtonX), y + options.moveEntryIntoButtonY.get());
+            buttonMoveInto.extractRenderState(context, mouseX, mouseY, tickDelta);
+        }
     }
 
     @Override

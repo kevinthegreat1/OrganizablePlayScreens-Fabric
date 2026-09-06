@@ -155,6 +155,7 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
                 minecraft.gui.setScreen(lastScreen);
             }
         }).bounds(options.backButtonX.get(), options.backButtonY.get(), 20, 20).build());
+        organizableplayscreens_buttonBack.visible = options.showBackButton.get();
         organizableplayscreens_buttonMoveEntryBack = addRenderableWidget(Button.builder(Component.nullToEmpty("←+"), _ -> {
             if (!serverListWidget.organizableplayscreens_isRootFolder()) {
                 ServerSelectionList.Entry entry = serverListWidget.getSelected();
@@ -169,10 +170,12 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
                 }
             }
         }).bounds(options.moveEntryBackButtonX.get(), options.moveEntryBackButtonY.get(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
+        organizableplayscreens_buttonMoveEntryBack.visible = options.showMoveEntryBackButton.get();
         organizableplayscreens_buttonNewEntry = addRenderableWidget(Button.builder(Component.nullToEmpty("+"), _ -> minecraft.gui.setScreen(new MultiplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
             MultiplayerFolderEntry folder = serverListWidget.organizableplayscreens_getCurrentFolder();
             return organizableplayscreens_newEntry = type.multiplayerEntry((JoinMultiplayerScreen) (Object) this, folder);
         }))).bounds(options.getValue(options.newFolderButtonX), options.newFolderButtonY.get(), 20, 20).build());
+        organizableplayscreens_buttonNewEntry.visible = options.showNewFolderButton.get();
         organizableplayscreens_buttonOptions = addRenderableWidget(SpriteIconButton.builder(Component.translatable("organizableplayscreens:options.optionsButton"), _ -> minecraft.gui.setScreen(new OrganizablePlayScreensOptionsScreen(this)), true)
                 .size(20, 20)
                 .sprite(new WidgetSprites(
@@ -183,6 +186,7 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
                 .build()
         );
         organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.get());
+        organizableplayscreens_buttonOptions.visible = options.showOptionsButton.get();
     }
 
     /**
@@ -191,10 +195,14 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     @Inject(method = "repositionElements", at = @At(value = "RETURN"))
     private void organizableplayscreens_refreshWidgetPositions(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
-        if (organizableplayscreens_buttonBack != null) organizableplayscreens_buttonBack.setPosition(options.backButtonX.get(), options.backButtonY.get());
-        if (organizableplayscreens_buttonMoveEntryBack != null) organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.get(), options.moveEntryBackButtonY.get());
-        if (organizableplayscreens_buttonNewEntry != null) organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.get());
-        if (organizableplayscreens_buttonOptions != null) organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.get());
+        organizableplayscreens_buttonBack.visible = options.showBackButton.get();
+        organizableplayscreens_buttonBack.setPosition(options.backButtonX.get(), options.backButtonY.get());
+        organizableplayscreens_buttonMoveEntryBack.visible = options.showMoveEntryBackButton.get();
+        organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.get(), options.moveEntryBackButtonY.get());
+        organizableplayscreens_buttonNewEntry.visible = options.showNewFolderButton.get();
+        organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.get());
+        organizableplayscreens_buttonOptions.visible = options.showOptionsButton.get();
+        organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.get());
     }
 
     /**

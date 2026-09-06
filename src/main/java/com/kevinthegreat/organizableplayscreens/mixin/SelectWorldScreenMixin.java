@@ -130,6 +130,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 minecraft.gui.setScreen(lastScreen);
             }
         }).bounds(options.backButtonX.get(), options.backButtonY.get(), 20, 20).build());
+        organizableplayscreens_buttonBack.visible = options.showBackButton.get();
         organizableplayscreens_buttonMoveEntryBack = addRenderableWidget(Button.builder(Component.nullToEmpty("←+"), _ -> {
             if (!list.organizableplayscreens_isRootFolder()) {
                 WorldSelectionList.Entry entry = list.getSelected();
@@ -148,10 +149,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 list.organizableplayscreens_updateAndSave();
             }
         }).bounds(options.moveEntryBackButtonX.get(), options.moveEntryBackButtonY.get(), 20, 20).tooltip(OrganizablePlayScreens.MOVE_ENTRY_BACK_TOOLTIP).build());
+        organizableplayscreens_buttonMoveEntryBack.visible = options.showMoveEntryBackButton.get();
         organizableplayscreens_buttonNewEntry = addRenderableWidget(Button.builder(Component.nullToEmpty("+"), _ -> minecraft.gui.setScreen(new SingleplayerEditEntryScreen(this, this::organizableplayscreens_addEntry, type -> {
             SingleplayerFolderEntry folder = list.organizableplayscreens_getCurrentFolder();
             return organizableplayscreens_newEntry = type.singleplayerEntry((SelectWorldScreen) (Object) this, folder);
         }))).bounds(options.getValue(options.newFolderButtonX), options.newFolderButtonY.get(), 20, 20).build());
+        organizableplayscreens_buttonNewEntry.visible = options.showNewFolderButton.get();
         organizableplayscreens_buttonOptions = addRenderableWidget(SpriteIconButton.builder(Component.translatable("organizableplayscreens:options.optionsButton"), _ -> minecraft.gui.setScreen(new OrganizablePlayScreensOptionsScreen(this)), true)
                 .size(20, 20)
                 .sprite(new WidgetSprites(
@@ -162,6 +165,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 .build()
         );
         organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.get());
+        organizableplayscreens_buttonOptions.visible = options.showOptionsButton.get();
     }
 
     /**
@@ -170,9 +174,13 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Inject(method = "repositionElements", at = @At("RETURN"))
     private void organizableplayscreens_refreshWidgetPositions(CallbackInfo ci) {
         OrganizablePlayScreensOptions options = OrganizablePlayScreens.getInstance().options;
+        organizableplayscreens_buttonBack.visible = options.showBackButton.get();
         organizableplayscreens_buttonBack.setPosition(options.backButtonX.get(), options.backButtonY.get());
+        organizableplayscreens_buttonMoveEntryBack.visible = options.showMoveEntryBackButton.get();
         organizableplayscreens_buttonMoveEntryBack.setPosition(options.moveEntryBackButtonX.get(), options.moveEntryBackButtonY.get());
+        organizableplayscreens_buttonNewEntry.visible = options.showNewFolderButton.get();
         organizableplayscreens_buttonNewEntry.setPosition(options.getValue(options.newFolderButtonX), options.newFolderButtonY.get());
+        organizableplayscreens_buttonOptions.visible = options.showOptionsButton.get();
         organizableplayscreens_buttonOptions.setPosition(options.getValue(options.optionsButtonX), options.optionsButtonY.get());
     }
 

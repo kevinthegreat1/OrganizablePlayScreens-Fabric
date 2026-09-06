@@ -35,5 +35,7 @@
     "organizableplayscreens:options.moveEntryIntoButton": "Move Entry Into Button",
     "organizableplayscreens:options.buttonType": "Button Type",
     "organizableplayscreens:options.textField": "Text Field",
-    "organizableplayscreens:options.slider": "Slider"
+    "organizableplayscreens:options.slider": "Slider",
+    "organizableplayscreens:options.shown": "Shown",
+    "organizableplayscreens:options.hidden": "Hidden"
 }
