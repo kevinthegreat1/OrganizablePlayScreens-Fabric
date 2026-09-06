@@ -123,11 +123,7 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
             return;
         }
 
-        LinearLayout headerLayout = layout.addToHeader(LinearLayout.vertical().spacing(4));
-        headerLayout.defaultCellSetting().alignHorizontallyCenter();
-        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new StringWidget(Component.empty(), font);
-        headerLayout.addChild(organizableplayscreens_pathWidget);
-        headerLayout.addChild(new StringWidget(component, font));
+        organizableplayscreens_pathWidget = layout.addToHeader(new StringWidget(component, font));
     }
 
     /**

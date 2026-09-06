@@ -12,9 +12,8 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
@@ -106,10 +105,9 @@ public abstract class SelectWorldScreenMixin extends Screen {
      *
      * @see #organizableplayscreens_pathWidget pathWidget
      */
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;", ordinal = 0))
-    private void organizableplayscreens_modifyHeader(CallbackInfo ci, @Local(name = "header") LinearLayout header) {
-        if (organizableplayscreens_pathWidget == null) organizableplayscreens_pathWidget = new StringWidget(Component.empty(), font);
-        header.addChild(organizableplayscreens_pathWidget);
+    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;", ordinal = 0))
+    private LayoutElement organizableplayscreens_modifyHeader(LayoutElement titleWidget) {
+        return organizableplayscreens_pathWidget = (StringWidget) titleWidget;
     }
 
     /**

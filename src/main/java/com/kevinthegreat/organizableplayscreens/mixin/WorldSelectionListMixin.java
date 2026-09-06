@@ -7,6 +7,7 @@ import com.kevinthegreat.organizableplayscreens.gui.SingleplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.WorldListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.LevelVersionInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
@@ -18,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -406,13 +408,7 @@ public abstract class WorldSelectionListMixin extends ObjectSelectionList<WorldS
      */
     @Unique
     public void organizableplayscreens_updateCurrentPath(String search) {
-        // Update the path widget to search results if searching
-        if (!search.isEmpty()) {
-            organizableplayscreens_pathWidget.setMessage(Component.translatable("debug.options.search").withColor(0xFFA0A0A0));
-            ((SelectWorldScreenAccessor) screen).invokeRepositionElements();
-            return;
-        }
-        // Update the path widget to the full path if not searching
+        // Always update the path widget to the full path, the path is still relevant when searching, and the user already knows they are searching, no need for a message
         List<String> path = new ArrayList<>();
         SingleplayerFolderEntry folder = organizableplayscreens_currentFolder;
         while (folder.getParent() != null) {
@@ -420,7 +416,12 @@ public abstract class WorldSelectionListMixin extends ObjectSelectionList<WorldS
             folder = folder.getParent();
         }
         Collections.reverse(path);
-        organizableplayscreens_pathWidget.setMessage(Component.literal(String.join(" > ", path)).withColor(0xFFA0A0A0));
+        MutableComponent title = Component.translatable("selectWorld.title");
+        if (!path.isEmpty()) {
+            title.append(Component.literal("  |  ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(String.join(" > ", path)).withStyle(ChatFormatting.GRAY));
+        }
+        organizableplayscreens_pathWidget.setMessage(title);
         ((SelectWorldScreenAccessor) screen).invokeRepositionElements();
     }
 
