@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.SelectableEntry;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * An abstract entry with a name and type.
  */
-public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends ObjectSelectionList.Entry<E>> extends EntryWithIcon, Mutable<String> {
+public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends ObjectSelectionList.Entry<E>> extends EntryWithIcon, Mutable<String>, SelectableEntry {
     Minecraft client = Minecraft.getInstance();
     Identifier JOIN_TEXTURE = Identifier.parse("server_list/join");
     Identifier JOIN_HIGHLIGHTED_TEXTURE = Identifier.parse("server_list/join_highlighted");
@@ -78,7 +79,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
     /**
      * Renders a section entry with the given parameters.
      */
-    static void renderSectionEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+    default void renderSectionEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
         context.text(client.font, name, x + 32 + 3, y + 1, 0xFFFFFFFF);
         context.text(client.font, EntryType.SECTION.text(), x + 32 + 3, y + 12, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
@@ -87,7 +88,7 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
     /**
      * Renders a separator entry with the given parameters.
      */
-    static void renderSeparatorEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
+    default void renderSeparatorEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, String name, int listSize) {
         context.text(client.font, "--------------------------------------", x + 32 + 3, y + 12, 0xFFFFFFFF);
         context.text(client.font, name, x + 32 + 3, y + 23, 0xFF808080);
         renderEntry(context, index, y, x, mouseX, mouseY, hovered, listSize, false);
@@ -97,28 +98,29 @@ public interface AbstractEntry<T extends ObjectSelectionList<E>, E extends Objec
      * Renders the move entry and open entry buttons.
      *
      * @param renderOpenButton whether to render the open entry button.
+     * @see net.minecraft.client.gui.screens.multiplayer.ServerSelectionList.OnlineServerEntry#extractContent(GuiGraphicsExtractor, int, int, boolean, float)
      */
-    static void renderEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, int listSize, boolean renderOpenButton) {
+    default void renderEntry(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, int listSize, boolean renderOpenButton) {
         if (hovered) {
             context.fill(x, y, x + 32, y + 32, 0xa0909090);
-            int o = mouseX - x;
-            int p = mouseY - y;
+            int relX = mouseX - x;
+            int relY = mouseY - y;
             if (renderOpenButton) {
-                if (o < 32 && o > 16) {
+                if (mouseOverRightHalf(relX, relY, 32)) {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, JOIN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, JOIN_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index > 0) {
-                if (o < 16 && p < 16) {
+                if (mouseOverTopLeftQuarter(relX, relY, 32)) {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, MOVE_UP_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, MOVE_UP_TEXTURE, x, y, 32, 32);
                 }
             }
             if (index < listSize - 1) {
-                if (o < 16 && p > 16) {
+                if (mouseOverBottomLeftQuarter(relX, relY, 32)) {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, MOVE_DOWN_HIGHLIGHTED_TEXTURE, x, y, 32, 32);
                 } else {
                     context.blitSprite(RenderPipelines.GUI_TEXTURED, MOVE_DOWN_TEXTURE, x, y, 32, 32);

@@ -83,11 +83,12 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
         serverListWidget.organizableplayscreens_setCurrentFolder(this);
     }
 
+    /// @see ServerSelectionList.OnlineServerEntry#extractContent(GuiGraphicsExtractor, int, int, boolean, float)
     @Override
     public void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
         AbstractFolderEntry.super.render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize);
 
-        // Ping servers inside folders similar to MultiplayerServerListWidget.ServerEntry#render
+        // Ping servers inside folders similar to ServerSelectionList.OnlineServerEntry#extractContent
         for (ServerSelectionList.Entry entry : entries) {
             if (!(entry instanceof ServerSelectionList.OnlineServerEntry serverEntry)) continue;
             ServerData server = serverEntry.getServerData();
@@ -114,10 +115,10 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
                 });
             }
 
-            byte[] bs = server.getIconBytes();
-            if (!Arrays.equals(bs, ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).getLastIconBytes())) {
-                if (((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).invokeUploadServerIcon(bs)) {
-                    ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).setLastIconBytes(bs);
+            byte[] currentIconBytes = server.getIconBytes();
+            if (!Arrays.equals(currentIconBytes, ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).getLastIconBytes())) {
+                if (((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).invokeUploadServerIcon(currentIconBytes)) {
+                    ((ServerSelectionListMixin.ServerEntryAccessor) serverEntry).setLastIconBytes(currentIconBytes);
                 } else {
                     server.setIconBytes(null);
                     serverEntry.updateServerList();
