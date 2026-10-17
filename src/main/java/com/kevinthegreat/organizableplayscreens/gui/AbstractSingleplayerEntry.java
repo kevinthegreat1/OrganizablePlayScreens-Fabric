@@ -5,6 +5,7 @@ import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.FaviconTextureAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.FaviconTexture;
@@ -17,7 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
@@ -104,7 +104,7 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
     /**
      * Handles key presses for this folder.
      * <p>
-     * The folder is opened if the key is {@link GLFW#GLFW_KEY_ENTER}. Then, the folder is shifted down or up if {@link GLFW#GLFW_KEY_LEFT_SHIFT} and {@link GLFW#GLFW_KEY_DOWN} or {@link GLFW#GLFW_KEY_UP} are pressed, and it is valid to shift.
+     * The folder is opened if the key is {@link InputConstants#KEY_RETURN}. Then, the folder is shifted down or up if {@link InputConstants#KEY_LSHIFT} and {@link InputConstants#KEY_DOWN} or {@link InputConstants#KEY_UP} are pressed, and it is valid to shift.
      *
      * @return whether the key press has been consumed (prevents further processing or not)
      */
@@ -117,8 +117,8 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
             return true;
         } else if (input.hasShiftDown()) {
             int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
-            if (i != -1 && (input.key() == GLFW.GLFW_KEY_DOWN && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || input.key() == GLFW.GLFW_KEY_UP && i > 0)) {
-                swapEntries(i, input.key() == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
+            if (i != -1 && (input.key() == InputConstants.KEY_DOWN && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || input.key() == InputConstants.KEY_UP && i > 0)) {
+                swapEntries(i, input.key() == InputConstants.KEY_DOWN ? i + 1 : i - 1);
             }
             return true;
         }

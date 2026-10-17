@@ -112,16 +112,16 @@ publishMods {
 		projectSlug = "organizable-play-screens" // Required for discord webhook
 		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
 		minecraftVersionRange {
-			start = "26.2"
-			end = "26.2"
+			start = "26.3"
+			end = "26.3"
 		}
 	}
 	modrinth {
 		projectId = "zKrZtg3n"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersionRange {
-			start = "26.2"
-			end = "26.2"
+			start = "26.3"
+			end = "26.3"
 		}
 	}
 	github {

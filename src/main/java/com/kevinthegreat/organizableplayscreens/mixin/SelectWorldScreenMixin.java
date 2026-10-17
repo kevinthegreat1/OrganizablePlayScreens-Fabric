@@ -13,6 +13,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -24,7 +25,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -292,12 +292,12 @@ public abstract class SelectWorldScreenMixin extends Screen {
     /**
      * Handles escape key and the screen buttons.
      * <p>
-     * First, sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
+     * First, sets {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link InputConstants#KEY_ESCAPE} is pressed.
      * Then, calls {@link Screen#keyPressed(int, int, int)}.
      */
     @Override
     public boolean keyPressed(KeyEvent input) {
-        return input.key() == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && list.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(input);
+        return input.key() == InputConstants.KEY_ESCAPE && !shouldCloseOnEsc() && list.organizableplayscreens_setCurrentFolderToParent() || super.keyPressed(input);
     }
 
     /**
@@ -340,7 +340,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
     }
 
     /**
-     * Prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
+     * Prevents closing the screen if {@link InputConstants#KEY_ESCAPE} is pressed and {@link com.kevinthegreat.organizableplayscreens.mixin.WorldSelectionListMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
      *
      * @return whether the screen should close
      */

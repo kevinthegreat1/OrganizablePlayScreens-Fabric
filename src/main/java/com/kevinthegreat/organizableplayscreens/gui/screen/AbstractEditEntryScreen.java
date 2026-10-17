@@ -3,6 +3,7 @@ package com.kevinthegreat.organizableplayscreens.gui.screen;
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
 import com.kevinthegreat.organizableplayscreens.gui.AbstractEntry;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.gui.components.Button;
@@ -16,10 +17,12 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import org.jspecify.annotations.Nullable;
+import org.lwjgl.sdl.SDLDialog;
+import org.lwjgl.sdl.SDLError;
+import org.lwjgl.sdl.SDL_DialogFileCallback;
+import org.lwjgl.sdl.SDL_DialogFileFilter;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,6 +35,9 @@ import java.util.function.Function;
 
 public abstract class AbstractEditEntryScreen<T extends ObjectSelectionList<E>, E extends ObjectSelectionList.Entry<E>> extends Screen {
     private static final SystemToast.SystemToastId SELECT_ICON = new SystemToast.SystemToastId();
+    private static final SDL_DialogFileFilter.Buffer ICON_FILTERS = SDL_DialogFileFilter.calloc(1).name(MemoryUtil.memUTF8("PNG files")).pattern(MemoryUtil.memUTF8("png"));
+    private static final SDL_DialogFileCallback ICON_DIALOG_CALLBACK = SDL_DialogFileCallback.create(AbstractEditEntryScreen::onIconDialogResult);
+    private static @Nullable AbstractEditEntryScreen<?, ?> iconDialogScreen;
     private final Screen parent;
     /**
      * This is called when this screen should be closed.
@@ -138,14 +144,14 @@ public abstract class AbstractEditEntryScreen<T extends ObjectSelectionList<E>, 
     }
 
     /**
-     * Handles key presses for the screen. Saves and closes the screen if the done button is active, the name text field is not focused, and {@link GLFW#GLFW_KEY_ENTER} or {@link GLFW#GLFW_KEY_KP_ENTER} is pressed.
+     * Handles key presses for the screen. Saves and closes the screen if the done button is active, the name text field is not focused, and {@link InputConstants#KEY_RETURN} or {@link InputConstants#KEY_NUMPADENTER} is pressed.
      *
      * @return whether the key press has been consumed or not (prevents further processing or not)
      * @see #saveAndClose()
      */
     @Override
     public boolean keyPressed(@NonNull KeyEvent input) {
-        if (!buttonDone.active || getFocused() != nameField || input.key() != GLFW.GLFW_KEY_ENTER && input.key() != GLFW.GLFW_KEY_KP_ENTER) {
+        if (!buttonDone.active || getFocused() != nameField || input.key() != InputConstants.KEY_RETURN && input.key() != InputConstants.KEY_NUMPADENTER) {
             return super.keyPressed(input);
         } else {
             saveAndClose();
@@ -199,30 +205,43 @@ public abstract class AbstractEditEntryScreen<T extends ObjectSelectionList<E>, 
     }
 
     private void selectIcon(Button button) {
-        CompletableFuture.runAsync(() -> {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                PointerBuffer filters = stack.mallocPointer(1);
-                filters.put(stack.UTF8("*.png"));
-                filters.flip();
-                String file = TinyFileDialogs.tinyfd_openFileDialog("", "", filters, "PNG files", false);
+        iconDialogScreen = this;
+        SDLDialog.SDL_ShowOpenFileDialog(ICON_DIALOG_CALLBACK, MemoryUtil.NULL, minecraft.getWindow().handle(), ICON_FILTERS, (CharSequence) null, false);
+    }
 
-                if (file == null) {
-                    minecraft.execute(() -> minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectedNone"), Component.empty())));
-                    return;
-                }
+    private static void onIconDialogResult(long userdata, long filelist, int filter) {
+        AbstractEditEntryScreen<?, ?> screen = iconDialogScreen;
+        iconDialogScreen = null;
+        if (screen == null) return;
 
-                NativeImage image = resizeIconImage(NativeImage.read(Files.newInputStream(Path.of(file))));
-                minecraft.execute(() -> {
-                    entry.getCustomIconTexture().upload(image);
-                    iconChanged = true;
-                    updateDoneButton(nameField.getValue()); // Needed because the screen stays the same throughout the dialog
-                    minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectSuccess"), Component.empty()));
-                });
-            } catch (IOException e) {
-                OrganizablePlayScreens.LOGGER.error("Failed to read custom icon file for entry {}", entry, e);
-                minecraft.execute(() -> minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectFailed"), Component.empty())));
+        if (filelist == MemoryUtil.NULL) {
+            OrganizablePlayScreens.LOGGER.error("Failed to open custom icon file dialog: {}", SDLError.SDL_GetError());
+            screen.minecraft.execute(() -> screen.minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectFailed"), Component.empty())));
+            return;
+        }
+
+        String file = MemoryUtil.memUTF8Safe(MemoryUtil.memGetAddress(filelist));
+        CompletableFuture.runAsync(() -> screen.loadIcon(file));
+    }
+
+    private void loadIcon(@Nullable String file) {
+        try {
+            if (file == null) {
+                minecraft.execute(() -> minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectedNone"), Component.empty())));
+                return;
             }
-        });
+
+            NativeImage image = resizeIconImage(NativeImage.read(Files.newInputStream(Path.of(file))));
+            minecraft.execute(() -> {
+                entry.getCustomIconTexture().upload(image);
+                iconChanged = true;
+                updateDoneButton(nameField.getValue()); // Needed because the screen stays the same throughout the dialog
+                minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectSuccess"), Component.empty()));
+            });
+        } catch (IOException e) {
+            OrganizablePlayScreens.LOGGER.error("Failed to read custom icon file for entry {}", entry, e);
+            minecraft.execute(() -> minecraft.gui.toastManager().addToast(new SystemToast(SELECT_ICON, Component.translatable("organizableplayscreens:entry.icon.selectFailed"), Component.empty())));
+        }
     }
 
     private NativeImage resizeIconImage(NativeImage image) {

@@ -13,6 +13,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -30,7 +31,6 @@ import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,7 +52,7 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     @Shadow
     protected ServerSelectionList serverSelectionList;
     @Shadow
-    private Button selectButton;
+    private Button joinButton;
     @Shadow
     private Button editButton;
     @Shadow
@@ -333,11 +333,11 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed.
+     * Sets {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} to its parent if there is one and prevents closing the screen if {@link InputConstants#KEY_ESCAPE} is pressed.
      */
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void organizableplayscreens_keyPressed(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (event.key() == GLFW.GLFW_KEY_ESCAPE && !shouldCloseOnEsc() && serverSelectionList.organizableplayscreens_setCurrentFolderToParent() && !Compatibility.essential_preventMultiplayerFeatures()) {
+        if (event.key() == InputConstants.KEY_ESCAPE && !shouldCloseOnEsc() && serverSelectionList.organizableplayscreens_setCurrentFolderToParent() && !Compatibility.essential_preventMultiplayerFeatures()) {
             cir.setReturnValue(true);
         }
     }
@@ -352,9 +352,9 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
         }
         ServerSelectionList.Entry selectedEntry = serverSelectionList.getSelected();
         if (selectedEntry instanceof ServerSelectionList.OnlineServerEntry) {
-            selectButton.setMessage(Component.translatable("selectServer.select"));
+            joinButton.setMessage(Component.translatable("selectServer.select"));
         } else if (selectedEntry instanceof AbstractEntry<?, ?> abstractEntry) {
-            abstractEntry.updateScreenButtonStates(selectButton, editButton, deleteButton, null);
+            abstractEntry.updateScreenButtonStates(joinButton, editButton, deleteButton, null);
         }
         organizableplayscreens_buttonCancel.setMessage(serverSelectionList.organizableplayscreens_isRootFolder() ? CommonComponents.GUI_CANCEL : CommonComponents.GUI_BACK);
         organizableplayscreens_buttonMoveEntryBack.active = selectedEntry != null && !(selectedEntry instanceof ServerSelectionList.LANHeader) && !serverSelectionList.organizableplayscreens_isRootFolder();
@@ -377,7 +377,7 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     }
 
     /**
-     * Prevents closing the screen if {@link GLFW#GLFW_KEY_ESCAPE} is pressed and {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
+     * Prevents closing the screen if {@link InputConstants#KEY_ESCAPE} is pressed and {@link com.kevinthegreat.organizableplayscreens.mixin.ServerSelectionListMixin#organizableplayscreens_currentFolder currentFolder} is not the root folder
      *
      * @return whether the screen should close
      */
