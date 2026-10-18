@@ -41,6 +41,10 @@ jobs:
           distribution: 'microsoft'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
+      - name: Install Vulkan drivers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers
 
       - name: Run production client gametest
         run: ./gradlew runProductionClientGameTest
