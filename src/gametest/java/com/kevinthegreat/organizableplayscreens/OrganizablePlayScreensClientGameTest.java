@@ -1,8 +1,9 @@
 package com.kevinthegreat.organizableplayscreens;
 
 import com.kevinthegreat.organizableplayscreens.gui.*;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.Window;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
+import org.joml.Vector2d;
 
 import java.util.List;
 import java.util.Optional;
@@ -244,7 +246,7 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     }
 
     private void clickScreenButton(ClientGameTestContext context, String text) {
-        context.runOnClient(client -> Optional.ofNullable(client.gui.screen())
+        AbstractWidget widget = context.computeOnClient(client -> Optional.ofNullable(client.gui.screen())
                 .map(ScreenAccessor.class::cast)
                 .map(ScreenAccessor::getRenderables)
                 .orElse(List.of())
@@ -253,10 +255,12 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
                 .map(AbstractWidget.class::cast)
                 .filter(clickableWidget -> text.equals(clickableWidget.getMessage().getString()))
                 .findAny()
-                .ifPresentOrElse(clickableWidget -> clickableWidget.onClick(new MouseButtonEvent(clickableWidget.getX(), clickableWidget.getY(), new MouseButtonInfo(0, 0)), false), () -> {
-                    throw new AssertionError("Could not find button '%s' in screen '%s'".formatted(text, Optionull.map(client.gui.screen(), screen -> screen.getClass().getName())));
-                })
+                .orElseThrow(() -> new AssertionError("Could not find button '%s' in screen '%s'".formatted(text, Optionull.map(client.gui.screen(), screen -> screen.getClass().getName()))))
         );
+        // Move mouse
+        setCursorPos(context, widget.getX(), widget.getY());
+        // Click
+        context.runOnClient(_ -> widget.onClick(new MouseButtonEvent(widget.getX(), widget.getY(), new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false));
     }
 
     private <T extends ObjectSelectionList.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int xOffset) {
@@ -264,22 +268,31 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
     }
 
     private <T extends ObjectSelectionList.Entry<? super T>> void clickListWidgetEntry(ClientGameTestContext context, Class<T> entryClass, int ordinal, int xOffset) {
+        T entry = context.computeOnClient(client -> {
+            ObjectSelectionList<?> listWidget = getListWidget(client);
+            return getListWidgetEntry(listWidget, entryClass, ordinal);
+        });
+        int x = entry.getContentX() + xOffset;
+        int y = entry.getContentY();
+        // Move mouse
+        setCursorPos(context, x, y);
+        // Click
         context.runOnClient(client -> {
             ObjectSelectionList<?> listWidget = getListWidget(client);
-            T entry = getListWidgetEntry(listWidget, entryClass, ordinal);
-            int i = listWidget.children().indexOf(entry);
-            int x = listWidget.getRowLeft() + xOffset;
-            int y = ((AbstractSelectionListInvoker) listWidget).rowTop(i);
-            listWidget.mouseClicked(new MouseButtonEvent(x, y, new MouseButtonInfo(0, 0)), false);
+            listWidget.mouseClicked(new MouseButtonEvent(x, y, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
         });
     }
 
     private <T extends ObjectSelectionList.Entry<? super T> & AbstractFolderEntry<?, ? super T>> void clickFolderMoveInto(ClientGameTestContext context, Class<T> folderClass) {
-        context.runOnClient(client -> {
+        T folderEntry = context.computeOnClient(client -> {
             ObjectSelectionList<?> listWidget = getListWidget(client);
-            T folderEntry = getListWidgetEntry(listWidget, folderClass, 0);
-            folderEntry.getButtonMoveInto().onClick(new MouseButtonEvent(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseButtonInfo(0, 0)), false);
+            return getListWidgetEntry(listWidget, folderClass, 0);
         });
+
+        // Move mouse
+        setCursorPos(context, folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY());
+        // Click
+        context.runOnClient(_ -> folderEntry.getButtonMoveInto().onClick(new MouseButtonEvent(folderEntry.getButtonMoveInto().getX(), folderEntry.getButtonMoveInto().getY(), new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false));
     }
 
     private ObjectSelectionList<?> getListWidget(Minecraft client) {
@@ -301,5 +314,20 @@ public class OrganizablePlayScreensClientGameTest implements FabricClientGameTes
                 .skip(ordinal)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Could not find entry of type '%s' with ordinal '%s' in list widget '%s' with entries '%s'".formatted(entryClass.getName(), ordinal, listWidget.getClass().getName(), listWidget.children())));
+    }
+
+    private void setCursorPos(ClientGameTestContext context, int x, int y) {
+        var screenPos = getScreenPos(context, x, y);
+        context.getInput().setCursorPos(screenPos.x, screenPos.y);
+    }
+
+    private Vector2d getScreenPos(ClientGameTestContext context, int x, int y) {
+        return context.computeOnClient(client -> {
+            Window window = client.getWindow();
+            return new Vector2d(
+                    (double) x * window.getScreenWidth() / window.getGuiScaledWidth(),
+                    (double) y * window.getScreenHeight() / window.getGuiScaledHeight()
+            );
+        });
     }
 }
