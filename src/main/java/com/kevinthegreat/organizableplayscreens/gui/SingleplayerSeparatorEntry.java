@@ -18,6 +18,6 @@ public class SingleplayerSeparatorEntry extends AbstractSingleplayerEntry {
 
     @Override
     public void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        AbstractEntry.renderSeparatorEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
+        renderSeparatorEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
     }
 }

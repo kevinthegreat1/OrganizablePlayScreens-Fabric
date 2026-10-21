@@ -1,7 +1,7 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom' version '1.18-SNAPSHOT'
 	id 'maven-publish'
-	id 'me.modmuss50.mod-publish-plugin' version '1.1.0'
+	id 'me.modmuss50.mod-publish-plugin' version '2.2.1'
 }
 
 version = project.mod_version + '+' + project.minecraft_version
@@ -110,18 +110,20 @@ publishMods {
 	curseforge {
 		projectId = "687113"
 		projectSlug = "organizable-play-screens" // Required for discord webhook
+		client = true
+		server = false
 		accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
 		minecraftVersionRange {
-			start = "26.2"
-			end = "26.2"
+			start = "26.3"
+			end = "26.3"
 		}
 	}
 	modrinth {
 		projectId = "zKrZtg3n"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersionRange {
-			start = "26.2"
-			end = "26.2"
+			start = "26.3"
+			end = "26.3"
 		}
 	}
 	github {

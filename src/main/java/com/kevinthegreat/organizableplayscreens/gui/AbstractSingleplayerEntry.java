@@ -2,9 +2,9 @@ package com.kevinthegreat.organizableplayscreens.gui;
 
 import com.kevinthegreat.organizableplayscreens.OrganizablePlayScreens;
 import com.kevinthegreat.organizableplayscreens.api.EntryType;
-import com.kevinthegreat.organizableplayscreens.mixin.accessor.AbstractSelectionListInvoker;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.FaviconTextureAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.SelectWorldScreenAccessor;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.FaviconTexture;
@@ -17,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
@@ -104,9 +103,10 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
     /**
      * Handles key presses for this folder.
      * <p>
-     * The folder is opened if the key is {@link GLFW#GLFW_KEY_ENTER}. Then, the folder is shifted down or up if {@link GLFW#GLFW_KEY_LEFT_SHIFT} and {@link GLFW#GLFW_KEY_DOWN} or {@link GLFW#GLFW_KEY_UP} are pressed, and it is valid to shift.
+     * The folder is opened if the key is {@link InputConstants#KEY_RETURN}. Then, the folder is shifted down or up if {@link InputConstants#KEY_LSHIFT} and {@link InputConstants#KEY_DOWN} or {@link InputConstants#KEY_UP} are pressed, and it is valid to shift.
      *
      * @return whether the key press has been consumed (prevents further processing or not)
+     * @see WorldSelectionList.WorldListEntry#keyPressed(KeyEvent)
      */
     @Override
     public boolean keyPressed(KeyEvent input) {
@@ -115,10 +115,15 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
             levelList.setSelected(this);
             entrySelectionConfirmed(levelList);
             return true;
-        } else if (input.hasShiftDown()) {
+        }
+
+        if (input.hasShiftDown()) {
             int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
-            if (i != -1 && (input.key() == GLFW.GLFW_KEY_DOWN && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || input.key() == GLFW.GLFW_KEY_UP && i > 0)) {
-                swapEntries(i, input.key() == GLFW.GLFW_KEY_DOWN ? i + 1 : i - 1);
+            if (i == -1) {
+                return true;
+            }
+            if (input.isDown() && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 || input.isUp() && i > 0) {
+                swapEntries(i, input.isDown() ? i + 1 : i - 1);
             }
             return true;
         }
@@ -129,34 +134,34 @@ public abstract class AbstractSingleplayerEntry extends WorldSelectionList.Entry
      * Handles mouse clicks for this folder.
      * <p>
      * Checks for click on the open and swap buttons, and handles double-clicking.
+     *
+     * @see WorldSelectionList.WorldListEntry#mouseClicked(MouseButtonEvent, boolean)
      */
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         WorldSelectionList levelList = ((SelectWorldScreenAccessor) screen).getList();
+        int relX = (int) click.x() - getContentX();
+        int relY = (int) click.y() - getContentY();
+        if (mouseOverRightHalf(relX, relY, 32)) {
+            levelList.setSelected(this);
+            entrySelectionConfirmed(levelList);
+            return true;
+        }
         int i = levelList.organizableplayscreens_getCurrentNonWorldEntries().indexOf(this);
-        double d = click.x() - (double) levelList.getRowLeft();
-        double e = click.y() - (double) ((AbstractSelectionListInvoker) levelList).rowTop(i);
-        if (d <= 32) {
-            if (d < 32 && d > 16) {
-                levelList.setSelected(this);
-                entrySelectionConfirmed(levelList);
-                return true;
-            }
-            if (d < 16 && e < 16 && i > 0) {
-                swapEntries(i, i - 1);
-                return true;
-            }
-            if (d < 16 && e > 16 && i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1) {
-                swapEntries(i, i + 1);
-                return true;
-            }
+        if (i > 0 && mouseOverTopLeftQuarter(relX, relY, 32)) {
+            swapEntries(i, i - 1);
+            return true;
+        }
+        if (i < levelList.organizableplayscreens_getCurrentNonWorldEntries().size() - 1 && mouseOverBottomLeftQuarter(relX, relY, 32)) {
+            swapEntries(i, i + 1);
+            return true;
         }
 
         levelList.setSelected(this);
         if (doubled) {
             entrySelectionConfirmed(levelList);
         }
-        return false;
+        return super.mouseClicked(click, doubled);
     }
 
     /**

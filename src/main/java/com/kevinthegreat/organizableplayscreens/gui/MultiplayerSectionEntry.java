@@ -18,6 +18,6 @@ public class MultiplayerSectionEntry extends AbstractMultiplayerEntry {
 
     @Override
     public void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
-        AbstractEntry.renderSectionEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
+        renderSectionEntry(context, index, y, x, mouseX, mouseY, hovered, name, listSize);
     }
 }
