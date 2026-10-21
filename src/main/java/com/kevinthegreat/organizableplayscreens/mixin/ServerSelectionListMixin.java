@@ -7,6 +7,7 @@ import com.kevinthegreat.organizableplayscreens.gui.AbstractMultiplayerEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerFolderEntry;
 import com.kevinthegreat.organizableplayscreens.gui.MultiplayerServerListWidgetAccessor;
 import com.kevinthegreat.organizableplayscreens.mixin.accessor.JoinMultiplayerScreenAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
@@ -18,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -293,7 +295,12 @@ public abstract class ServerSelectionListMixin extends ObjectSelectionList<Serve
             folder = folder.getParent();
         }
         Collections.reverse(path);
-        organizableplayscreens_pathWidget.setMessage(Component.literal(String.join(" > ", path)).withColor(0xFFA0A0A0));
+        MutableComponent title = Component.translatable("multiplayer.title");
+        if (!path.isEmpty()) {
+            title.append(Component.literal("  |  ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(String.join(" > ", path)).withStyle(ChatFormatting.GRAY));
+        }
+        organizableplayscreens_pathWidget.setMessage(title);
         ((JoinMultiplayerScreenAccessor) screen).getLayout().arrangeElements(); // Only refresh the layout positions instead of calling MultiplayerScreen#refreshWidgetPositions to avoid activating other mixins to prevent NPEs as this can run before all buttons are initialized.
     }
 
