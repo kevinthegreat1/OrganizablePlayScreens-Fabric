@@ -68,17 +68,29 @@ public class OrganizablePlayScreensButtonOptionsScreen extends OptionsSubScreen 
         int i = 0;
         ImmutableList.Builder<Button> resetButtonsBuilder = ImmutableList.builderWithExpectedSize(5);
         for (List<Pair<String, OptionInstance<?>>> optionRow : modOptions.optionsArray) {
-            int j = 0;
             int y = MARGIN_TOP + i * ROW_HEIGHT;
+            OptionInstance<Boolean> showButtonOption = modOptions.showButtonOptions.get(i);
+            if (showButtonOption != null) {
+                Button toggleButton = Button.builder(
+                    Component.translatable(showButtonOption.get() ? "organizableplayscreens:options.shown" : "organizableplayscreens:options.hidden"),
+                    button -> {
+                        boolean next = !showButtonOption.get();
+                        showButtonOption.set(next);
+                        button.setMessage(Component.translatable(next ? "organizableplayscreens:options.shown" : "organizableplayscreens:options.hidden"));
+                    }
+                ).bounds(width / 2 - 180, y, 40, 20).build();
+                addRenderableWidget(toggleButton);
+            }
+            int j = 0;
             for (Pair<String, OptionInstance<?>> namedOption : optionRow) {
-                int x = width / 2 - 155 + j * 135;
+                int x = width / 2 - 130 + j * 135;
                 addRenderableWidget(namedOption.value().createButton(options, x, y, 125));
                 j++;
             }
             Button resetButton = Button.builder(Component.translatable("controls.reset"), _ -> {
                 OrganizablePlayScreensOptions.reset(optionRow);
                 Minecraft.getInstance().gui.setScreen(new OrganizablePlayScreensButtonOptionsScreen(lastScreen));
-            }).bounds(width / 2 - 155 + j * 135, y, 40, 20).build();
+            }).bounds(width / 2 + 140, y, 40, 20).build();
             resetButtonsBuilder.add(resetButton);
             addRenderableWidget(resetButton);
             if (i++ == 4) {
@@ -138,9 +150,9 @@ public class OrganizablePlayScreensButtonOptionsScreen extends OptionsSubScreen 
         if (modOptions.buttonType.get()) {
             for (i = 0; i < 5; i++) {
                 int y = MARGIN_TOP + i * ROW_HEIGHT;
-                int x = width / 2 - 155;
+                int x = width / 2 - 130;
                 context.text(font, X_COLON, x + 5, y + 6, 0xFFFFFFFF);
-                x = width / 2 - 155 + 135;
+                x = width / 2 - 130 + 135;
                 context.text(font, Y_COLON, x + 5, y + 6, 0xFFFFFFFF);
             }
         }
