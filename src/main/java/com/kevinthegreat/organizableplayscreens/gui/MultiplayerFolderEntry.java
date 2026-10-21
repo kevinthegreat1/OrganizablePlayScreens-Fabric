@@ -88,12 +88,21 @@ public class MultiplayerFolderEntry extends AbstractMultiplayerEntry implements 
     public void render(GuiGraphicsExtractor context, int index, int y, int x, int mouseX, int mouseY, boolean hovered, float tickDelta, String name, int listSize) {
         AbstractFolderEntry.super.render(context, index, y, x, mouseX, mouseY, hovered, tickDelta, name, listSize);
 
+        // Ping servers inside folders similar to MultiplayerServerListWidget.ServerEntry#render
+        // Only ping the first 4 servers to load their icon
+        // Skip pinging if the server icon already exists
+        int pingedOnlineServerEntries = 0;
         // Ping servers inside folders similar to ServerSelectionList.OnlineServerEntry#extractContent
         for (ServerSelectionList.Entry entry : entries) {
             if (!(entry instanceof ServerSelectionList.OnlineServerEntry serverEntry)) continue;
             ServerData server = serverEntry.getServerData();
+            pingedOnlineServerEntries++;
+            if (pingedOnlineServerEntries > 4) {
+                continue;
+            }
 
-            if (server.state() == ServerData.State.INITIAL) {
+            // Skip pinging if the server icon already exists
+            if (server.state() == ServerData.State.INITIAL && server.getIconBytes() == null) {
                 server.setState(ServerData.State.PINGING);
                 server.motd = CommonComponents.EMPTY;
                 server.status = CommonComponents.EMPTY;
